@@ -1,5 +1,7 @@
 # Decidr Application
 
+2023/11/25
+
 **How to run**:
 
 Navigate to server folder and run 'npm start'
