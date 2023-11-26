@@ -15,6 +15,7 @@ const Timer = () => {
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
 
+  //SOMETHING NEEDS TO HAPPEN IF IT HITS 0
   return (
     <div>
       <p>
