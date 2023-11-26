@@ -4,23 +4,7 @@ import { useState } from "react";
 import data from "../data";
 import View from "../UI/view";
 
-const VotingRow = ({ totalVotes, data }) => (
-  <>
-    <Row>
-      <Col>{data.nameOfPlace}</Col>
-      <Col>
-        {data.totalVotes} / {totalVotes}
-      </Col>
-      <Col>{data.currentVotes}</Col>
-      <Col>
-        <button>&#x2b;</button>
-      </Col>
-      <Col>
-        <button>&#45;</button>
-      </Col>
-    </Row>
-  </>
-);
+const Bubble = ({ data, weight }) => <div>{data.nameOfPlace}</div>;
 
 const View1 = () => {
   const totalVotes = 25; //do actual math later
@@ -28,7 +12,7 @@ const View1 = () => {
   return (
     <View>
       {data.map((info) => (
-        <VotingRow data={info} totalVotes={totalVotes} />
+        <Bubble data={info} totalVotes={totalVotes} />
       ))}
     </View>
   );
