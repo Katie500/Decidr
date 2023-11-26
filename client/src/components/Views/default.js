@@ -12,7 +12,7 @@ function Default() {
             <h1>Decidr</h1>
           </Row>
           <Row>
-            <h4>Enter a code for an existing sessio:</h4>
+            <h4>Enter a code for an existing session:</h4>
           </Row>
           <Row>
             <Col xs="auto">
