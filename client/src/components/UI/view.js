@@ -1,9 +1,8 @@
 import { Col, Container, Row } from "react-bootstrap";
-import Timer from "../UI/timer";
-import { Children, useState } from "react";
-import data from "../data";
+import Timer from "./timer";
+import { useState } from "react";
 
-const View = ({children}) => {
+const View = ({ children }) => {
   const maxVotesPerPerson = 5;
 
   const [votes, setVotes] = useState(maxVotesPerPerson); //total votes a user is allowed ; this value will increment/decrement
@@ -14,6 +13,9 @@ const View = ({children}) => {
 
   return (
     <Container>
+      <Row style={{ justifyContent: "center", textAlign: "center" }}>
+        <h2>Where should we eat?</h2>
+      </Row>
       <Row style={{ justifyContent: "flex-end", textAlign: "right" }}>
         <Col>
           <Timer />

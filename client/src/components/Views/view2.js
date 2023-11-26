@@ -2,7 +2,7 @@ import { Col, Container, Row } from "react-bootstrap";
 import Timer from "../UI/timer";
 import { useState } from "react";
 import data from "../data";
-import View from "./view";
+import View from "../UI/view";
 
 const VotingRow = ({ totalVotes, data }) => (
   <>
