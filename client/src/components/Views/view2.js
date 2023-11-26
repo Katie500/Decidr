@@ -57,10 +57,17 @@ const View2 = () => {
       {data.map((info) => (
         <VotingRow data={info} totalVotes={totalVotes} />
       ))}
-      <Row style={{ textAlign: "center", justifyContent: "center" }}>
+      <Row
+        style={{
+          textAlign: "center",
+          justifyContent: "center",
+          paddingTop: "50px",
+        }}
+      >
         <h3>
           You have {votesLeft}/{maxVotesPerPerson} votes left
         </h3>
+        <button>&#x2b;</button>
       </Row>
     </Container>
   );
