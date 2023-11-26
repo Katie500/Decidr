@@ -1,6 +1,7 @@
 import { Col, Container, Row } from "react-bootstrap";
 import Timer from "../UI/timer";
 import { useState } from "react";
+import data from "../data";
 
 const VotingRow = ({ totalVotes, data }) => (
   <>
@@ -19,24 +20,6 @@ const VotingRow = ({ totalVotes, data }) => (
     </Row>
   </>
 );
-
-const data = [
-  {
-    nameOfPlace: "Timmies",
-    totalVotes: 7,
-    currentVotes: 2,
-  },
-  {
-    nameOfPlace: "Pizza Hut",
-    totalVotes: 4,
-    currentVotes: 1,
-  },
-  {
-    nameOfPlace: `McDonald's`,
-    totalVotes: 1,
-    currentVotes: 1,
-  },
-];
 
 const View2 = () => {
   const maxVotesPerPerson = 5;
