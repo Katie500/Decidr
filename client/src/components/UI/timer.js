@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 const Timer = () => {
   const [time, setTime] = useState(300); // time in time
 
-  //decrements by 1 second every second
+  //if time !=0 then decrement time by 1 second every second
   useEffect(() => {
     const interval = setInterval(() => {
-      setTime((prevTime) => prevTime - 1);
+      setTime((prevTime) => (prevTime !== 0 ? prevTime - 1 : 0));
     }, 1000);
     return () => clearInterval(interval);
   }, []); // Empty dependency array to run the effect only once on mount
