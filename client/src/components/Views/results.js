@@ -8,7 +8,9 @@ const VotingRow = ({ data }) => (
       <Col>{data.nameOfPlace}:</Col>
       <Col>{data.totalVotes}</Col>
       <Col>
-        <IoInformationCircle />
+        <IoInformationCircle
+          onClick={() => alert("Add names + change this to a modal eventually")}
+        />
       </Col>
     </Row>
   </>
