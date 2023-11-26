@@ -1,0 +1,69 @@
+import { Col, Container, Row } from "react-bootstrap";
+import Timer from "../UI/timer";
+import { useState } from "react";
+
+const VotingRow = ({ totalVotes, data }) => (
+  <>
+    <Row>
+      <Col>{data.nameOfPlace}</Col>
+      <Col>
+        {data.totalVotes} / {totalVotes}
+      </Col>
+      <Col>{data.currentVotes}</Col>
+      <Col>
+        <button>&#x2b;</button>
+      </Col>
+      <Col>
+        <button>&#45;</button>
+      </Col>
+    </Row>
+  </>
+);
+
+const data = [
+  {
+    nameOfPlace: "Timmies",
+    totalVotes: 7,
+    currentVotes: 2,
+  },
+  {
+    nameOfPlace: "Pizza Hut",
+    totalVotes: 4,
+    currentVotes: 1,
+  },
+  {
+    nameOfPlace: `McDonald's`,
+    totalVotes: 1,
+    currentVotes: 1,
+  },
+];
+
+const View2 = () => {
+  const maxVotesPerPerson = 5;
+
+  const [votes, setVotes] = useState(maxVotesPerPerson); //total votes a user is allowed ; this value will increment/decrement
+
+  const votesLeft = 1; //actually do math here later
+
+  const totalVotes = 25; //do actual math later
+
+  return (
+    <Container>
+      <Row style={{ justifyContent: "flex-end", textAlign: "right" }}>
+        <Col>
+          <Timer />
+        </Col>
+      </Row>
+      {data.map((info) => (
+        <VotingRow data={info} totalVotes={totalVotes} />
+      ))}
+      <Row style={{ textAlign: "center", justifyContent: "center" }}>
+        <h3>
+          You have {votesLeft}/{maxVotesPerPerson} votes left
+        </h3>
+      </Row>
+    </Container>
+  );
+};
+
+export default View2;
