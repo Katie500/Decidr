@@ -23,12 +23,6 @@ const VotingRow = ({ totalVotes, data }) => (
 );
 
 const View2 = () => {
-  const maxVotesPerPerson = 5;
-
-  const [votes, setVotes] = useState(maxVotesPerPerson); //total votes a user is allowed ; this value will increment/decrement
-
-  const votesLeft = 1; //actually do math here later
-
   const totalVotes = 25; //do actual math later
 
   return (
