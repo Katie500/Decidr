@@ -10,9 +10,9 @@ const Test = () => (
   <div>
     {/* <View1 /> */}
     {/* <Results /> */}
-    <Nickname />
+    {/* <Nickname /> */}
     {/* <Default /> */}
-    {/* <StartNewSession /> */}
+    <StartNewSession />
   </div>
 );
 

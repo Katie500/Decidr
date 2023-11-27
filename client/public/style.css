@@ -1,6 +1,7 @@
 :root {
   --default-blue: rgba(30, 25, 233, 1);
   --default-green: rgba(45, 222, 30, 1);
+  --blue-1: rgba(64, 142, 209, 255);
 }
 
 html {
@@ -40,4 +41,13 @@ body {
 .centered {
   justify-content: center;
   text-align: center;
+}
+
+.pad-bottom {
+  padding-bottom: 15px;
+}
+
+.code {
+  color: var(--blue-1);
+  font-size: 200%;
 }

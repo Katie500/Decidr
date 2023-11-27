@@ -4,6 +4,7 @@ import Col from "react-bootstrap/Col";
 import { Container } from "react-bootstrap";
 import { useRef } from "react";
 import { FaRegCopy } from "react-icons/fa";
+import Header from "../UI/header";
 
 function StartNewSession() {
   const joinCode = useRef(null);
@@ -17,14 +18,14 @@ function StartNewSession() {
 
   return (
     <Container>
-      <Row>
-        <h1>Decidr</h1>
-      </Row>
+      <Header />
       <Row>
         <h4>Your Generated Code</h4>
       </Row>
-      <Row>
-        <span ref={joinCode}>X 1 2 A Y Z</span>{" "}
+      <Row className="pad-bottom centered">
+        <span ref={joinCode} className="code">
+          X 1 2 A Y Z
+        </span>{" "}
         <a>
           <FaRegCopy />
         </a>
@@ -33,54 +34,48 @@ function StartNewSession() {
         <Row>
           <h4>Enter your question</h4>
         </Row>
-        <Row>
+        <Row className="pad-bottom">
           <Col xs="auto">
-            <Row>
-              <Form.Control
-                type="text"
-                placeholder="Enter your question"
-                className=" mr-sm-2"
-              />
-            </Row>
+            <Form.Control
+              type="text"
+              placeholder="Enter your question"
+              className="mr-sm-2"
+            />
           </Col>
         </Row>
         <Row>
           <h4>Enter time:</h4>
         </Row>
-        <Row>
+        <Row className="pad-bottom">
           <Col xs="auto">
-            <Row>
-              <Form.Control
-                type="text"
-                placeholder="5:00 min(s)"
-                className=" mr-sm-2"
-              />
-            </Row>
+            <Form.Control
+              type="text"
+              placeholder="5:00 min(s)"
+              className=" mr-sm-2"
+            />
           </Col>
         </Row>
         <Row>
           <h4>Votes Per Person:</h4>
         </Row>
-        <Row>
+        <Row className="pad-bottom centered">
           <Col xs="auto">
-            <Row>
-              <Form.Group className="mr-sm-2">
-                <Form.Select>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                  <option>6</option>
-                  <option>7</option>
-                </Form.Select>
-              </Form.Group>
-            </Row>
+            <Form.Group className="mr-sm-2">
+              <Form.Select>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+              </Form.Select>
+            </Form.Group>
           </Col>
         </Row>
 
         <Row>
-          <button>Start your session</button>
+          <button className="default-button">Start your session</button>
         </Row>
       </Form>
     </Container>
