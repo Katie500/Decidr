@@ -8,7 +8,7 @@ function Default() {
     <>
       <Form inline style={{ textAlign: "center", justifyContent: "center" }}>
         <Container>
-          <Row>
+          <Row className="centered" style={{ paddingBottom: "50px" }}>
             <h1>Decidr</h1>
           </Row>
           <Row>
@@ -24,13 +24,30 @@ function Default() {
                 />
               </Row>
             </Col>
-            <Col xs="auto" style={{ alignItems: "center", display: "flex" }}>
-              <button type="submit">Verify</button>
+            <Col
+              xs="auto"
+              style={{ alignItems: "center", display: "flex" }}
+              className="short"
+            >
+              <button type="submit" className="default-button">
+                Verify
+              </button>
             </Col>
           </Row>
-          <Row>or</Row>
+          <Row
+            style={{
+              textAlign: "center",
+              width: "100%",
+              justifyContent: "center",
+              paddingTop: "5%",
+              paddingBottom: "5%",
+              fontWeight: "700",
+            }}
+          >
+            or
+          </Row>
           <Row>
-            <button>Start a new session</button>
+            <button className="alt-button">Start a new session</button>
           </Row>
         </Container>
       </Form>

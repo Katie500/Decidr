@@ -1,5 +1,6 @@
 :root {
   --default-blue: rgba(30, 25, 233, 1);
+  --default-green: rgba(45, 222, 30, 1);
 }
 
 html {
@@ -7,6 +8,7 @@ html {
 
 body {
   font-family: "Roboto-Regular", Helvetica;
+  padding: 2.5px;
 }
 
 .slightly-bigger-text {
@@ -17,7 +19,25 @@ body {
   background-color: var(--default-blue);
   border: 1px solid var(--default-blue);
   color: white;
-  width: 100%; /*Make responsive*/
+  width: 95%; /*Make responsive*/
   padding: 1.25%;
   border-radius: 25px;
+}
+
+.alt-button {
+  background-color: var(--default-green);
+  border: 1px solid var(--default-green);
+  color: white;
+  width: 95%; /*Make responsive*/
+  padding: 1.25%;
+  border-radius: 25px;
+}
+
+.short {
+  width: 30%;
+}
+
+.centered {
+  justify-content: center;
+  text-align: center;
 }

@@ -9,9 +9,9 @@ import View2 from "./components/Views/view2";
 const Test = () => (
   <div>
     {/* <View1 /> */}
-    <Results />
+    {/* <Results /> */}
     {/* <Nickname /> */}
-    {/* <Default /> */}
+    <Default />
     {/* <StartNewSession /> */}
   </div>
 );
