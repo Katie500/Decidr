@@ -1,56 +1,77 @@
- // client/src/components/Room.js
- import React, { useEffect, useState } from 'react';
- import { useParams } from 'react-router-dom';
- import socket from '../utils/socket';
- 
- const Room = () => {
-   const { roomName } = useParams();
-   const [messages, setMessages] = useState([]);
-   const [message, setMessage] = useState('');
- 
-   useEffect(() => {
-     socket.emit('new-user', roomName, 'YourName'); // Replace 'YourName' with the actual user's name
- 
-     socket.on('chat-message', (data) => {
-       setMessages((prevMessages) => [...prevMessages, `${data.name}: ${data.message}`]);
-     });
- 
-     socket.on('user-connected', (name) => {
-       setMessages((prevMessages) => [...prevMessages, `${name} connected`]);
-     });
- 
-     socket.on('user-disconnected', (name) => {
-       setMessages((prevMessages) => [...prevMessages, `${name} disconnected`]);
-     });
- 
-     return () => {
-       // Clean up event listeners on component unmount
-       socket.off('chat-message');
-       socket.off('user-connected');
-       socket.off('user-disconnected');
-     };
-   }, [roomName]);
- 
-   const sendMessage = (e) => {
-     e.preventDefault();
-     socket.emit('send-chat-message', roomName, message);
-     setMessages((prevMessages) => [...prevMessages, `You: ${message}`]);
-     setMessage('');
-   };
- 
-   return (
-     <div>
-       <div>
-         {messages.map((msg, index) => (
-           <div key={index}>{msg}</div>
-         ))}
-       </div>
-       <form onSubmit={sendMessage}>
-         <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
-         <button type="submit">Send</button>
-       </form>
-     </div>
-   );
- };
- 
- export default Room;
+import React, { useEffect, useState } from "react";
+import ScrollToBottom from "react-scroll-to-bottom";
+
+function Room({ socket, username, room }) {
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [messageList, setMessageList] = useState([]);
+
+  const sendMessage = async () => {
+    if (currentMessage !== "") {
+      const messageData = {
+        room: room,
+        author: username,
+        message: currentMessage,
+        time:
+          new Date(Date.now()).getHours() +
+          ":" +
+          new Date(Date.now()).getMinutes(),
+      };
+
+      await socket.emit("send_message", messageData);
+      setMessageList((list) => [...list, messageData]);
+      setCurrentMessage("");
+    }
+  };
+
+  useEffect(() => {
+    socket.on("receive_message", (data) => {
+      setMessageList((list) => [...list, data]);
+    });
+  }, [socket]);
+
+  return (
+    <div className="chat-window">
+      <div className="chat-header">
+      <p>Live Chat - Room Code: {room}</p>
+      </div>
+      <div className="chat-body">
+        <ScrollToBottom className="message-container">
+          {messageList.map((messageContent) => {
+            return (
+              <div
+                className="message"
+                id={username === messageContent.author ? "you" : "other"}
+              >
+                <div>
+                  <div className="message-content">
+                    <p>{messageContent.message}</p>
+                  </div>
+                  <div className="message-meta">
+                    <p id="time">{messageContent.time}</p>
+                    <p id="author">{messageContent.author}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </ScrollToBottom>
+      </div>
+      <div className="chat-footer">
+        <input
+          type="text"
+          value={currentMessage}
+          placeholder="Send a message..."
+          onChange={(event) => {
+            setCurrentMessage(event.target.value);
+          }}
+          onKeyPress={(event) => {
+            event.key === "Enter" && sendMessage();
+          }}
+        />
+        <button onClick={sendMessage}>&#9658;</button>
+      </div>
+    </div>
+  );
+}
+
+export default Room;
