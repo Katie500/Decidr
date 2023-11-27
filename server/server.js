@@ -1,63 +1,41 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const http = require("http");
+const cors = require("cors");
+const { Server } = require("socket.io");
+app.use(cors());
 
-app.set('views', './views');
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
+const server = http.createServer(app);
 
-const rooms = {};
-
-// Define the function to generate a random room code
-const generateRandomCode = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return code;
-};
-
-app.get('/', (req, res) => {
-  res.render('index', { rooms: rooms });
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
 
-app.get('/api/rooms', (req, res) => {
-  res.json(rooms);
-});
+io.on("connection", (socket) => {
+  console.log(`User Connected: ${socket.id}`);
 
-app.post('/room', (req, res) => {
-  // Handle the form submission
-  const randomRoomCode = generateRandomCode();
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
 
-  if (rooms[randomRoomCode] != null) {
-    // If the generated code already exists, try again
-    return res.redirect('/');
-  }
+  socket.on("check_room", (data, callback) => {
+    const roomExists = io.sockets.adapter.rooms.has(data);
+    callback(roomExists);
+  });
 
-  rooms[randomRoomCode] = { users: [] };
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
 
-  // Redirect to the newly created room
-  res.redirect(`/${randomRoomCode}`);
-
-  // Send a message that a new room was created
-  io.emit('room-created', randomRoomCode);
-});
-
-io.on('connection', (socket) => {
-  // ... (existing socket event handlers)
-
-  socket.on('disconnect', () => {
-    // ... (existing disconnect logic)
-
-    // Send an update to all clients with the new rooms data
-    io.emit('update-rooms', rooms);
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
   });
 });
 
-// Start the server and listen on port 3001
 server.listen(3001, () => {
-  console.log('Server is running on port 3001');
+  console.log("SERVER RUNNING");
 });
