@@ -8,11 +8,11 @@ import View2 from "./components/Views/view2";
 
 const Test = () => (
   <div>
-    {/* <View1 /> */}
+    <View2 />
     {/* <Results /> */}
     {/* <Nickname /> */}
     {/* <Default /> */}
-    <StartNewSession />
+    {/* <StartNewSession /> */}
   </div>
 );
 
