@@ -1,0 +1,23 @@
+:root {
+  --default-blue: rgba(30, 25, 233, 1);
+}
+
+html {
+}
+
+body {
+  font-family: "Roboto-Regular", Helvetica;
+}
+
+.slightly-bigger-text {
+  font-size: 115%;
+}
+
+.default-button {
+  background-color: var(--default-blue);
+  border: 1px solid var(--default-blue);
+  color: white;
+  width: 100%; /*Make responsive*/
+  padding: 1.25%;
+  border-radius: 25px;
+}
