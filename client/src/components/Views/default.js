@@ -34,18 +34,7 @@ function Default() {
               </button>
             </Col>
           </Row>
-          <Row
-            style={{
-              textAlign: "center",
-              width: "100%",
-              justifyContent: "center",
-              paddingTop: "5%",
-              paddingBottom: "5%",
-              fontWeight: "700",
-            }}
-          >
-            or
-          </Row>
+          
           <Row>
             <button className="alt-button">Start a new session</button>
           </Row>

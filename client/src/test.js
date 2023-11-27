@@ -10,8 +10,8 @@ const Test = () => (
   <div>
     {/* <View1 /> */}
     {/* <Results /> */}
-    {/* <Nickname /> */}
-    <Default />
+    <Nickname />
+    {/* <Default /> */}
     {/* <StartNewSession /> */}
   </div>
 );
