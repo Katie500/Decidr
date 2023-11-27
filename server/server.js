@@ -2,8 +2,13 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const cors = require("cors");
+const mongoose = require('mongoose');
 const { Server } = require("socket.io");
 app.use(cors());
+
+// Database Schemas
+import User from "./models/userSchema";
+import Room from "./models/roomSchema";
 
 const server = http.createServer(app);
 
