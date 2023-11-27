@@ -95,7 +95,7 @@ function App() {
             <Route path="/test" element={<Test />} />
           </Routes>
         </Router>
-        <div className="App">
+        {/* <div className="App">
           {!showChat ? (
             <div className="joinChatContainer">
               <div>
@@ -138,7 +138,7 @@ function App() {
               randomRoomCode={randomRoomCode}
             />
           )}
-        </div>
+        </div> */}
       </body>
     </>
   );
