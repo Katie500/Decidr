@@ -10,6 +10,15 @@ app.use(cors());
 import User from "./models/userSchema";
 import Room from "./models/roomSchema";
 
+const CONNECTION_URL = 'mongodb+srv://decidr_admin:decidr2023@cluster0.oluaicr.mongodb.net/decidrDB'
+const PORT = process.env.PORT || 5000;
+
+mongoose.connect(CONNECTION_URL, {useNewUrlParser: true, useUnifiedTopology: true})
+  .then(() => app.listen(PORT, () => console.log(`Server running on port: ${PORT}`)))
+  .catch((err) => console.log(err.message));
+
+mongoose.set('useFindAndModify', false);
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
