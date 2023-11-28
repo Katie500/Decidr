@@ -1,4 +1,6 @@
+// Instead of using export default, use module.exports
 const mongoose = require('mongoose');
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -7,4 +9,4 @@ const userSchema = new Schema({
 
 const User = mongoose.model('User', userSchema);
 
-export default User;
+module.exports = User;

@@ -7,8 +7,8 @@ const { Server } = require("socket.io");
 app.use(cors());
 
 // Database Schemas
-import User from "./models/userSchema";
-import Room from "./models/roomSchema";
+const User = require("./models/userSchema");
+const Room = require("./models/roomSchema");
 
 const server = http.createServer(app);
 
