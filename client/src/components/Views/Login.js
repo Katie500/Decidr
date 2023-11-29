@@ -4,11 +4,12 @@ import Col from "react-bootstrap/Col";
 import { Container } from "react-bootstrap";
 import { useState } from "react";
 import io from "socket.io-client";
-import Room from "../Room";
+import Room from "./Room";
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from "react-router-dom";
 
 const socket = io.connect("http://localhost:3001");
 
-function Default() {
+function Login() {
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [showChat, setShowChat] = useState(false);
@@ -16,9 +17,12 @@ function Default() {
   const [nameError, setNameError] = useState(false); // New state for name error
   const [codeError, setCodeError] = useState(false); // New state for code error
 
-  const joinRoom = () => {
+  const joinRoom = (event) => {
+    console.log("hey");
+    event.preventDefault();
     if (username !== "") {
       if (room !== "") {
+        event.preventDefault();
         // Check if the room with the entered code exists
         socket.emit("check_room", room, (roomExists) => {
           if (roomExists) {
@@ -59,6 +63,7 @@ function Default() {
       setCodeError(false);
     }
   };
+  
   return (
     <>
       {!showChat ? (
@@ -137,4 +142,4 @@ function Default() {
   );
 }
 
-export default Default;
+export default Login;

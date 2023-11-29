@@ -1,11 +1,10 @@
 // client/App.js
 
-import "./App.css";
+import "./styles/App.css";
 import io from "socket.io-client";
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Room from "./components/Room";
-import Test from "./test";
+import Login from "./components/Views/Login";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -40,8 +39,7 @@ function App() {
       <body>
         <Router>
           <Routes>
-            <Route path="/:roomName" element={<Room />} />
-            <Route path="/test" element={<Test />} />
+            <Route path="/" element={<Login />} />
           </Routes>
         </Router>
       </body>
