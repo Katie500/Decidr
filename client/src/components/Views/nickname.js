@@ -2,15 +2,15 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Container } from "react-bootstrap";
+import Header from "../UI/header";
+import Or from "../UI/or";
 
 function Nickname() {
   return (
     <>
       <Form inline style={{ textAlign: "center", justifyContent: "center" }}>
         <Container>
-          <Row>
-            <h1>Decidr</h1>
-          </Row>
+          <Header />
           <Row>
             <h4>Enter a nickname:</h4>
           </Row>
@@ -24,13 +24,17 @@ function Nickname() {
                 />
               </Row>
             </Col>
-            <Col xs="auto" style={{ alignItems: "center", display: "flex" }}>
-              <button type="submit">Submit</button>
+            <Col xs="auto" className="centered short">
+              <button type="submit" className="alt-button">
+                Go
+              </button>
             </Col>
           </Row>
-          <Row>or</Row>
-          <Row>
-            <button>Give me an anonymous name</button>
+          <Or />
+          <Row className="centered">
+            <button className="default-button">
+              Give me an anonymous name
+            </button>
           </Row>
         </Container>
       </Form>

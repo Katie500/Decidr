@@ -5,12 +5,12 @@ const data = [
     currentVotes: 2,
   },
   {
-    nameOfPlace: "Pizza Hut",
+    nameOfPlace: "Pizza",
     totalVotes: 4,
     currentVotes: 1,
   },
   {
-    nameOfPlace: `McDonald's`,
+    nameOfPlace: `McD's`,
     totalVotes: 1,
     currentVotes: 1,
   },

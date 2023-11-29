@@ -27,12 +27,18 @@ const View = ({ children }) => {
           textAlign: "center",
           justifyContent: "center",
           paddingTop: "50px",
+          alignItems: "center",
         }}
       >
         <h3>
           You have {votesLeft}/{maxVotesPerPerson} votes left
         </h3>
-        <button>&#x2b;</button>
+        <button
+          className="vote-button"
+          style={{ color: "lightgreen", fontSize: "375%" }}
+        >
+          &#x2b;
+        </button>
       </Row>
     </Container>
   );
