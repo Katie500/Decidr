@@ -5,6 +5,7 @@ import NicknamePage from './pages/NicknamePage';
 import '../src/styles/SharedStyles.css';
 import Room from './pages/Room';
 import StartNewRoom from './pages/StartNewRoom';
+import { UserProvider } from './contexts/UserContext';
 
 function App() {
   const theme = createTheme({
@@ -23,14 +24,16 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/nickname" element={<NicknamePage />} />
-          <Route path="/startnewroom" element={<StartNewRoom />} />
-          <Route path="/room" element={<Room />} />
-        </Routes>
-      </BrowserRouter>
+      <UserProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/nickname" element={<NicknamePage />} />
+            <Route path="/startnewroom" element={<StartNewRoom />} />
+            <Route path="/room" element={<Room />} />
+          </Routes>
+        </BrowserRouter>
+      </UserProvider>
     </ThemeProvider>
   );
 }

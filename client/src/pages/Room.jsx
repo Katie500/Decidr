@@ -8,8 +8,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
-import io from 'socket.io-client';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
@@ -18,7 +17,7 @@ const Room = ({}) => {
       <Box className="topBarContainer">
         <Box container className="topBar widthConstraint">
           <IconButton className="topBarIcon">
-            <ArrowBackOutlinedIcon />
+            <MenuIcon />
           </IconButton>
           <Typography variant="h6">Where do we wanna eat?</Typography>
         </Box>

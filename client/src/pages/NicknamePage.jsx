@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import {
@@ -16,11 +16,19 @@ import {
   animals,
 } from 'unique-names-generator';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../contexts/UserContext';
 
-const MainPage = ({ room, userID }) => {
+const NicknamePage = () => {
   const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
+  const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (userDetails?.nickname) {
+      setName(userDetails.nickname);
+    }
+  }, [userDetails]);
 
   const handleAnonymousName = () => {
     const shortName = uniqueNamesGenerator({
@@ -32,20 +40,31 @@ const MainPage = ({ room, userID }) => {
 
   const handleStart = () => {
     setPending(true);
+    updateUserDetails({
+      nickname: name,
+    });
     setTimeout(() => {
       setPending(false);
-      navigate('/room', { state: { room, userID, name } });
-    }, 2000);
+      if (userDetails?.isAdmin) {
+        navigate('/StartNewRoom');
+      } else {
+        navigate('/room');
+      }
+    }, 1000);
+  };
+
+  const handleBack = () => {
+    navigate('/');
   };
 
   return (
     <>
       <Box className="topBarContainer">
         <Box container className="topBar widthConstraint">
-          <IconButton className="topBarIcon">
+          <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
-          <Typography variant="h6">Decidr</Typography>
+          <Typography variant="h6">Choosing a name</Typography>
         </Box>
       </Box>
 
@@ -83,4 +102,4 @@ const MainPage = ({ room, userID }) => {
   );
 };
 
-export default MainPage;
+export default NicknamePage;

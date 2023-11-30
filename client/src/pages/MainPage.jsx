@@ -1,14 +1,15 @@
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../contexts/UserContext';
 
 const socket = io.connect('http://localhost:3001');
 const MainPage = () => {
   const [pending, setPending] = useState(false);
   const [room, setRoom] = useState('');
-
+  const { updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleVerify = () => {
@@ -18,11 +19,19 @@ const MainPage = () => {
     }, 1000);
   };
 
-  const handleStart = () => {
+  const handleCreateRoom = () => {
     setPending(true);
+
+    updateUserDetails({
+      userID: 'User12345',
+      roomID: 'Room12345',
+      isAdmin: true, // Creating a room, make this true
+    });
+
+    // Simulate pending state, HIT API to create room
     setTimeout(() => {
       setPending(false);
-      navigate('/nickname', { state: { room } });
+      navigate('/nickname');
     }, 1000);
   };
 
@@ -58,7 +67,7 @@ const MainPage = () => {
           <Button
             variant="contained"
             color="success"
-            onClick={handleStart}
+            onClick={handleCreateRoom}
             fullWidth
           >
             Start a new room

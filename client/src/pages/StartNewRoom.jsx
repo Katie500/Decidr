@@ -10,19 +10,21 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import './StartNewRoom.css';
-import { useNavigation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../contexts/UserContext';
 
-const StartNewRoom = ({ userID, name }) => {
+const StartNewRoom = () => {
   const [pending, setPending] = useState(true);
   const [roomCode, setRoomCode] = useState('X12AYZ');
   const [duration, setDuration] = useState('');
   const [votes, setVotes] = useState(1);
-  const navigate = useNavigation();
+  const { userDetails, updateUserDetails } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => {
@@ -35,8 +37,12 @@ const StartNewRoom = ({ userID, name }) => {
     setPending(true);
     setTimeout(() => {
       setPending(false);
-      navigate('/room', { state: { room: roomCode, userID, name } });
+      // navigate('/room');
     }, 1000);
+  };
+
+  const handleBack = () => {
+    navigate('/nickname');
   };
 
   const handleDurationChange = (event) => {
@@ -50,10 +56,12 @@ const StartNewRoom = ({ userID, name }) => {
     <>
       <Box className="topBarContainer">
         <Box container className="topBar widthConstraint">
-          <IconButton className="topBarIcon">
+          <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
-          <Typography variant="h6">Start a new room</Typography>
+          <Typography variant="h6">
+            {userDetails?.nickname}'s new room
+          </Typography>
         </Box>
       </Box>
       <Grid className="container">
