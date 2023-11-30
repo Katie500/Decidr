@@ -14,11 +14,11 @@ import React, { useEffect, useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
-import './StartNewSession.css';
+import './StartNewRoom.css';
 
-const StartNewSession = () => {
+const StartNewRoom = () => {
   const [pending, setPending] = useState(true);
-  const [sessionCode, setSessionCode] = useState('X12AYZ');
+  const [roomCode, setRoomCode] = useState('X12AYZ');
   const [duration, setDuration] = useState('');
   const [votes, setVotes] = useState(1);
 
@@ -50,21 +50,21 @@ const StartNewSession = () => {
           <IconButton className="topBarIcon">
             <ArrowBackOutlinedIcon />
           </IconButton>
-          <Typography variant="h6">Start a new session</Typography>
+          <Typography variant="h6">Start a new room</Typography>
         </Box>
       </Box>
       <Grid className="container">
         <Box className="contentBox widthConstraint">
           <Grid margin={1}>
-            <Typography variant="h6">Your session code is:</Typography>
-            <Box className="session">
+            <Typography variant="h6">Your room code is:</Typography>
+            <Box className="room">
               <Typography
                 variant="h4"
                 textAlign={'center'}
                 fontStyle={'italic'}
                 marginTop={1.5}
               >
-                {sessionCode}
+                {roomCode}
               </Typography>
               <IconButton>
                 <ContentCopyOutlinedIcon />
@@ -80,7 +80,7 @@ const StartNewSession = () => {
             />
           </Grid>
           <Grid margin={1}>
-            <Typography variant="h6">Enter session duration:</Typography>
+            <Typography variant="h6">Enter room duration:</Typography>
             <FormControl fullWidth>
               <InputLabel>Duration</InputLabel>
               <Select
@@ -116,7 +116,7 @@ const StartNewSession = () => {
             fullWidth
             className="sessionButton"
           >
-            Start Session
+            Start Room
           </Button>
         </Box>
       </Grid>
@@ -125,4 +125,4 @@ const StartNewSession = () => {
   );
 };
 
-export default StartNewSession;
+export default StartNewRoom;
