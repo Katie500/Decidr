@@ -1,9 +1,8 @@
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { Container } from "react-bootstrap";
+import React from "react";
+import { Form, Row, Col, Container } from "react-bootstrap";
 import Header from "../UI/header";
 import Or from "../UI/or";
+import { Link } from "react-router-dom";
 
 function Nickname() {
   return (
@@ -25,9 +24,9 @@ function Nickname() {
               </Row>
             </Col>
             <Col xs="auto" className="centered short">
-              <button type="submit" className="alt-button">
+              <Link to="/Session" className="alt-button">
                 Go
-              </button>
+              </Link>
             </Col>
           </Row>
           <Or />

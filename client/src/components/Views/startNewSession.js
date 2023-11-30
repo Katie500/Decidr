@@ -6,7 +6,7 @@ import { useRef } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import Header from "../UI/header";
 
-function StartNewSession() {
+function StartNewSession({ room }) {
   const joinCode = useRef(null);
 
   const handleCopyClick = () => {
@@ -24,7 +24,7 @@ function StartNewSession() {
       </Row>
       <Row className="pad-bottom centered">
         <span ref={joinCode} className="code">
-          X 1 2 A Y Z
+          {room}
         </span>{" "}
         <a>
           <FaRegCopy />
