@@ -27,12 +27,23 @@ function Room({ socket, username, room }) {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
-  }, [socket]);
+
+    // You can perform additional initialization here if needed
+
+    // For example:
+    // socket.emit("join_room", { username, room });
+
+    // Cleanup when the component unmounts
+    return () => {
+      // For example:
+      // socket.emit("leave_room", { username, room });
+    };
+  }, [socket, username, room]);
 
   return (
     <div className="chat-window">
       <div className="chat-header">
-      <p>Live Chat - Room Code: {room}</p>
+        <p>Live Chat - Room Code: {room}</p>
       </div>
       <div className="chat-body">
         <ScrollToBottom className="message-container">
@@ -41,6 +52,7 @@ function Room({ socket, username, room }) {
               <div
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
+                key={messageContent.time} // Assuming time is unique
               >
                 <div>
                   <div className="message-content">

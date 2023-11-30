@@ -5,6 +5,9 @@ import io from "socket.io-client";
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Views/Login";
+import Nickname from "./components/Views/nickname";
+import Room from "./components/Views/Room";
+import StartNewSession from "./components/Views/startNewSession";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -40,6 +43,9 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/nickname" element={<Nickname />} />
+            <Route path="/room" element={<Room />} />
+            <Route path="/Session" element={<StartNewSession />} />
           </Routes>
         </Router>
       </body>
