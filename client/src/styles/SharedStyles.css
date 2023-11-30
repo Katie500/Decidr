@@ -1,0 +1,31 @@
+/* USED IN Mainpage and NicknamePage */
+.container {
+    height: 98vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .title {
+    width: 100%;
+    font-weight: lighter;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .contentBox {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .inputBox {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  
+
+  

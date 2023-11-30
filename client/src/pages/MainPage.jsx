@@ -1,13 +1,7 @@
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
+import '../styles/SharedStyles.css';
 
 const MainPage = () => {
   const [pending, setPending] = useState(false);
@@ -28,86 +22,46 @@ const MainPage = () => {
   };
 
   return (
-    <Container
-      style={{
-        height: '98vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <Grid className="container">
       <Box>
         <Typography
           variant="h4"
-          style={{
-            width: '100%',
-            textAlign: 'center',
-            fontWeight: 'lighter',
-            marginTop: '1rem',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
+          className="title"
+          marginTop={2}
+          textAlign={'center'}
         >
           Decidr
         </Typography>
       </Box>
-      {/* TODO: 'MAKE THIS CONTENT IN THE GRID BELOW TO SHOW UP IN THE CENTER */}
-      <Box
-        style={{
-          gap: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography variant="h6">Enter code for an existing session</Typography>
-        <Box style={{ display: 'flex', gap: 2, marginTop: '1rem' }}>
+      <Box className="contentBox">
+        <Typography variant="h6">
+          Enter code for an existing session:
+        </Typography>
+        <Box className="inputBox">
           <TextField
             fullWidth
             label="Session Code"
             variant="outlined"
             size="small"
           />
-          <Button
-            variant="contained"
-            onClick={handleVerify}
-            sx={{
-              minWidth: 'initial',
-            }}
-          >
+          <Button variant="contained" onClick={handleVerify}>
             Verify
           </Button>
         </Box>
-
-        <Typography
-          variant="h6"
-          style={{
-            width: '100%',
-            textAlign: 'center',
-            display: 'block',
-            marginTop: '1rem',
-            marginBottom: '1rem',
-          }}
-        >
+        <Typography variant="h6" margin={1} textAlign={'center'}>
           or
         </Typography>
         <Button
           variant="contained"
           color="success"
-          sx={{
-            width: '100%',
-            backgroundColor: (theme) => theme.palette.success.light,
-          }}
           onClick={handleStart}
+          fullWidth
         >
           Start a new session
         </Button>
       </Box>
       <LoadingBackdrop open={pending} />
-    </Container>
+    </Grid>
   );
 };
 
