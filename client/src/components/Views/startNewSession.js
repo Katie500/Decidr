@@ -5,25 +5,30 @@ import { Container } from "react-bootstrap";
 import { useRef } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import Header from "../UI/header";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-function StartNewSession({ room }) {
+function StartNewSession() {
+
+  //Grabs stored code from previous sections
   const { state } = useLocation();
 
-
+  const navigate = useNavigate();
   const code = state ? state.code : '';
+  const username = state ? state.username : '';
 
   const joinCode = useRef(null);
-  //room = "hey";
-  console.log(room);
+
 
   const handleCopyClick = () => {
-    console.log(room);
     // Select the text in the textarea
     joinCode.current.select();
     // Execute copy command
     document.execCommand("copy");
   };
+
+  const navigateToLobby = () => {
+    navigate('/Lobby', { state: { code, username } });
+  }
 
   return (
     <Container>
@@ -84,7 +89,7 @@ function StartNewSession({ room }) {
         </Row>
 
         <Row>
-          <button className="default-button">Start your session</button>
+          <button onClick={navigateToLobby} className="default-button">Start your session</button>
         </Row>
       </Form>
     </Container>
