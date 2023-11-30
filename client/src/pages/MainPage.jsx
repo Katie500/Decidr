@@ -6,6 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 
 const socket = io.connect('http://localhost:3001');
+
+// TODO:
+// 1. ADD INPUT VALIDATION FOR ROOM CODE
+// 2. APP ERROR MESSAGE IF ROOM CODE IS INVALID
 const MainPage = () => {
   const [pending, setPending] = useState(false);
   const [room, setRoom] = useState('');
@@ -14,6 +18,17 @@ const MainPage = () => {
 
   const handleVerify = () => {
     setPending(true);
+    // Simulate pending state, HIT API to verify room
+    // Assume room is verified:
+
+    updateUserDetails({
+      userID: 'User12345',
+      isAdmin: false,
+      nickname: '',
+    });
+
+    navigate('/nickname');
+
     setTimeout(() => {
       setPending(false);
     }, 1000);
@@ -24,7 +39,7 @@ const MainPage = () => {
 
     updateUserDetails({
       userID: 'User12345',
-      roomID: 'Room12345',
+      roomID: Math.random().toString(36).substring(7),
       isAdmin: true, // Creating a room, make this true
     });
 

@@ -6,12 +6,16 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
+import { UserContext } from '../contexts/UserContext';
 
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
+
+  const { userDetails, updateUserDetails } = useContext(UserContext);
+
   return (
     <>
       <Box className="topBarContainer">
@@ -19,13 +23,16 @@ const Room = ({}) => {
           <IconButton className="topBarIcon">
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6">Where do we wanna eat?</Typography>
+          <Typography variant="h6">
+            In room{' '}
+            <span style={{ textTransform: 'uppercase' }}>
+              {userDetails.roomID}
+            </span>
+          </Typography>
         </Box>
       </Box>
 
-      <Grid className="container">
-        <LoadingBackdrop open={pending} />
-      </Grid>
+      <LoadingBackdrop open={pending} />
     </>
   );
 };

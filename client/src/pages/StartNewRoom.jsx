@@ -20,8 +20,10 @@ import { UserContext } from '../contexts/UserContext';
 
 const StartNewRoom = () => {
   const [pending, setPending] = useState(true);
-  const [roomCode, setRoomCode] = useState('X12AYZ');
-  const [duration, setDuration] = useState('');
+  const [roomCode, setRoomCode] = useState(
+    Math.random().toString(36).substring(7)
+  ); // TODO: Generate room code
+  const [duration, setDuration] = useState();
   const [votes, setVotes] = useState(1);
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
@@ -33,11 +35,14 @@ const StartNewRoom = () => {
     // setSessionCode(generateSessionCode());
   });
 
-  const handleVerify = () => {
+  const handleCreate = () => {
     setPending(true);
     setTimeout(() => {
       setPending(false);
-      // navigate('/room');
+      updateUserDetails({
+        roomID: roomCode,
+      });
+      navigate('/room');
     }, 1000);
   };
 
@@ -74,6 +79,7 @@ const StartNewRoom = () => {
                 textAlign={'center'}
                 fontStyle={'italic'}
                 marginTop={1.5}
+                textTransform={'uppercase'}
               >
                 {roomCode}
               </Typography>
@@ -123,7 +129,7 @@ const StartNewRoom = () => {
           <Button
             variant="contained"
             color="success"
-            onClick={handleVerify}
+            onClick={handleCreate}
             fullWidth
             className="sessionButton"
           >
