@@ -15,16 +15,18 @@ import {
   colors,
   animals,
 } from 'unique-names-generator';
+import { useNavigate } from 'react-router-dom';
 
-const MainPage = ({ sessionCode }) => {
+const MainPage = ({ room, userID }) => {
   const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
+  const navigate = useNavigate();
 
   const handleAnonymousName = () => {
     const shortName = uniqueNamesGenerator({
       dictionaries: [adjectives, animals, colors],
       length: 2,
-    }); // big-donkey
+    }); // e.g big-donkey
     setName(shortName);
   };
 
@@ -32,6 +34,7 @@ const MainPage = ({ sessionCode }) => {
     setPending(true);
     setTimeout(() => {
       setPending(false);
+      navigate('/room', { state: { room, userID, name } });
     }, 2000);
   };
 

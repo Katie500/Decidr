@@ -2,8 +2,9 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import { ThemeProvider, createTheme } from '@mui/material';
 import NicknamePage from './pages/NicknamePage';
-import StartNewSession from './pages/StartNewSession';
 import '../src/styles/SharedStyles.css';
+import Room from './pages/Room';
+import StartNewRoom from './pages/StartNewRoom';
 
 function App() {
   const theme = createTheme({
@@ -26,7 +27,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/nickname" element={<NicknamePage />} />
-          <Route path="/startnewsession" element={<StartNewSession />} />
+          <Route path="/startnewroom" element={<StartNewRoom />} />
+          <Route path="/room" element={<Room />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
