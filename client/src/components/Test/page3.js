@@ -1,18 +1,17 @@
+// Page3.js
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
-const Page2 = () => {
+const Page3 = () => {
   const { state } = useLocation();
-
-  // Retrieve the inputValue from the state
   const inputValue = state ? state.inputValue : '';
 
   return (
     <div>
-      <h2>Page 2</h2>
-      <p>User Input: {inputValue}</p>
+      <h2>Page 3</h2>
+      <p>User Input from Page1: {inputValue}</p>
     </div>
   );
 };
 
-export default Page2;
+export default Page3;

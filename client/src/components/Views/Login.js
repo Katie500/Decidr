@@ -7,20 +7,17 @@ import StartNewSession from "./startNewSession";
 const socket = io.connect("http://localhost:3001");
 
 function Login() {
-  const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [randomRoomCode, setRandomRoomCode] = useState("");
-  const [nameError, setNameError] = useState(false);
   const [codeError, setCodeError] = useState(false);
   const navigate = useNavigate();
 
   const joinRoom = (event) => {
     event.preventDefault();
-    if (username !== "" && room !== "") {
+    if (room !== "") {
       socket.emit("check_room", room, (roomExists) => {
         if (roomExists) {
           socket.emit("join_room", room);
-          setNameError(false);
           setCodeError(false);
           navigate("/Session", { state: { generatedCode: room } });
         } else {
@@ -28,26 +25,17 @@ function Login() {
         }
       });
     } else {
-      setNameError(username === "");
       setCodeError(room === "");
     }
   };
 
   const generateRandomRoom = () => {
-    if (username !== "") {
       const code = Math.random().toString(36).substring(7);
       setRoom(code);
       setRandomRoomCode(code);
       socket.emit("join_room", code);
-      setNameError(false);
       setCodeError(false);
-      navigate("/Session", { state: { code } });
-
-      
-    } else {
-      setNameError(true);
-      setCodeError(false);
-    }
+      navigate("/Nickname", { state: { code } });
   };
   
   return (
@@ -56,26 +44,6 @@ function Login() {
           <Container>
             <Row className="centered" style={{ paddingBottom: "50px" }}>
               <h1>Decidr</h1>
-            </Row>
-            <Row>
-              <h4>Enter your name:</h4>
-            </Row>
-            <Row>
-              <Col xs="auto">
-                <Row>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter your name"
-                    className=" mr-sm-2"
-                    onChange={(event) => {
-                      setUsername(event.target.value);
-                      // Reset name error when the user types
-                      setNameError(false);
-                      setCodeError(false);
-                    }}
-                  />
-                </Row>
-              </Col>
             </Row>
             <Row>
               <h4>Enter a code for an existing session:</h4>

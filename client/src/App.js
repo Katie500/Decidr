@@ -8,9 +8,12 @@ import Login from "./components/Views/Login";
 import Nickname from "./components/Views/nickname";
 import Room from "./components/Views/Room";
 import StartNewSession from "./components/Views/startNewSession";
+import Lobby from "./components/Views/Lobby";
 
-import Page1 from './components/Views/page1';
-import Page2 from './components/Views/page2';
+//Test Files
+import Page1 from './components/Test/page1';
+import Page2 from './components/Test/page2';
+import Page3 from './components/Test/page3';
 
 const socket = io.connect("http://localhost:3001");
 
@@ -45,12 +48,17 @@ function App() {
       <body>
         <Router>
           <Routes>
+            {/* Test Files */}
           <Route path="/page1" element={<Page1 />} />
-        <Route path="/page2" element={<Page2 />} />
+          <Route path="/page2" element={<Page2 />} />
+          <Route path="/page3" element={<Page3 />} />
+
+            {/* Main Code */}
             <Route path="/" element={<Login />} />
             <Route path="/nickname" element={<Nickname />} />
             <Route path="/room" element={<Room />} />
             <Route path="/Session" element={<StartNewSession />} />
+            <Route path="/Lobby" element={<Lobby />} />
             
           </Routes>
         </Router>
