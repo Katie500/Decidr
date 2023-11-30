@@ -9,6 +9,9 @@ import Nickname from "./components/Views/nickname";
 import Room from "./components/Views/Room";
 import StartNewSession from "./components/Views/startNewSession";
 
+import Page1 from './components/Views/page1';
+import Page2 from './components/Views/page2';
+
 const socket = io.connect("http://localhost:3001");
 
 // client/src/App.js
@@ -42,10 +45,13 @@ function App() {
       <body>
         <Router>
           <Routes>
+          <Route path="/page1" element={<Page1 />} />
+        <Route path="/page2" element={<Page2 />} />
             <Route path="/" element={<Login />} />
             <Route path="/nickname" element={<Nickname />} />
             <Route path="/room" element={<Room />} />
             <Route path="/Session" element={<StartNewSession />} />
+            
           </Routes>
         </Router>
       </body>
