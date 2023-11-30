@@ -15,12 +15,14 @@ import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import './StartNewRoom.css';
+import { useNavigation } from 'react-router-dom';
 
-const StartNewRoom = () => {
+const StartNewRoom = ({ userID, name }) => {
   const [pending, setPending] = useState(true);
   const [roomCode, setRoomCode] = useState('X12AYZ');
   const [duration, setDuration] = useState('');
   const [votes, setVotes] = useState(1);
+  const navigate = useNavigation();
 
   useEffect(() => {
     setTimeout(() => {
@@ -33,6 +35,7 @@ const StartNewRoom = () => {
     setPending(true);
     setTimeout(() => {
       setPending(false);
+      navigate('/room', { state: { room: roomCode, userID, name } });
     }, 1000);
   };
 
