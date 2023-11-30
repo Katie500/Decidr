@@ -11,6 +11,7 @@ function Login() {
   const [randomRoomCode, setRandomRoomCode] = useState("");
   const [codeError, setCodeError] = useState(false);
   const navigate = useNavigate();
+  //const code = "";
 
   const joinRoom = (event) => {
     event.preventDefault();
@@ -19,7 +20,8 @@ function Login() {
         if (roomExists) {
           socket.emit("join_room", room);
           setCodeError(false);
-          navigate("/Session", { state: { generatedCode: room } });
+          //code = room;
+          navigate("/Nickname", { state: { room } });
         } else {
           alert("Room does not exist. Please enter a valid code.");
         }
@@ -35,7 +37,7 @@ function Login() {
       setRandomRoomCode(code);
       socket.emit("join_room", code);
       setCodeError(false);
-      navigate("/Nickname", { state: { code } });
+      navigate("/Nickname", { state: { room: code } });
   };
   
   return (

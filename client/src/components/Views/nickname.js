@@ -15,18 +15,19 @@ const Nickname = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const code = state ? state.code : '';
+  const room = state ? state.room : '';
 
   const nicknameToSession = () => {
     if (username !== "") {
-      navigate('/Session', { state: { code, username } });
+
+      navigate('/Session', { state: { room, username } });
     } else {
       alert("Please enter a nickname.");
     }
   };
 
   const anonymousNameToSession = () => {
-    navigate('/Session', { state: { code } });
+    navigate('/Session', { state: { room } });
   };
 
   return (
