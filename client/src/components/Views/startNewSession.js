@@ -5,11 +5,20 @@ import { Container } from "react-bootstrap";
 import { useRef } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import Header from "../UI/header";
+import { useLocation } from 'react-router-dom';
 
 function StartNewSession({ room }) {
+  const { state } = useLocation();
+
+
+  const code = state ? state.code : '';
+
   const joinCode = useRef(null);
+  //room = "hey";
+  console.log(room);
 
   const handleCopyClick = () => {
+    console.log(room);
     // Select the text in the textarea
     joinCode.current.select();
     // Execute copy command
@@ -24,9 +33,9 @@ function StartNewSession({ room }) {
       </Row>
       <Row className="pad-bottom centered">
         <span ref={joinCode} className="code">
-          {room}
+          {code}
         </span>{" "}
-        <a>
+        <a onClick={handleCopyClick}>
           <FaRegCopy />
         </a>
       </Row>
@@ -51,7 +60,7 @@ function StartNewSession({ room }) {
             <Form.Control
               type="text"
               placeholder="5:00 min(s)"
-              className=" mr-sm-2"
+              className="mr-sm-2"
             />
           </Col>
         </Row>
