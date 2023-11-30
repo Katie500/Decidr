@@ -1,7 +1,6 @@
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
-import '../styles/SharedStyles.css';
 
 const MainPage = () => {
   const [pending, setPending] = useState(false);
@@ -33,7 +32,7 @@ const MainPage = () => {
           Decidr
         </Typography>
       </Box>
-      <Box className="contentBox">
+      <Box className="contentBox widthConstraint">
         <Typography variant="h6">Enter a nickname:</Typography>
         <Box className="inputBox">
           <TextField fullWidth label="Name" variant="outlined" size="small" />

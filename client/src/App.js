@@ -2,6 +2,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import { ThemeProvider, createTheme } from '@mui/material';
 import NicknamePage from './pages/NicknamePage';
+import StartNewSession from './pages/StartNewSession';
+import '../src/styles/SharedStyles.css';
 
 function App() {
   const theme = createTheme({
@@ -24,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/nickname" element={<NicknamePage />} />
+          <Route path="/startnewsession" element={<StartNewSession />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

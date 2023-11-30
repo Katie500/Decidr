@@ -1,10 +1,33 @@
-/* USED IN Mainpage and NicknamePage */
-.container {
+  .container {
     height: 98vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
   }
+
+  .topBarContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    position: absolute;
+  }
+  
+  .topBar{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .topBar .topBarIcon {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+ 
   
   .title {
     width: 100%;
@@ -17,6 +40,12 @@
   .contentBox {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .widthConstraint {
+    max-width: 450px;
   }
   
   .inputBox {
@@ -27,5 +56,6 @@
     margin-top: 1rem;
   }
   
+
 
   
