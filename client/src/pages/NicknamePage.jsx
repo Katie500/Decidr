@@ -2,9 +2,11 @@ import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
 
-const MainPage = () => {
+const MainPage = ({ sessionCode }) => {
   const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
+
+  // A USE E
 
   const handleVerify = () => {
     setPending(true);
