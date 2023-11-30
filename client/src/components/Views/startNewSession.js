@@ -5,7 +5,10 @@ import { Container } from "react-bootstrap";
 import { useRef } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import Header from "../UI/header";
+import io from "socket.io-client";
 import { useLocation, useNavigate } from 'react-router-dom';
+
+const socket = io.connect("http://localhost:3001");
 
 function StartNewSession() {
 
@@ -13,7 +16,7 @@ function StartNewSession() {
   const { state } = useLocation();
 
   const navigate = useNavigate();
-  const code = state ? state.code : '';
+  const room = state ? state.room : '';
   const username = state ? state.username : '';
 
   const joinCode = useRef(null);
@@ -27,7 +30,8 @@ function StartNewSession() {
   };
 
   const navigateToLobby = () => {
-    navigate('/Lobby', { state: { code, username } });
+    socket.emit("join_room", room);
+    navigate('/Lobby', { state: { room, username } });
   }
 
   return (
@@ -38,7 +42,7 @@ function StartNewSession() {
       </Row>
       <Row className="pad-bottom centered">
         <span ref={joinCode} className="code">
-          {code}
+          {room}
         </span>{" "}
         <a onClick={handleCopyClick}>
           <FaRegCopy />

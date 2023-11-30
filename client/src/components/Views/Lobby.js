@@ -12,7 +12,7 @@ function Lobby() {
   //Grabs stored code from previous sections
   const { state } = useLocation();
   const navigate = useNavigate();
-  const code = state ? state.code : '';
+  const room = state ? state.room : '';
   const username = state ? state.username : '';
 
   const joinCode = useRef(null);
@@ -30,6 +30,9 @@ function Lobby() {
       <Header />
       <Row>
         <h4>Welcome {username} !</h4>
+        <div>
+        <p>Room Code: {room}</p>
+        </div>
       </Row>
  
     </Container>
