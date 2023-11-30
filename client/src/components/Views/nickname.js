@@ -1,11 +1,35 @@
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { Container } from "react-bootstrap";
+import React, { useState } from "react";
+import { Form, Row, Col, Container } from "react-bootstrap";
 import Header from "../UI/header";
 import Or from "../UI/or";
+import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 
-function Nickname() {
+
+const Nickname = () => {
+
+  //Use States
+  const [username, setUsername] = useState("");
+  const [nameError, setNameError] = useState(false);
+
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
+  const room = state ? state.room : '';
+
+  const nicknameToSession = () => {
+    if (username !== "") {
+
+      navigate('/Session', { state: { room, username } });
+    } else {
+      alert("Please enter a nickname.");
+    }
+  };
+
+  const anonymousNameToSession = () => {
+    navigate('/Session', { state: { room } });
+  };
+
   return (
     <>
       <Form inline style={{ textAlign: "center", justifyContent: "center" }}>
@@ -21,18 +45,24 @@ function Nickname() {
                   type="text"
                   placeholder="Enter a nickname"
                   className=" mr-sm-2"
+                  onChange={(event) => {
+                    // Detect name change for use state
+                    setUsername(event.target.value);
+                    // Reset name error when the user types
+                    setNameError(false);
+                  }}
                 />
               </Row>
             </Col>
             <Col xs="auto" className="centered short">
-              <button type="submit" className="alt-button">
+              <button className="alt-button" onClick={nicknameToSession}>
                 Go
               </button>
             </Col>
           </Row>
           <Or />
           <Row className="centered">
-            <button className="default-button">
+            <button className="default-button" onClick={anonymousNameToSession}>
               Give me an anonymous name
             </button>
           </Row>

@@ -5,9 +5,22 @@ import { Container } from "react-bootstrap";
 import { useRef } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import Header from "../UI/header";
+import io from "socket.io-client";
+import { useLocation, useNavigate } from 'react-router-dom';
+
+const socket = io.connect("http://localhost:3001");
 
 function StartNewSession() {
+
+  //Grabs stored code from previous sections
+  const { state } = useLocation();
+
+  const navigate = useNavigate();
+  const room = state ? state.room : '';
+  const username = state ? state.username : '';
+
   const joinCode = useRef(null);
+
 
   const handleCopyClick = () => {
     // Select the text in the textarea
@@ -15,6 +28,11 @@ function StartNewSession() {
     // Execute copy command
     document.execCommand("copy");
   };
+
+  const navigateToLobby = () => {
+    socket.emit("join_room", room);
+    navigate('/Lobby', { state: { room, username } });
+  }
 
   return (
     <Container>
@@ -24,9 +42,9 @@ function StartNewSession() {
       </Row>
       <Row className="pad-bottom centered">
         <span ref={joinCode} className="code">
-          X 1 2 A Y Z
+          {room}
         </span>{" "}
-        <a>
+        <a onClick={handleCopyClick}>
           <FaRegCopy />
         </a>
       </Row>
@@ -51,7 +69,7 @@ function StartNewSession() {
             <Form.Control
               type="text"
               placeholder="5:00 min(s)"
-              className=" mr-sm-2"
+              className="mr-sm-2"
             />
           </Col>
         </Row>
@@ -75,7 +93,7 @@ function StartNewSession() {
         </Row>
 
         <Row>
-          <button className="default-button">Start your session</button>
+          <button onClick={navigateToLobby} className="default-button">Start your session</button>
         </Row>
       </Form>
     </Container>
