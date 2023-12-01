@@ -1,17 +1,29 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Form } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { Container } from "react-bootstrap";
+import { useRef } from "react";
+import { FaRegCopy } from "react-icons/fa";
 import Header from "../UI/header";
 import { useLocation, useNavigate } from 'react-router-dom';
 
-
-//Lobby component represents the page where users can vote on choices.
 function Lobby() {
 
-    // Extracting room and username from the location state using useLocation hook.
+  //Grabs stored code from previous sections
   const { state } = useLocation();
   const navigate = useNavigate();
   const room = state ? state.room : '';
   const username = state ? state.username : '';
+
+
+  const joinCode = useRef(null);
+
+
+  const handleCopyClick = () => {
+    // Select the text in the textarea
+    joinCode.current.select();
+    // Execute copy command
+    document.execCommand("copy");
 
   // State to manage choices and votes
   const [choices, setChoices] = useState([
@@ -55,6 +67,7 @@ function Lobby() {
   //Navigates back to the login page.  
   const navigateBack = () => {
     navigate('/');
+
   };
 
   return (
