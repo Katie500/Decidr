@@ -21,6 +21,7 @@ import { UserContext } from '../contexts/UserContext';
 const NicknamePage = () => {
   const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -36,13 +37,19 @@ const NicknamePage = () => {
       length: 2,
     }); // e.g big-donkey
     setName(shortName);
+    setError('');
   };
 
   const handleStart = () => {
+    if (!name) {
+      setError('Please enter a name.');
+      return;
+    }
     setPending(true);
     updateUserDetails({
       nickname: name,
     });
+
     setTimeout(() => {
       setPending(false);
       if (userDetails?.isAdmin) {
@@ -78,7 +85,12 @@ const NicknamePage = () => {
               variant="outlined"
               size="small"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError('');
+              }}
+              error={error}
+              helperText={error}
             />
             <Button variant="contained" onClick={handleStart}>
               Go
