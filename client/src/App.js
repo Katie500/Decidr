@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import { ThemeProvider, createTheme } from '@mui/material';
@@ -27,10 +28,12 @@ function App() {
       <UserProvider>
         <BrowserRouter>
           <Routes>
+
             <Route path="/" element={<MainPage />} />
             <Route path="/nickname" element={<NicknamePage />} />
             <Route path="/startnewroom" element={<StartNewRoom />} />
             <Route path="/room" element={<Room />} />
+
           </Routes>
         </BrowserRouter>
       </UserProvider>
