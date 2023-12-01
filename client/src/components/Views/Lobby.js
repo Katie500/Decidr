@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import Header from "../UI/header";
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 //Lobby component represents the page where users can vote on choices.
 function Lobby() {
 
-  // Extracting room and username from the location state using useLocation hook.
+    // Extracting room and username from the location state using useLocation hook.
   const { state } = useLocation();
   const navigate = useNavigate();
   const room = state ? state.room : '';
@@ -17,8 +17,9 @@ function Lobby() {
   const [choices, setChoices] = useState([
     { id: 1, text: "Choice 1", votes: 0 },
     { id: 2, text: "Choice 2", votes: 0 },
-    // We can fix this later to add the choices
   ]);
+
+  const [newChoiceText, setNewChoiceText] = useState("");
 
   const handleVote = (choiceId) => {
     setChoices((prevChoices) =>
@@ -26,6 +27,13 @@ function Lobby() {
         choice.id === choiceId ? { ...choice, votes: choice.votes + 1 } : choice
       )
     );
+  };
+
+  const handleAddChoice = () => {
+    const newChoiceId = choices.length + 1;
+    const newChoice = { id: newChoiceId, text: newChoiceText, votes: 0 };
+    setChoices([...choices, newChoice]);
+    setNewChoiceText(""); // Clear the input field after adding a choice
   };
 
   const renderChoices = () => {
@@ -62,6 +70,20 @@ function Lobby() {
         <h4>Vote on Choices</h4>
       </Row>
       {renderChoices()}
+      <Row className="pad-bottom centered">
+        <Col xs="auto">
+          <Form.Control
+            type="text"
+            placeholder="Enter new choice"
+            className="mr-sm-2"
+            value={newChoiceText}
+            onChange={(event) => setNewChoiceText(event.target.value)}
+          />
+        </Col>
+        <Col xs="auto">
+          <button onClick={handleAddChoice}>Add Choice</button>
+        </Col>
+      </Row>
       <Row className="pad-bottom centered">
         <Col xs="auto">
           <button onClick={navigateBack}>Back to Login</button>
