@@ -19,23 +19,32 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 
 const StartNewRoom = () => {
-  const [pending, setPending] = useState(true);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState('');
+  const [question, setQuestion] = useState('');
+  const [duration, setDuration] = useState(5);
+  const [votes, setVotes] = useState(1);
   const [roomCode, setRoomCode] = useState(
     Math.random().toString(36).substring(7)
   ); // TODO: Generate room code
-  const [duration, setDuration] = useState();
-  const [votes, setVotes] = useState(1);
+
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTimeout(() => {
-      setPending(false);
-    }, 1000);
+    // if user details are not present, redirect to home page
+    if (!userDetails?.userID && !userDetails?.nickname) {
+      navigate('/');
+      alert('User not found');
+    }
     // setSessionCode(generateSessionCode());
-  });
+  }, []);
 
   const handleCreate = () => {
+    if (!question) {
+      setError('Please enter a question.');
+      return;
+    }
     setPending(true);
     setTimeout(() => {
       setPending(false);
@@ -60,7 +69,7 @@ const StartNewRoom = () => {
   return (
     <>
       <Box className="topBarContainer">
-        <Box container className="topBar widthConstraint">
+        <Box className="topBar widthConstraint">
           <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
@@ -94,6 +103,13 @@ const StartNewRoom = () => {
               fullWidth
               label="Enter your Question "
               variant="outlined"
+              value={question}
+              onChange={(e) => {
+                setQuestion(e.target.value);
+                setError('');
+              }}
+              error={error ? true : false}
+              helperText={error}
             />
           </Grid>
           <Grid margin={1}>

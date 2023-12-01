@@ -8,8 +8,7 @@ import { UserContext } from '../contexts/UserContext';
 const socket = io.connect('http://localhost:3001');
 
 // TODO:
-// 1. ADD INPUT VALIDATION FOR ROOM CODE
-// 2. APP ERROR MESSAGE IF ROOM CODE IS INVALID
+
 const MainPage = () => {
   const [pending, setPending] = useState(false);
   const [room, setRoom] = useState('');
