@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 //Lobby component represents the page where users can vote on choices.
 function Lobby() {
 
-    // Extracting room and username from the location state using useLocation hook.
+  // Extracting room and username from the location state using useLocation hook.
   const { state } = useLocation();
   const navigate = useNavigate();
   const room = state ? state.room : '';
@@ -20,6 +20,7 @@ function Lobby() {
   ]);
 
   const [newChoiceText, setNewChoiceText] = useState("");
+  const [choiceCounter, setChoiceCounter] = useState(2);
 
   const handleVote = (choiceId) => {
     setChoices((prevChoices) =>
@@ -30,10 +31,15 @@ function Lobby() {
   };
 
   const handleAddChoice = () => {
-    const newChoiceId = choices.length + 1;
+    const newChoiceId = choiceCounter + 1;
     const newChoice = { id: newChoiceId, text: newChoiceText, votes: 0 };
-    setChoices([...choices, newChoice]);
+    setChoices((prevChoices) => [...prevChoices, newChoice]);
     setNewChoiceText(""); // Clear the input field after adding a choice
+    setChoiceCounter(newChoiceId);
+  };
+
+  const handleRemoveChoice = (choiceId) => {
+    setChoices((prevChoices) => prevChoices.filter((choice) => choice.id !== choiceId));
   };
 
   const renderChoices = () => {
@@ -48,11 +54,14 @@ function Lobby() {
         <Col xs="auto">
           <p>Votes: {choice.votes}</p>
         </Col>
+        <Col xs="auto">
+          <button onClick={() => handleRemoveChoice(choice.id)}>Remove Choice</button>
+        </Col>
       </Row>
     ));
   };
 
-  //Navigates back to the login page.  
+  //Navigates back to the login page.
   const navigateBack = () => {
     navigate('/');
   };
