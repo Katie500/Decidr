@@ -4,11 +4,21 @@ const http = require("http");
 const cors = require("cors");
 const mongoose = require('mongoose');
 const { Server } = require("socket.io");
+const PORT = 3001;
+
 app.use(cors());
+app.use(express.json());
+
 
 // Database Schemas
 const User = require("./models/userSchema");
 const Room = require("./models/roomSchema");
+
+// Require the Routes
+const apiRoutes = require("./routes/apiRoutes");
+
+// Use the apiRoutes
+app.use('/', apiRoutes);
 
 const server = http.createServer(app);
 
@@ -41,6 +51,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3001, () => {
-  console.log("SERVER RUNNING");
+server.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
