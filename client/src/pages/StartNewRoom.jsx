@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
@@ -27,6 +28,7 @@ const StartNewRoom = () => {
   const [roomCode, setRoomCode] = useState(
     Math.random().toString(36).substring(7)
   ); // TODO: Generate room code
+  const [copySuccess, setCopySuccess] = useState(false); // Notifies user that room code has been copied by changing button text
 
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
@@ -66,6 +68,21 @@ const StartNewRoom = () => {
     setVotes(event.target.value);
   };
 
+  // Function to handle copying room code to clipboard
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(roomCode)
+      .then(() => {
+        setCopySuccess(true);
+        setTimeout(() => {
+          setCopySuccess(false);
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+      });
+  };
+
   return (
     <>
       <Box className="topBarContainer">
@@ -92,9 +109,11 @@ const StartNewRoom = () => {
               >
                 {roomCode}
               </Typography>
-              <IconButton>
-                <ContentCopyOutlinedIcon />
-              </IconButton>
+              <Tooltip title={copySuccess ? 'Copied' : 'Click to copy'}>
+                <IconButton onClick={handleCopy}>
+                  <ContentCopyOutlinedIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Grid>
           <Grid margin={1}>
