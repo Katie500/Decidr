@@ -13,13 +13,12 @@ const socket = io.connect('http://localhost:3001');
 const MainPage = () => {
   const [pending, setPending] = useState(false);
   const [room, setRoom] = useState('');
+  const [error, setError] = useState('');
   const { updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleVerify = () => {
     setPending(true);
-    // Simulate pending state, HIT API to verify room
-    // Assume room is verified:
     if (room) {
       socket.emit('check_room', room, (roomExists) => {
         if (roomExists) {
@@ -34,11 +33,12 @@ const MainPage = () => {
 
           navigate('/Nickname');
         } else {
-          alert('Room does not exist. Please enter a valid code.');
+          setError('Room does not exist.');
           setPending(false);
         }
       });
     } else {
+      setError('Please enter a room code.');
       setPending(false);
     }
   };
@@ -46,6 +46,7 @@ const MainPage = () => {
   const handleCreateRoom = () => {
     setPending(true);
 
+    // TODO: WE NEED AN API TO GET A USER_ID
     updateUserDetails({
       userID: 'User12345',
       roomID: '',
@@ -81,9 +82,14 @@ const MainPage = () => {
               variant="outlined"
               size="small"
               value={room}
-              onChange={(e) => setRoom(e.target.value)}
+              onChange={(e) => {
+                setRoom(e.target.value);
+                setError('');
+              }}
+              error={error}
+              helperText={error}
             />
-            <Button variant="contained" onClick={handleVerify}>
+            <Button variant="contained" onClick={handleVerify} size="small">
               Verify
             </Button>
           </Box>
