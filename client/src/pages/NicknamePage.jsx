@@ -67,7 +67,7 @@ const NicknamePage = () => {
   return (
     <>
       <Box className="topBarContainer">
-        <Box container className="topBar widthConstraint">
+        <Box className="topBar widthConstraint">
           <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
@@ -89,7 +89,7 @@ const NicknamePage = () => {
                 setName(e.target.value);
                 setError('');
               }}
-              error={error}
+              error={error ? true : false}
               helperText={error}
             />
             <Button variant="contained" onClick={handleStart}>

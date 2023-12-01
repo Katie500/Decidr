@@ -86,7 +86,7 @@ const MainPage = () => {
                 setRoom(e.target.value);
                 setError('');
               }}
-              error={error}
+              error={error ? true : false}
               helperText={error}
             />
             <Button variant="contained" onClick={handleVerify} size="small">
