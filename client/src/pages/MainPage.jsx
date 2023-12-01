@@ -20,18 +20,27 @@ const MainPage = () => {
     setPending(true);
     // Simulate pending state, HIT API to verify room
     // Assume room is verified:
+    if (room) {
+      socket.emit('check_room', room, (roomExists) => {
+        if (roomExists) {
+          updateUserDetails({
+            userID: 'User12345', // TODO: Change this to actual user ID
+            roomID: room,
+            isAdmin: false,
+            nickname: '',
+          });
 
-    updateUserDetails({
-      userID: 'User12345',
-      isAdmin: false,
-      nickname: '',
-    });
+          socket.emit('join_room', room);
 
-    navigate('/nickname');
-
-    setTimeout(() => {
+          navigate('/Nickname');
+        } else {
+          alert('Room does not exist. Please enter a valid code.');
+          setPending(false);
+        }
+      });
+    } else {
       setPending(false);
-    }, 1000);
+    }
   };
 
   const handleCreateRoom = () => {
@@ -39,7 +48,7 @@ const MainPage = () => {
 
     updateUserDetails({
       userID: 'User12345',
-      roomID: Math.random().toString(36).substring(7),
+      roomID: '',
       isAdmin: true, // Creating a room, make this true
     });
 
@@ -71,6 +80,8 @@ const MainPage = () => {
               label="Room Code"
               variant="outlined"
               size="small"
+              value={room}
+              onChange={(e) => setRoom(e.target.value)}
             />
             <Button variant="contained" onClick={handleVerify}>
               Verify
