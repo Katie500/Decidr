@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+const User = require("../models/userSchema");
 //====================== GET ENDPOINTS =================//
 
 //1) GET Endpoint for room details
@@ -22,19 +23,19 @@ router.get('/users', (req, res) => {
       userID: 'User12345',
       roomID: '',
       isAdmin: false,
-      nickname: '',
+      username: '',
     },
     {
       userID: 'User2',
       roomID: '2',
       isAdmin: false,
-      nickname: 'Aaron',
+      username: 'Aaron',
     },
     {
       userID: 'User3',
       roomID: '3',
       isAdmin: false,
-      nickname: 'Samir',
+      username: 'Samir',
     }    
   ];
 
@@ -48,33 +49,30 @@ router.get('/users', (req, res) => {
 //7) Getting all the users of a particular room
 
 //====================== POST ENDPOINTS ==================//
-//POST Endpoint for room
-router.post('/room/:id', (req, res) => {
-  const { id } = req.params;
-  const { code } = req.body;
-
-  if (!code) {
-    res.status(418).send({ message: 'We need a code!' });
-    return;
-  }
-
-  res.send({
-    room: `Your ${code} and ID ${id}`,
-  });
-});
-
 
 //4) add a new user to the users endpoint
 router.post('/users', (req, res) => {
-  const { userID, roomID, isAdmin, nickname } = req.body;
+  const { userID, roomID, isAdmin, username } = req.body;
 
-  if (!userID || !roomID || !nickname) {
-    res.status(400).send({ message: 'Incomplete user data. Please provide userID, roomID, and nickname.' });
+  if (!userID || !roomID || !username) {
+    res.status(400).send({ message: 'Incomplete user data. Please provide userID, roomID, and username.' });
     return;
   }
 
+  // Create a new user object with the provided data
+  const newUser = {
+    userID: 'Some User ID',
+    roomID: 'Some Room ID',
+    isAdmin: 'false',
+    username: 'Some Username',
+  };
+
+  // Add the new user to the in-memory array or store it in the database
+  // (you can replace the in-memory array with a database operation)
+
   res.status(201).send(newUser);
 });
+
 
 
 //====================== DELETE ENDPOINTS ==================//

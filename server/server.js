@@ -9,6 +9,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+const server = http.createServer(app);
 
 // Database Schemas
 const User = require("./models/userSchema");
@@ -20,8 +21,6 @@ const apiRoutes = require("./routes/apiRoutes");
 // Use the apiRoutes
 app.use('/', apiRoutes);
 
-const server = http.createServer(app);
-
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -29,6 +28,8 @@ const io = new Server(server, {
   },
 });
 
+
+//==================================== ROOM CONNECTION =========================//
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
@@ -50,6 +51,9 @@ io.on("connection", (socket) => {
     console.log("User Disconnected", socket.id);
   });
 });
+
+
+//============================ SERVER RESPONSE =============================//
 
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
