@@ -5,9 +5,11 @@ import RemoveIcon from '@mui/icons-material/Remove';
 
 const VotingOptionCard = ({
   name,
-  votesIn,
-  userVotesIn,
+  votes,
+  numerOfUserVotes,
   totalAvailableVotes,
+  handleAddVote,
+  handleRemoveVote,
 }) => {
   return (
     <Card
@@ -27,16 +29,16 @@ const VotingOptionCard = ({
       >
         {name}
       </Typography>
-      <Chip label={`${votesIn} / ${totalAvailableVotes}`} />
+      <Chip label={`${votes.length} / ${totalAvailableVotes}`} />
       <Chip
-        label={`${userVotesIn}`}
+        label={`${numerOfUserVotes}`}
         sx={{ background: '#B7CFEE', color: '#2E419D' }}
       />
       <Box>
-        <IconButton>
+        <IconButton onClick={handleAddVote}>
           <AddIcon sx={{ color: 'green' }} />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={handleRemoveVote}>
           <RemoveIcon sx={{ color: 'red' }} />
         </IconButton>
       </Box>
