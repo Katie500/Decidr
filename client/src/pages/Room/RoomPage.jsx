@@ -1,25 +1,12 @@
-import {
-  Box,
-  Button,
-  Card,
-  Chip,
-  Grid,
-  Icon,
-  IconButton,
-  Modal,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Grid, IconButton, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import PermanentDrawerLeft from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
+import AddNewOptionModal from './NewOptionModal';
 
 const dummyVotingOptions = [
   {
@@ -37,12 +24,12 @@ const dummyVotingOptions = [
 ];
 
 const drawerWidth = 240;
-
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
-  const [newOption, setNewOption] = useState('');
+
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
+  const [newOptionText, setNewOptionText] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -51,40 +38,20 @@ const Room = ({}) => {
   };
 
   const handleAddNewOption = () => {
-    if (!newOption) {
+    if (!newOptionText) {
       return;
     }
     setVotingOptions([
       {
-        name: newOption,
+        name: newOptionText,
         votesIn: 0,
         userVotesIn: 0,
         totalAvailableVotes: 0,
       },
       ...votionOptions,
     ]);
-    setNewOption('');
+    setNewOptionText('');
     setOpenNewOption(false);
-  };
-
-  // const handleVote = (choiceId) => {
-  //   setChoices((prevChoices) =>
-  //     prevChoices.map((choice) =>
-  //       choice.id === choiceId ? { ...choice, votes: choice.votes + 1 } : choice
-  //     )
-  //   );
-  // };
-
-  // const handleAddChoice = () => {
-  //   const newChoiceId = choices.length + 1;
-  //   const newChoice = { id: newChoiceId, text: newChoiceText, votes: 0 };
-  //   setChoices([...choices, newChoice]);
-  //   setNewChoiceText(''); // Clear the input field after adding a choice
-  // };
-
-  //Navigates back to the login page.
-  const navigateBack = () => {
-    navigate('/');
   };
 
   return (
@@ -178,38 +145,13 @@ const Room = ({}) => {
           </Box>
         </Box>
       </Grid>
-
-      <Modal
+      <AddNewOptionModal
         open={openNewOption}
-        onClose={closeNewOptionModal}
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Card className="widthConstraint" style={{ padding: '2rem' }}>
-          <Typography variant="h6" textAlign={'center'}>
-            Add a new voting option
-          </Typography>
-
-          <Box className="inputBox">
-            <TextField
-              fullWidth
-              label="New Voting Option"
-              variant="outlined"
-              size="small"
-              value={newOption}
-              onChange={(e) => {
-                setNewOption(e.target.value);
-              }}
-            />
-            <Button variant="contained" onClick={handleAddNewOption}>
-              Add
-            </Button>
-          </Box>
-        </Card>
-      </Modal>
+        handleAdd={handleAddNewOption}
+        handleClose={closeNewOptionModal}
+        newOptionText={newOptionText}
+        setNewOptionText={setNewOptionText}
+      />
 
       <LoadingBackdrop open={pending} />
     </>
