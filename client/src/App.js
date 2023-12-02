@@ -8,7 +8,8 @@ import Room from './pages/Room';
 import StartNewRoom from './pages/StartNewRoom';
 import { UserProvider } from './contexts/UserContext';
 
-import Test from './components/Test/apiTest';
+import TestUser from './components/Test/apiTest';
+import TestRoom from './components/Test/apiTest2';
 
 function App() {
   const theme = createTheme({
@@ -35,7 +36,8 @@ function App() {
             <Route path="/nickname" element={<NicknamePage />} />
             <Route path="/startnewroom" element={<StartNewRoom />} />
             <Route path="/room" element={<Room />} />
-            <Route path="/test" element={<Test />} />
+            <Route path="/testUser" element={<TestUser />} />
+            <Route path="/testRoom" element={<TestRoom />} />
 
           </Routes>
         </BrowserRouter>
