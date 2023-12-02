@@ -42,7 +42,7 @@ const drawerWidth = 240;
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
-  const [users, setUsername] = useState(dummyUsers); // Username state
+  const [users, setUser] = useState(dummyUsers); // Username state
   const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
   const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
@@ -74,7 +74,7 @@ const Room = ({}) => {
     }
     setVotingOptions([
       {
-        optionID: (votionOptions.length + 1).toString(), 
+        optionID: (votionOptions.length + 1).toString(),
         text: newOptionText,
         votes: [],
       },
