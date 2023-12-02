@@ -116,7 +116,6 @@ const Room = ({}) => {
       <Grid
         className="container"
         style={{
-          border: '2px solid red',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'initial',
@@ -124,7 +123,13 @@ const Room = ({}) => {
       >
         <Box
           className="widthConstraint"
-          style={{ marginTop: '80px', width: '100%' }}
+          style={{
+            marginTop: '80px',
+            width: '100%',
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
         >
           <Typography
             variant="h5"
@@ -134,15 +139,37 @@ const Room = ({}) => {
           >
             Where do we wanna eat?
           </Typography>
-          {votionOptions.map((option, index) => (
-            <VotingOptionCard
-              key={index}
-              name={option.name}
-              votesIn={option.votesIn}
-              totalAvailableVotes={option.totalAvailableVotes}
-              userVotesIn={option.userVotesIn}
-            />
-          ))}
+          <Box
+            style={{
+              flexGrow: 1,
+              overflowY: 'scroll',
+            }}
+          >
+            {votionOptions.map((option, index) => (
+              <VotingOptionCard
+                key={index}
+                name={option.name}
+                votesIn={option.votesIn}
+                totalAvailableVotes={option.totalAvailableVotes}
+                userVotesIn={option.userVotesIn}
+              />
+            ))}
+          </Box>
+          <Box
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '1rem',
+              alignItems: 'center',
+            }}
+          >
+            <Typography variant="h6" fontStyle={'italic'}>
+              You have X votes left to use.
+            </Typography>
+            <Button variant="contained" color="success">
+              Add a new option
+            </Button>
+          </Box>
         </Box>
       </Grid>
 
