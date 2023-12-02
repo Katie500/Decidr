@@ -1,7 +1,10 @@
 import {
   Box,
   Button,
+  Card,
+  Chip,
   Grid,
+  Icon,
   IconButton,
   TextField,
   Typography,
@@ -11,62 +14,94 @@ import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+
+const dummyVotingOptions = [
+  {
+    name: 'Time Hortons',
+    votesIn: 0,
+    userVotesIn: 0,
+    totalAvailableVotes: 0,
+  },
+  {
+    name: 'McDonalds',
+    votesIn: 0,
+    userVotesIn: 0,
+    totalAvailableVotes: 0,
+  },
+];
 
 const Room = ({}) => {
-  const navigate = useNavigate();
   const [pending, setPending] = useState(false);
-
+  const [newChoiceText, setNewChoiceText] = useState('');
+  const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
   const { userDetails, updateUserDetails } = useContext(UserContext);
+  const navigate = useNavigate();
 
-  // State to manage choices and votes
-  const [choices, setChoices] = useState([
-    { id: 1, text: "Choice 1", votes: 0 },
-    { id: 2, text: "Choice 2", votes: 0 },
-  ]);
+  // const handleVote = (choiceId) => {
+  //   setChoices((prevChoices) =>
+  //     prevChoices.map((choice) =>
+  //       choice.id === choiceId ? { ...choice, votes: choice.votes + 1 } : choice
+  //     )
+  //   );
+  // };
 
-  const [newChoiceText, setNewChoiceText] = useState("");
+  // const handleAddChoice = () => {
+  //   const newChoiceId = choices.length + 1;
+  //   const newChoice = { id: newChoiceId, text: newChoiceText, votes: 0 };
+  //   setChoices([...choices, newChoice]);
+  //   setNewChoiceText(''); // Clear the input field after adding a choice
+  // };
 
-  const handleVote = (choiceId) => {
-    setChoices((prevChoices) =>
-      prevChoices.map((choice) =>
-        choice.id === choiceId ? { ...choice, votes: choice.votes + 1 } : choice
-      )
+  //Navigates back to the login page.
+  const navigateBack = () => {
+    navigate('/');
+  };
+
+  const VotingOptionCard = ({
+    name,
+    votesIn,
+    userVotesIn,
+    totalAvailableVotes,
+  }) => {
+    return (
+      <Card
+        style={{
+          padding: '1rem',
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'center',
+          margin: '1rem',
+        }}
+      >
+        <Typography
+          textAlign={'left'}
+          width={'45%'}
+          textOverflow={'ellipsis'}
+          overflow={'hidden'}
+        >
+          {name}
+        </Typography>
+        <Chip label={`${votesIn} / ${totalAvailableVotes}`} />
+        <Chip
+          label={`${userVotesIn}`}
+          sx={{ background: '#B7CFEE', color: '#2E419D' }}
+        />
+        <IconButton>
+          <AddIcon sx={{ color: 'green' }} />
+        </IconButton>
+        <IconButton>
+          <RemoveIcon sx={{ color: 'red' }} />
+        </IconButton>
+      </Card>
     );
   };
-
-  const renderChoices = () => {
-    return choices.map((choice) => (
-      <div key={choice.id} className="pad-bottom centered">
-        <div xs="auto">
-          <p>{choice.text}</p>
-        </div>
-        <div xs="auto">
-          <button onClick={() => handleVote(choice.id)}>Vote</button>
-        </div>
-        <div xs="auto">
-          <p>Votes: {choice.votes}</p>
-        </div>
-      </div>
-    ));
-  };
-
-  const handleAddChoice = () => {
-    const newChoiceId = choices.length + 1;
-    const newChoice = { id: newChoiceId, text: newChoiceText, votes: 0 };
-    setChoices([...choices, newChoice]);
-    setNewChoiceText(""); // Clear the input field after adding a choice
-  };
-
-    //Navigates back to the login page.  
-    const navigateBack = () => {
-      navigate('/');
-    };
-
 
   return (
     <>
       <Box className="topBarContainer">
-        <Box container className="topBar widthConstraint">
+        <Box className="topBar widthConstraint">
           <IconButton className="topBarIcon">
             <MenuIcon />
           </IconButton>
@@ -78,40 +113,40 @@ const Room = ({}) => {
           </Typography>
         </Box>
       </Box>
-
-
-      <Box className="container">
-      <div>
-          <h4>Vote on Choices</h4>
-      </div>
-      
-      {renderChoices()}
-      <div>
-        <div>
-          <div
-            type="text"
-            placeholder="Enter new choice"
-            className="mr-sm-2"
-            value={newChoiceText}
-            onChange={(event) => setNewChoiceText(event.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={handleAddChoice}>Add Choice</button>
-        </div>
-      </div>
-      <div className="pad-bottom centered">
-        <div>
-          <button onClick={navigateBack}>Back to Login</button>
-        </div>
-      </div>
-      </Box>
-
+      <Grid
+        className="container"
+        style={{
+          border: '2px solid red',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'initial',
+        }}
+      >
+        <Box
+          className="widthConstraint"
+          style={{ marginTop: '80px', width: '100%' }}
+        >
+          <Typography
+            variant="h5"
+            fontStyle={'italic'}
+            width={'100%'}
+            textAlign={'center'}
+          >
+            Where do we wanna eat?
+          </Typography>
+          {votionOptions.map((option, index) => (
+            <VotingOptionCard
+              key={index}
+              name={option.name}
+              votesIn={option.votesIn}
+              totalAvailableVotes={option.totalAvailableVotes}
+              userVotesIn={option.userVotesIn}
+            />
+          ))}
+        </Box>
+      </Grid>
 
       <LoadingBackdrop open={pending} />
-
-
-
     </>
   );
 };
