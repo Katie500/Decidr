@@ -71,3 +71,21 @@ mongoose.connect("mongodb://0.0.0.0:27017/users")
   .catch((error) => {
     console.error('MongoDB connection error:', error);
   });
+
+
+// Connect to MongoDB using mongoose
+mongoose.connect("mongodb://0.0.0.0:27017/rooms")
+  .then(() => {
+    console.log('MongoDB connected');
+
+    // Run the roomSchema.js code
+    require("./models/roomSchema");
+
+    // Start the server after MongoDB connection is established
+    server.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+  });

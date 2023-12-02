@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-mongoose.connect("mongodb://0.0.0.0:27017/room")
+mongoose.connect("mongodb://0.0.0.0:27017/rooms")
 .then(() => {
     console.log('mongodb connected');
 })

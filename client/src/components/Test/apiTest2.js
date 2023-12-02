@@ -29,21 +29,25 @@ const ApiTest2 = () => {
         },
         body: JSON.stringify(newRoom),
       });
-
+  
+      console.log('Response status:', response.status);
+  
       if (response.ok) {
         console.log('Room created successfully');
-        // Fetch the updated room list after creating a new room
-        const updatedRoom = await response.json();
-        setRooms([...rooms, updatedRoom]);
-        // Reset the form
+        const responseJson = await response.json();
+        console.log('Response from server:', responseJson);
+        setRooms([...rooms, responseJson]);
         setNewRoom({ RoomID: '', question: '', endTime: '', ownerUserID: '' });
       } else {
-        console.error('Failed to create room');
+        console.error('Failed to create room. Status:', response.status);
+        const errorText = await response.text();
+        console.error('Error details:', errorText);
       }
+      
     } catch (error) {
       console.error('Error creating room:', error);
     }
-  };
+  };  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
