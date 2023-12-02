@@ -14,7 +14,6 @@ mongoose.connect("mongodb://0.0.0.0:27017/users")
 
 const userSchema = new Schema({
 
-    userID: { type: String, required: true },
     roomID: { type: String, required: true },
     isAdmin: { type: Boolean, required: true },
     username: { type: String, required: true },

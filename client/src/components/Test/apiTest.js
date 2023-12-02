@@ -4,20 +4,19 @@ import { useNavigate } from 'react-router-dom';
 const ApiTest = () => {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState({
-    userID: '',
     roomID: '',
     isAdmin: false,
     username: '',
   });
   const navigate = useNavigate();
 
-  //TEST FOR GET 
+  //TEST FOR GET
   useEffect(() => {
     // Fetch data from the API
     fetch('http://localhost:3001/users')
-      .then(response => response.json())
-      .then(data => setUsers(data))
-      .catch(error => console.error('Error fetching data:', error));
+      .then((response) => response.json())
+      .then((data) => setUsers(data))
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   //TEST FOR POST
@@ -38,7 +37,7 @@ const ApiTest = () => {
         const updatedUser = await response.json();
         setUsers([...users, updatedUser]);
         // Reset the form
-        setNewUser({ userID: '', roomID: '', username: '' });
+        setNewUser({ roomID: '', username: '' });
       } else {
         console.error('Failed to create user');
       }
@@ -56,29 +55,41 @@ const ApiTest = () => {
     <div>
       <h1>User List</h1>
       <ul>
-        {users.map(user => (
-          <li key={user.userID}>
-            UserID: {user.userID}, RoomID: {user.roomID}, isAdmin: {user.isAdmin.toString()}, Username: {user.username}
+        {users.map((user) => (
+          <li key={user._id}>
+            User ID: {user._id}, Room ID: {user.roomID}, isAdmin: {user.isAdmin.toString()}, Username: {user.username}
           </li>
         ))}
       </ul>
 
-    <h2>Enter new user information for the database here:</h2>
+      <h2>Enter new user information for the database here:</h2>
 
       {/* Input fields for creating a new user */}
-      <label>
-        UserID:
-        <input type="text" name="userID" value={newUser.userID} onChange={handleInputChange} />
-      </label>
-      <label>
-        RoomID:
-        <input type="text" name="roomID" value={newUser.roomID} onChange={handleInputChange} />
-      </label>
-      <label>
-        Username:
-        <input type="text" name="username" value={newUser.username} onChange={handleInputChange} />
-      </label>
-
+      <div className="input-row">
+        <label>
+          Room ID:
+          <input
+            type="text"
+            name="roomID"
+            placeholder="Enter room ID here"
+            value={newUser.roomID}
+            onChange={handleInputChange}
+          />
+        </label>
+        <br />
+        <br />
+        <label>
+          Username:
+          <input
+            type="text"
+            name="username"
+            placeholder="Enter username here"
+            value={newUser.username}
+            onChange={handleInputChange}
+          />
+        </label>
+      </div>
+      <br />
       <button onClick={handleCreateUser}>Create User</button>
     </div>
   );

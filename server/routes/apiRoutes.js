@@ -41,9 +41,9 @@ router.get('/users', async (req, res) => {
 
 //4) add a new user to the users endpoint
 router.post('/users', async (req, res) => {
-  const { userID, roomID, isAdmin, username } = req.body;
+  const { roomID, isAdmin, username } = req.body;
 
-  if (!userID || !roomID || !username) {
+  if (!roomID || !username) {
     res.status(400).send({ message: 'Incomplete user data. Please provide userID, roomID, and username.' });
     return;
   }
@@ -51,7 +51,6 @@ router.post('/users', async (req, res) => {
   try {
     // Create a new user object with the provided data
     const newUser = new User({
-      userID,
       roomID,
       isAdmin,
       username,
