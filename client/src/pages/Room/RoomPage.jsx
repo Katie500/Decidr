@@ -10,7 +10,6 @@ import React, { useContext, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
 import PermanentDrawerLeft from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
@@ -35,15 +34,13 @@ const drawerWidth = 240;
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
+  const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
-
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
   );
-
-  const navigate = useNavigate();
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
@@ -69,7 +66,11 @@ const Room = ({}) => {
 
   return (
     <>
-      <PermanentDrawerLeft drawerWidth={drawerWidth} />
+      <PermanentDrawerLeft
+        drawerWidth={drawerWidth}
+        open={drawerOpen}
+        setDrawerOpen={setDrawerOpen}
+      />
       <Grid
         className="container roomWrapper"
         sx={{
@@ -78,9 +79,12 @@ const Room = ({}) => {
       >
         <Box className="widthConstraint contentBox">
           <Box className="headerBox">
-            {/* ONLY SHOW */}
+            {/* ONLY SHOW HAMBURGER ON MOBILE*/}
             {hideDesktopDrawer && (
-              <IconButton className="menuIcon">
+              <IconButton
+                className="menuIcon"
+                onClick={() => setDrawerOpen(true)}
+              >
                 <MenuIcon />
               </IconButton>
             )}

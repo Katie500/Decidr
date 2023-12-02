@@ -17,14 +17,18 @@ import { useState } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
 
-export default function PermanentDrawerLeft({ open = false, drawerWidth }) {
+export default function PermanentDrawerLeft({
+  open,
+  setDrawerOpen,
+  drawerWidth,
+}) {
+  console.log('drawer is :', open);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     // Update the drawer state based on screen size and passed `open` prop
     if (isMobile) {
-      setDrawerOpen(false);
+      setDrawerOpen(open);
     } else {
       setDrawerOpen(true);
     }
@@ -44,7 +48,7 @@ export default function PermanentDrawerLeft({ open = false, drawerWidth }) {
           },
         }}
         variant={isMobile ? 'temporary' : 'permanent'}
-        open={drawerOpen}
+        open={open}
         onClose={() => setDrawerOpen(false)}
         anchor="left"
       >
