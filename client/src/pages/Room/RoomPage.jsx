@@ -1,4 +1,11 @@
-import { Box, Button, Grid, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Typography,
+  useMediaQuery,
+} from '@mui/material';
 import React, { useContext, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -32,6 +39,10 @@ const Room = ({}) => {
   const [newOptionText, setNewOptionText] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
 
+  const hideDesktopDrawer = useMediaQuery((theme) =>
+    theme.breakpoints.down('md')
+  );
+
   const navigate = useNavigate();
 
   const closeNewOptionModal = () => {
@@ -62,14 +73,18 @@ const Room = ({}) => {
       <Grid
         className="container roomWrapper"
         sx={{
-          marginLeft: '240px',
+          marginLeft: hideDesktopDrawer ? '0px' : '240px',
         }}
       >
         <Box className="widthConstraint contentBox">
           <Box className="headerBox">
-            <IconButton className="menuIcon">
-              <MenuIcon />
-            </IconButton>
+            {/* ONLY SHOW */}
+            {hideDesktopDrawer && (
+              <IconButton className="menuIcon">
+                <MenuIcon />
+              </IconButton>
+            )}
+
             <Typography>
               Room:
               <span style={{ textTransform: 'uppercase', fontStyle: 'italic' }}>
@@ -126,7 +141,6 @@ const Room = ({}) => {
         newOptionText={newOptionText}
         setNewOptionText={setNewOptionText}
       />
-
       <LoadingBackdrop open={pending} />
     </>
   );
