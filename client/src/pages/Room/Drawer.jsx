@@ -14,15 +14,23 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { IconButton, useMediaQuery } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { UserContext } from '../../contexts/UserContext';
 
 export default function PermanentDrawerLeft({
   open,
   setDrawerOpen,
   drawerWidth,
+  onCancelSession,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
+  const { userDetails, updateUserDetails } = useContext(UserContext);
+  const [users, setUsers] = useState([]); // Username state
+
+  const addUser = (newUser) => {
+    setUsers((prevUsers) => [...prevUsers, newUser]);
+  };
 
   useEffect(() => {
     // Update the drawer state based on screen size and passed `open` prop
@@ -56,7 +64,7 @@ export default function PermanentDrawerLeft({
             <AccountCircleIcon />
           </IconButton>
           <Typography noWrap component="div">
-            User Name
+            {userDetails?.nickname}
           </Typography>
         </Toolbar>
         <Divider />
@@ -75,7 +83,7 @@ export default function PermanentDrawerLeft({
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={onCancelSession}>
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>

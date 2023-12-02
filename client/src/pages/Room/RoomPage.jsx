@@ -146,13 +146,28 @@ const Room = ({}) => {
     }
   };
 
+  const handleCancelSession = () => {
+    console.log('Session cancelled!');
+  };
+
+  const sessionCancelled = false;
+
   return (
     <>
-      <PermanentDrawerLeft
-        drawerWidth={drawerWidth}
-        open={drawerOpen}
-        setDrawerOpen={setDrawerOpen}
-      />
+      {!sessionCancelled && (
+        <PermanentDrawerLeft
+          drawerWidth={drawerWidth}
+          open={drawerOpen}
+          setDrawerOpen={setDrawerOpen}
+          onCancelSession={handleCancelSession}
+        />
+      )}
+      {sessionCancelled ? (
+        // We can fix closing a room(session) later
+        <Typography variant="h4" align="center">
+          Session has been cancelled.
+        </Typography>
+      ) : (
       <Grid
         className="container roomWrapper"
         sx={{
@@ -227,6 +242,7 @@ const Room = ({}) => {
           </Box>
         </Box>
       </Grid>
+      )}
       <AddNewOptionModal
         open={openNewOption}
         handleAdd={handleAddNewOption}
