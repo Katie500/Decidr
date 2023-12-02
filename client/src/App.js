@@ -6,8 +6,8 @@ import '../src/styles/SharedStyles.css';
 import StartNewRoom from './pages/StartNewRoom';
 import { UserProvider } from './contexts/UserContext';
 import Room from './pages/Room/RoomPage';
-
 import Test from './components/Test/apiTest';
+import { SocketProvider } from './contexts/SocketContext';
 
 function App() {
   const theme = createTheme({
@@ -26,17 +26,19 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <UserProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/nickname" element={<NicknamePage />} />
-            <Route path="/startnewroom" element={<StartNewRoom />} />
-            <Route path="/room" element={<Room />} />
-            <Route path="/test" element={<Test />} />
-          </Routes>
-        </BrowserRouter>
-      </UserProvider>
+      <SocketProvider>
+        <UserProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<MainPage />} />
+              <Route path="/nickname" element={<NicknamePage />} />
+              <Route path="/startnewroom" element={<StartNewRoom />} />
+              <Route path="/room" element={<Room />} />
+              <Route path="/test" element={<Test />} />
+            </Routes>
+          </BrowserRouter>
+        </UserProvider>
+      </SocketProvider>
     </ThemeProvider>
   );
 }
