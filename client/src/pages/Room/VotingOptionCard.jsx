@@ -34,7 +34,7 @@ const VotingOptionCard = ({
         label={`${numerOfUserVotes}`}
         sx={{ background: '#B7CFEE', color: '#2E419D' }}
       />
-      <Box>
+      <Box style={{ display: 'flex' }}>
         <IconButton onClick={handleAddVote}>
           <AddIcon sx={{ color: 'green' }} />
         </IconButton>
