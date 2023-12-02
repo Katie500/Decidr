@@ -8,12 +8,8 @@ const voteOptionSchema = new Schema({
 
 const roomSchema = new Schema({
     RoomID: { type: String, required: true, unique: true },
-    questions: [
-        {
-            question: { type: String, required: true },
-            voteOptions: [voteOptionSchema],
-        }
-    ],
+    question: { type: String, required: true },
+    voteOptions: [voteOptionSchema],
     endTime: { type: Date, required: true },
     ownerUserID: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 });
