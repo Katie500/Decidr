@@ -55,6 +55,19 @@ io.on("connection", (socket) => {
 
 //============================ SERVER RESPONSE =============================//
 
-server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Connect to MongoDB using mongoose
+mongoose.connect("mongodb://0.0.0.0:27017/users")
+  .then(() => {
+    console.log('MongoDB connected');
+
+    // Run the userSchema.js code
+    require("./models/userSchema");
+
+    // Start the server after MongoDB connection is established
+    server.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+  });

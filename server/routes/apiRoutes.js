@@ -17,29 +17,18 @@ router.get('/room', (req, res) => {
 //2) GET Endpoint for creating room
 
 //3) getting all the users of a particular room
-router.get('/users', (req, res) => {
-  const users = [
-    {
-      userID: 'User12345',
-      roomID: '',
-      isAdmin: false,
-      username: '',
-    },
-    {
-      userID: 'User2',
-      roomID: '2',
-      isAdmin: false,
-      username: 'Aaron',
-    },
-    {
-      userID: 'User3',
-      roomID: '3',
-      isAdmin: false,
-      username: 'Samir',
-    }    
-  ];
+//3) getting all the users of a particular room
+router.get('/users', async (req, res) => {
+  try {
+    // Query the database to get all users
+    const users = await User.find();
 
-  res.status(200).send(users);
+    // Send the users in the response
+    res.status(200).send(users);
+  } catch (error) {
+    console.error('Error fetching users from the database:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 });
 
 //4) add a new voting option
@@ -51,7 +40,7 @@ router.get('/users', (req, res) => {
 //====================== POST ENDPOINTS ==================//
 
 //4) add a new user to the users endpoint
-router.post('/users', (req, res) => {
+router.post('/users', async (req, res) => {
   const { userID, roomID, isAdmin, username } = req.body;
 
   if (!userID || !roomID || !username) {
@@ -59,18 +48,23 @@ router.post('/users', (req, res) => {
     return;
   }
 
-  // Create a new user object with the provided data
-  const newUser = {
-    userID: 'Some User ID',
-    roomID: 'Some Room ID',
-    isAdmin: 'false',
-    username: 'Some Username',
-  };
+  try {
+    // Create a new user object with the provided data
+    const newUser = new User({
+      userID,
+      roomID,
+      isAdmin,
+      username,
+    });
 
-  // Add the new user to the in-memory array or store it in the database
-  // (you can replace the in-memory array with a database operation)
+    // Save the new user to the database
+    const savedUser = await newUser.save();
 
-  res.status(201).send(newUser);
+    res.status(201).send(savedUser);
+  } catch (error) {
+    console.error('Error saving user to the database:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 });
 
 

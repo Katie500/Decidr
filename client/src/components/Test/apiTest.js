@@ -3,8 +3,13 @@ import { useNavigate } from 'react-router-dom';
 
 const ApiTest = () => {
   const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState({
+    userID: '',
+    roomID: '',
+    isAdmin: false,
+    username: '',
+  });
   const navigate = useNavigate();
-
 
   //TEST FOR GET 
   useEffect(() => {
@@ -15,7 +20,6 @@ const ApiTest = () => {
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-
   //TEST FOR POST
   const handleCreateUser = async () => {
     try {
@@ -25,12 +29,7 @@ const ApiTest = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          userID: 'NewUserID', // Replace with the actual user data
-          roomID: 'NewRoomID',
-          isAdmin: false,
-          username: 'NewUsername',
-        }),
+        body: JSON.stringify(newUser),
       });
 
       if (response.ok) {
@@ -38,12 +37,19 @@ const ApiTest = () => {
         // Fetch the updated user list after creating a new user
         const updatedUser = await response.json();
         setUsers([...users, updatedUser]);
+        // Reset the form
+        setNewUser({ userID: '', roomID: '', username: '' });
       } else {
         console.error('Failed to create user');
       }
     } catch (error) {
       console.error('Error creating user:', error);
     }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewUser((prevUser) => ({ ...prevUser, [name]: value }));
   };
 
   return (
@@ -56,6 +62,23 @@ const ApiTest = () => {
           </li>
         ))}
       </ul>
+
+    <h2>Enter new user information for the database here:</h2>
+
+      {/* Input fields for creating a new user */}
+      <label>
+        UserID:
+        <input type="text" name="userID" value={newUser.userID} onChange={handleInputChange} />
+      </label>
+      <label>
+        RoomID:
+        <input type="text" name="roomID" value={newUser.roomID} onChange={handleInputChange} />
+      </label>
+      <label>
+        Username:
+        <input type="text" name="username" value={newUser.username} onChange={handleInputChange} />
+      </label>
+
       <button onClick={handleCreateUser}>Create User</button>
     </div>
   );
