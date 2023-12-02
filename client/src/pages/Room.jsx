@@ -6,6 +6,7 @@ import {
   Grid,
   Icon,
   IconButton,
+  Modal,
   TextField,
   Typography,
 } from '@mui/material';
@@ -16,10 +17,11 @@ import { UserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 
 const dummyVotingOptions = [
   {
-    name: 'Time Hortons',
+    name: 'Tim Hortons',
     votesIn: 0,
     userVotesIn: 0,
     totalAvailableVotes: 0,
@@ -34,10 +36,29 @@ const dummyVotingOptions = [
 
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
-  const [newChoiceText, setNewChoiceText] = useState('');
+  const [newOption, setNewOption] = useState('');
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
+  const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
+
+  const closeNewOptionModal = () => {
+    setOpenNewOption(false);
+  };
+
+  const handleAddNewOption = () => {
+    setVotingOptions([
+      {
+        name: newOption,
+        votesIn: 0,
+        userVotesIn: 0,
+        totalAvailableVotes: 0,
+      },
+      ...votionOptions,
+    ]);
+    setNewOption('');
+    setOpenNewOption(false);
+  };
 
   // const handleVote = (choiceId) => {
   //   setChoices((prevChoices) =>
@@ -108,7 +129,7 @@ const Room = ({}) => {
           <Typography variant="h6">
             In room{' '}
             <span style={{ textTransform: 'uppercase' }}>
-              {userDetails.roomID}
+              {userDetails.roomID || 'XXXXXX'}
             </span>
           </Typography>
         </Box>
@@ -166,12 +187,47 @@ const Room = ({}) => {
             <Typography variant="h6" fontStyle={'italic'}>
               You have X votes left to use.
             </Typography>
-            <Button variant="contained" color="success">
-              Add a new option
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => setOpenNewOption(true)}
+            >
+              New Voting Option
             </Button>
           </Box>
         </Box>
       </Grid>
+      <Modal
+        open={openNewOption}
+        onClose={closeNewOptionModal}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Card className="widthConstraint" style={{ padding: '2rem' }}>
+          <Typography variant="h6" textAlign={'center'}>
+            Add a new voting option
+          </Typography>
+
+          <Box className="inputBox">
+            <TextField
+              fullWidth
+              label="New Voting Option"
+              variant="outlined"
+              size="small"
+              value={newOption}
+              onChange={(e) => {
+                setNewOption(e.target.value);
+              }}
+            />
+            <Button variant="contained" onClick={handleAddNewOption}>
+              Add
+            </Button>
+          </Box>
+        </Card>
+      </Modal>
 
       <LoadingBackdrop open={pending} />
     </>
