@@ -13,16 +13,15 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import { useState } from 'react';
-import { useMediaQuery } from '@mui/material';
+import { IconButton, useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 export default function PermanentDrawerLeft({
   open,
   setDrawerOpen,
   drawerWidth,
 }) {
-  console.log('drawer is :', open);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   useEffect(() => {
@@ -52,14 +51,21 @@ export default function PermanentDrawerLeft({
         onClose={() => setDrawerOpen(false)}
         anchor="left"
       >
-        <Toolbar />
+        <Toolbar>
+          <IconButton>
+            <AccountCircleIcon />
+          </IconButton>
+          <Typography noWrap component="div">
+            User Name
+          </Typography>
+        </Toolbar>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {['User1', 'User2', 'User3', 'User4'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  <MailIcon />
                 </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItemButton>
@@ -68,16 +74,14 @@ export default function PermanentDrawerLeft({
         </List>
         <Divider />
         <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'red' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Cancel Session'} />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
     </Box>
