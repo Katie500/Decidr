@@ -109,12 +109,14 @@ const Room = ({}) => {
           label={`${userVotesIn}`}
           sx={{ background: '#B7CFEE', color: '#2E419D' }}
         />
-        <IconButton>
-          <AddIcon sx={{ color: 'green' }} />
-        </IconButton>
-        <IconButton>
-          <RemoveIcon sx={{ color: 'red' }} />
-        </IconButton>
+        <Box>
+          <IconButton>
+            <AddIcon sx={{ color: 'green' }} />
+          </IconButton>
+          <IconButton>
+            <RemoveIcon sx={{ color: 'red' }} />
+          </IconButton>
+        </Box>
       </Card>
     );
   };
@@ -131,6 +133,10 @@ const Room = ({}) => {
             <span style={{ textTransform: 'uppercase' }}>
               {userDetails.roomID || 'XXXXXX'}
             </span>
+          </Typography>
+          <Typography style={{ position: 'absolute', right: '0' }}>
+            Time Left:{' '}
+            <span style={{ fontWeight: 'bold', color: 'red' }}>00:00</span>
           </Typography>
         </Box>
       </Box>
