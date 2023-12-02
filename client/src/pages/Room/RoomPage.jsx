@@ -11,13 +11,14 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useContext, useState } from 'react';
-import LoadingBackdrop from '../components/global/LoadingBackdrop';
+import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
-import { UserContext } from '../contexts/UserContext';
+import { UserContext } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import PermanentDrawerLeft from './Drawer';
 
 const dummyVotingOptions = [
   {
@@ -34,6 +35,8 @@ const dummyVotingOptions = [
   },
 ];
 
+const drawerWidth = 240;
+
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
   const [newOption, setNewOption] = useState('');
@@ -47,6 +50,9 @@ const Room = ({}) => {
   };
 
   const handleAddNewOption = () => {
+    if (!newOption) {
+      return;
+    }
     setVotingOptions([
       {
         name: newOption,
@@ -123,41 +129,50 @@ const Room = ({}) => {
 
   return (
     <>
-      <Box className="topBarContainer">
-        <Box className="topBar widthConstraint">
-          <IconButton className="topBarIcon">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6">
-            In room{' '}
-            <span style={{ textTransform: 'uppercase' }}>
-              {userDetails.roomID || 'XXXXXX'}
-            </span>
-          </Typography>
-          <Typography style={{ position: 'absolute', right: '0' }}>
-            Time Left:{' '}
-            <span style={{ fontWeight: 'bold', color: 'red' }}>00:00</span>
-          </Typography>
-        </Box>
-      </Box>
+      <PermanentDrawerLeft drawerWidth={drawerWidth} />
       <Grid
         className="container"
         style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'initial',
+          paddingLeft: '240px',
         }}
       >
         <Box
           className="widthConstraint"
           style={{
-            marginTop: '80px',
+            margin: '1rem',
             width: '100%',
             flexGrow: 1,
             display: 'flex',
             flexDirection: 'column',
+            position: 'relative',
           }}
         >
+          <Box
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '1rem 1 rem 0',
+              margin: '1rem',
+            }}
+          >
+            <IconButton style={{ position: 'absolute', left: '0' }}>
+              <MenuIcon />
+            </IconButton>
+            <Typography>
+              Room:
+              <span style={{ textTransform: 'uppercase', fontStyle: 'italic' }}>
+                {userDetails.roomID || 'XXXXXX'}
+              </span>
+            </Typography>
+            <Typography style={{ position: 'absolute', right: '1rem' }}>
+              Time Left:{' '}
+              <span style={{ fontWeight: 'bold', color: 'red' }}>00:00</span>
+            </Typography>
+          </Box>
           <Typography
             variant="h5"
             fontStyle={'italic'}
@@ -203,6 +218,7 @@ const Room = ({}) => {
           </Box>
         </Box>
       </Grid>
+
       <Modal
         open={openNewOption}
         onClose={closeNewOptionModal}
