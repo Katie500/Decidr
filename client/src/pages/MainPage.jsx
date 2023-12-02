@@ -4,9 +4,7 @@ import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
-
-const socket = io.connect('http://localhost:3001');
-
+import { SocketContext } from '../contexts/SocketContext';
 // TODO:
 
 const MainPage = () => {
@@ -14,28 +12,35 @@ const MainPage = () => {
   const [room, setRoom] = useState('');
   const [error, setError] = useState('');
   const { updateUserDetails } = useContext(UserContext);
+  const socket = useContext(SocketContext);
+
   const navigate = useNavigate();
 
   const handleVerify = () => {
     setPending(true);
     if (room) {
-      socket.emit('check_room', room, (roomExists) => {
-        if (roomExists) {
-          updateUserDetails({
-            userID: 'User12345', // TODO: Change this to actual user ID
-            roomID: room,
-            isAdmin: false,
-            nickname: '',
-          });
+      if (socket) {
+        socket.emit('check_room', room, (roomExists) => {
+          if (roomExists) {
+            updateUserDetails({
+              userID: 'User12345', // TODO: Change this to actual user ID
+              roomID: room,
+              isAdmin: false,
+              nickname: '',
+            });
 
-          socket.emit('join_room', room);
+            socket.emit('join_room', room);
 
-          navigate('/Nickname');
-        } else {
-          setError('Room does not exist.');
-          setPending(false);
-        }
-      });
+            navigate('/Nickname');
+          } else {
+            setError('Room does not exist.');
+            setPending(false);
+          }
+        });
+      } else {
+        setError('Socket not found in MainPage.jsx.');
+        setPending(false);
+      }
     } else {
       setError('Please enter a room code.');
       setPending(false);
