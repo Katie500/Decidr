@@ -74,10 +74,9 @@ const Room = ({}) => {
     }
     setVotingOptions([
       {
-        name: newOptionText,
-        votesIn: 0,
-        userVotesIn: 0,
-        totalAvailableVotes: 0,
+        optionID: (votionOptions.length + 1).toString(), 
+        text: newOptionText,
+        votes: [],
       },
       ...votionOptions,
     ]);
