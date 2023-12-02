@@ -4,13 +4,22 @@ const http = require("http");
 const cors = require("cors");
 const mongoose = require('mongoose');
 const { Server } = require("socket.io");
+const PORT = 3001;
+
 app.use(cors());
+app.use(express.json());
+
+const server = http.createServer(app);
 
 // Database Schemas
 const User = require("./models/userSchema");
 const Room = require("./models/roomSchema");
 
-const server = http.createServer(app);
+// Require the Routes
+const apiRoutes = require("./routes/apiRoutes");
+
+// Use the apiRoutes
+app.use('/', apiRoutes);
 
 const io = new Server(server, {
   cors: {
@@ -19,6 +28,8 @@ const io = new Server(server, {
   },
 });
 
+
+//==================================== ROOM CONNECTION =========================//
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
@@ -41,6 +52,22 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3001, () => {
-  console.log("SERVER RUNNING");
-});
+
+//============================ SERVER RESPONSE =============================//
+
+// Connect to MongoDB using mongoose
+mongoose.connect("mongodb://0.0.0.0:27017/users")
+  .then(() => {
+    console.log('MongoDB connected');
+
+    // Run the userSchema.js code
+    require("./models/userSchema");
+
+    // Start the server after MongoDB connection is established
+    server.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+  });
