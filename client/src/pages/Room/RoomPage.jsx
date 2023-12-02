@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import PermanentDrawerLeft from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
+import './RoomPage.css';
 
 const dummyVotingOptions = [
   {
@@ -26,11 +27,11 @@ const dummyVotingOptions = [
 const drawerWidth = 240;
 const Room = ({}) => {
   const [pending, setPending] = useState(false);
-
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
+
   const navigate = useNavigate();
 
   const closeNewOptionModal = () => {
@@ -39,6 +40,7 @@ const Room = ({}) => {
 
   const handleAddNewOption = () => {
     if (!newOptionText) {
+      setOpenNewOption(false);
       return;
     }
     setVotingOptions([
@@ -58,35 +60,14 @@ const Room = ({}) => {
     <>
       <PermanentDrawerLeft drawerWidth={drawerWidth} />
       <Grid
-        className="container"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'initial',
-          paddingLeft: '240px',
+        className="container roomWrapper"
+        sx={{
+          marginLeft: '240px',
         }}
       >
-        <Box
-          className="widthConstraint"
-          style={{
-            margin: '1rem',
-            width: '100%',
-            flexGrow: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'relative',
-          }}
-        >
-          <Box
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: '1rem 1 rem 0',
-              margin: '1rem',
-            }}
-          >
-            <IconButton style={{ position: 'absolute', left: '0' }}>
+        <Box className="widthConstraint contentBox">
+          <Box className="headerBox">
+            <IconButton className="menuIcon">
               <MenuIcon />
             </IconButton>
             <Typography>
@@ -95,7 +76,7 @@ const Room = ({}) => {
                 {userDetails.roomID || 'XXXXXX'}
               </span>
             </Typography>
-            <Typography style={{ position: 'absolute', right: '1rem' }}>
+            <Typography className="timeText">
               Time Left:{' '}
               <span style={{ fontWeight: 'bold', color: 'red' }}>00:00</span>
             </Typography>
@@ -124,14 +105,7 @@ const Room = ({}) => {
               />
             ))}
           </Box>
-          <Box
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              padding: '1rem',
-              alignItems: 'center',
-            }}
-          >
+          <Box className="footerBox">
             <Typography variant="h6" fontStyle={'italic'}>
               You have X votes left to use.
             </Typography>
