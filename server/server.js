@@ -1,3 +1,5 @@
+
+
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -56,12 +58,13 @@ io.on("connection", (socket) => {
 //============================ SERVER RESPONSE =============================//
 
 // Connect to MongoDB using mongoose
-mongoose.connect("mongodb://0.0.0.0:27017/users")
+mongoose.connect("mongodb://0.0.0.0:27017/decidr")
   .then(() => {
     console.log('MongoDB connected');
 
     // Run the userSchema.js code
     require("./models/userSchema");
+    require("./models/roomSchema");
 
     // Start the server after MongoDB connection is established
     server.listen(PORT, () => {
