@@ -18,10 +18,12 @@ const Room = require('./models/roomSchema');
 // Require the Routes
 const apiRoutes = require('./routes/apiRoutes');
 const createUserAndRoom = require('./routes/createUserAndRoom');
+const verifyRoom = require('./routes/verifyRoom');
 
 // Use the apiRoutes
 app.use('/', apiRoutes);
 app.use('/createUserAndRoom', createUserAndRoom);
+app.use('/verifyRoom', verifyRoom);
 
 const io = new Server(server, {
   cors: {
@@ -65,7 +67,6 @@ mongoose
     // Run the userSchema.js code
     require('./models/userSchema');
     require('./models/roomSchema');
-
 
     // Start the server after MongoDB connection is established
     server.listen(PORT, () => {

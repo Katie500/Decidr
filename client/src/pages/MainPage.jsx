@@ -1,47 +1,31 @@
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import LoadingBackdrop from '../components/global/LoadingBackdrop';
-import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
-import { SocketContext } from '../contexts/SocketContext';
-// TODO:
+import { verifyRoom } from '../api/verifyRoom';
 
 const MainPage = () => {
   const [pending, setPending] = useState(false);
   const [room, setRoom] = useState('');
   const [error, setError] = useState('');
   const { updateUserDetails } = useContext(UserContext);
-  const socket = useContext(SocketContext);
 
   const navigate = useNavigate();
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     setPending(true);
     if (room) {
       const lowercaseRoom = room.toLowerCase();
 
-      if (socket) {
-        socket.emit('check_room', lowercaseRoom, (roomExists) => {
-          if (roomExists) {
-            updateUserDetails({
-              userID: 'User12345', // TODO: Change this to actual user ID
-              roomID: lowercaseRoom,
-              isAdmin: false,
-              nickname: '',
-            });
+      const roomIsActive = await verifyRoom(lowercaseRoom);
 
-            socket.emit('join_room', lowercaseRoom);
+      setPending(false);
 
-            navigate('/Nickname');
-          } else {
-            setError('Room does not exist.');
-            setPending(false);
-          }
-        });
+      if (roomIsActive) {
+        navigate('/Nickname');
       } else {
-        setError('Socket not found in MainPage.jsx.');
-        setPending(false);
+        setError('Room does not exist.');
       }
     } else {
       setError('Please enter a room code.');
@@ -50,20 +34,10 @@ const MainPage = () => {
   };
 
   const handleCreateRoom = () => {
-    setPending(true);
-
-    // TODO: WE NEED AN API TO GET A USER_ID
     updateUserDetails({
-      userID: 'User12345',
-      roomID: '',
       isAdmin: true, // Creating a room, make this true
     });
-
-    // Simulate pending state, HIT API to create room
-    setTimeout(() => {
-      setPending(false);
-      navigate('/nickname');
-    }, 1000);
+    navigate('/nickname');
   };
 
   return (
@@ -82,19 +56,19 @@ const MainPage = () => {
         <Box className="contentBox widthConstraint">
           <Typography variant="h6">Enter code for an existing room:</Typography>
           <Box className="inputBox">
-              <TextField
-                fullWidth
-                label="Room Code"
-                variant="outlined"
-                size="small"
-                value={room}
-                onChange={(e) => {
+            <TextField
+              fullWidth
+              label="Room Code"
+              variant="outlined"
+              size="small"
+              value={room}
+              onChange={(e) => {
                 setRoom(e.target.value);
                 setError('');
               }}
-                error={error ? true : false}
-                helperText={error}
-              />
+              error={error ? true : false}
+              helperText={error}
+            />
             <Button variant="contained" onClick={handleVerify} size="small">
               Verify
             </Button>
