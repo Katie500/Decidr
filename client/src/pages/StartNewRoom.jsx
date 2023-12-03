@@ -19,6 +19,7 @@ import './StartNewRoom.css';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { SocketContext } from '../contexts/SocketContext';
+import { createRoom } from '../api/createRoom';
 
 const StartNewRoom = () => {
   const [pending, setPending] = useState(false);
@@ -46,25 +47,30 @@ const StartNewRoom = () => {
     // setSessionCode(generateSessionCode());
   }, []);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!question) {
       setError('Please enter a question.');
       return;
     }
     setPending(true);
-    setTimeout(() => {
-      setPending(false);
-      updateUserDetails({
-        roomID: roomCode,
-      });
-      // Use the socket instance from the context to emit
-      if (socket) {
-        socket.emit('join_room', roomCode);
-      } else {
-        console.log('Socket not found in StartNewRoom.jsx');
-      }
-      navigate('/room');
-    }, 1000);
+    console.log('SOCKET: ', socket);
+
+    const userID = await createRoom({
+      roomID: roomCode,
+      socketID: socket.id,
+      username: userDetails.nickname,
+      question: question,
+      endTime: new Date(Date.now() + duration * 60000),
+    });
+
+    updateUserDetails({
+      roomID: roomCode,
+      userID: userID,
+    });
+
+    socket.emit('join_room', roomCode);
+
+    navigate('/room');
   };
 
   const handleBack = () => {
