@@ -61,13 +61,13 @@ const NicknamePage = () => {
         const userID = await createUser({
           username: name,
           socketID: socket.id,
-          roomID: userDetails.room,
+          roomID: userDetails.roomID,
         });
         updateUserDetails({
           nickname: name,
           userID: userID,
         });
-        socket.emit('join_room', userDetails.room);
+        socket.emit('join_room', userDetails.roomID);
         navigate('/room');
       } else {
         console.error('SOCKET NOT FOUND in NicknamePage');

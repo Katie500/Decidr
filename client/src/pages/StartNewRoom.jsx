@@ -27,9 +27,7 @@ const StartNewRoom = () => {
   const [question, setQuestion] = useState('');
   const [duration, setDuration] = useState(5);
   const [votes, setVotes] = useState(1);
-  const [roomCode, setRoomCode] = useState(
-    Math.random().toString(36).substring(7)
-  ); // TODO: Generate room code
+  const [roomID, setroomID] = useState(Math.random().toString(36).substring(7)); // TODO: Generate room code
   const [copySuccess, setCopySuccess] = useState(false); // Notifies user that room code has been copied by changing button text
 
   const { userDetails, updateUserDetails } = useContext(UserContext);
@@ -56,7 +54,7 @@ const StartNewRoom = () => {
     console.log('SOCKET: ', socket);
 
     const userID = await createRoom({
-      roomID: roomCode,
+      roomID: roomID,
       socketID: socket.id,
       username: userDetails.nickname,
       question: question,
@@ -64,11 +62,11 @@ const StartNewRoom = () => {
     });
 
     updateUserDetails({
-      roomID: roomCode,
+      roomID: roomID,
       userID: userID,
     });
 
-    socket.emit('join_room', roomCode);
+    socket.emit('join_room', roomID);
 
     navigate('/room');
   };
@@ -87,7 +85,7 @@ const StartNewRoom = () => {
   // Function to handle copying room code to clipboard
   const handleCopy = () => {
     navigator.clipboard
-      .writeText(roomCode)
+      .writeText(roomID)
       .then(() => {
         setCopySuccess(true);
         setTimeout(() => {
@@ -123,7 +121,7 @@ const StartNewRoom = () => {
                 marginTop={1.5}
                 textTransform={'uppercase'}
               >
-                {roomCode}
+                {roomID}
               </Typography>
               <Tooltip title={copySuccess ? 'Copied' : 'Click to copy'}>
                 <IconButton onClick={handleCopy}>

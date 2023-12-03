@@ -68,6 +68,7 @@ const Room = () => {
   useEffect(() => {
     if (userDetails.isAdmin) {
       setPending(false);
+      fetchRoomDetails();
       return;
     } else {
       fetchRoomDetails();
@@ -76,7 +77,7 @@ const Room = () => {
 
   const fetchRoomDetails = async () => {
     try {
-      if (!userDetails.room) {
+      if (!userDetails.roomID) {
         navigate('/');
         alert('Room ID not found. Please try again.');
       }
@@ -84,7 +85,7 @@ const Room = () => {
         navigate('/');
         alert('User ID not found. Please try again.');
       }
-      const roomDetails = await getRoomDetails(userDetails.room);
+      const roomDetails = await getRoomDetails(userDetails.roomID);
       setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 1 });
       setPending(false);
     } catch (error) {
@@ -192,28 +193,26 @@ const Room = () => {
     return differenceInSeconds > 0 ? differenceInSeconds : 0;
   };
 
+  // ===== HANDLING THE REMAINING TIME: ======//
   // useEffect to set the remaining time and update it every second
   useEffect(() => {
     setRemainingTimeInSeconds(
       calculateRemainingTimeInSeconds(roomDetails.endTime)
     );
-
     const interval = setInterval(() => {
       setRemainingTimeInSeconds((prevTime) => {
         return prevTime > 0 ? prevTime - 1 : 0;
       });
     }, 1000);
-
-    // Clear interval on component unmount
     return () => clearInterval(interval);
   }, [roomDetails.endTime]); // Dependency on roomDetails.endTime
   // Convert seconds to minutes and seconds for display
   const minutes = Math.floor(remainingTimeInSeconds / 60);
   const seconds = remainingTimeInSeconds % 60;
-
-  // Pad minutes and seconds to be two digits
   const paddedMinutes = String(minutes).padStart(2, '0');
   const paddedSeconds = String(seconds).padStart(2, '0');
+  // ===== END OF HANDLING THE REMAINING TIME ===== //
+
   return (
     <>
       {!sessionCancelled && (
@@ -253,7 +252,7 @@ const Room = () => {
                 <span
                   style={{ textTransform: 'uppercase', fontStyle: 'italic' }}
                 >
-                  {userDetails.room || 'XXXXXX'}
+                  {userDetails.roomID || 'XXXXXX'}
                 </span>
               </Typography>
               <Typography className="timeText">

@@ -21,7 +21,7 @@ const MainPage = () => {
       setPending(false);
 
       updateUserDetails({
-        room: lowercaseRoom,
+        roomID: lowercaseRoom,
         isAdmin: false, // Joining a room, make this false
       });
 
