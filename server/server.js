@@ -19,11 +19,13 @@ const Room = require('./models/roomSchema');
 const apiRoutes = require('./routes/apiRoutes');
 const createUserAndRoom = require('./routes/createUserAndRoom');
 const verifyRoom = require('./routes/verifyRoom');
+const createUser = require('./routes/createUser');
 
 // Use the apiRoutes
 app.use('/', apiRoutes);
 app.use('/createUserAndRoom', createUserAndRoom);
 app.use('/verifyRoom', verifyRoom);
+app.use('/createUser', createUser);
 
 const io = new Server(server, {
   cors: {

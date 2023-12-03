@@ -1,9 +1,15 @@
-router.post('/createUser', async (req, res) => {
+const express = require('express');
+const router = express.Router();
+
+const User = require('../models/userSchema');
+
+router.post('/', async (req, res) => {
   const { socketID, username, roomID } = req.body;
 
-  if (!socketID || !username) {
+  if (!socketID || !username || !roomID) {
     res.status(400).send({
-      message: 'Incomplete user data. Please provide socketID and username.',
+      message:
+        'Incomplete user data. Please provide socketID, username and roomID.',
     });
     return;
   }
@@ -25,3 +31,4 @@ router.post('/createUser', async (req, res) => {
     res.status(500).send({ message: 'Internal server error' });
   }
 });
+module.exports = router;

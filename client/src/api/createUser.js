@@ -10,9 +10,14 @@ const createUser = async (newUser) => {
     });
 
     if (response.ok) {
-      console.log('User created successfully', response);
+      const jsonResponse = await response.json();
+      return jsonResponse._id;
     } else {
-      console.error('Failed to create user');
+      console.error(
+        'Failed to create user:',
+        response.status,
+        response.statusText
+      );
     }
   } catch (error) {
     console.error('Error creating user:', error);

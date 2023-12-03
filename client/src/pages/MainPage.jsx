@@ -17,10 +17,13 @@ const MainPage = () => {
     setPending(true);
     if (room) {
       const lowercaseRoom = room.toLowerCase();
-
       const roomIsActive = await verifyRoom(lowercaseRoom);
-
       setPending(false);
+
+      updateUserDetails({
+        room: lowercaseRoom,
+        isAdmin: false, // Joining a room, make this false
+      });
 
       if (roomIsActive) {
         navigate('/Nickname');

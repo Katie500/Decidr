@@ -17,12 +17,15 @@ import {
 } from 'unique-names-generator';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import createUser from '../api/createUser';
+import { SocketContext } from '../contexts/SocketContext';
 
 const NicknamePage = () => {
   const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
+  const socket = useContext(SocketContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,24 +43,37 @@ const NicknamePage = () => {
     setError('');
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!name) {
       setError('Please enter a name.');
       return;
     }
     setPending(true);
-    updateUserDetails({
-      nickname: name,
-    });
 
-    setTimeout(() => {
-      setPending(false);
-      if (userDetails?.isAdmin) {
-        navigate('/StartNewRoom');
-      } else {
+    if (userDetails?.isAdmin) {
+      updateUserDetails({
+        nickname: name,
+      });
+      navigate('/StartNewRoom');
+    } else {
+      // CREATE USER HERE
+      if (socket) {
+        const userID = await createUser({
+          username: name,
+          socketID: socket.id,
+          roomID: userDetails.room,
+        });
+        updateUserDetails({
+          nickname: name,
+          userID: userID,
+        });
+        socket.emit('join_room', userDetails.room);
         navigate('/room');
+      } else {
+        console.error('SOCKET NOT FOUND in NicknamePage');
+        return;
       }
-    }, 1000);
+    }
   };
 
   const handleBack = () => {
