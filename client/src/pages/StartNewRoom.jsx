@@ -18,7 +18,7 @@ import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import './StartNewRoom.css';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
-import io from "socket.io-client";
+import { SocketContext } from '../contexts/SocketContext';
 
 const StartNewRoom = () => {
   const [pending, setPending] = useState(false);
@@ -33,8 +33,9 @@ const StartNewRoom = () => {
 
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
-  const socket = io.connect("http://localhost:3001");
 
+  // Access the socket instance from SocketContext
+  const socket = useContext(SocketContext);
 
   useEffect(() => {
     // if user details are not present, redirect to home page
@@ -56,7 +57,12 @@ const StartNewRoom = () => {
       updateUserDetails({
         roomID: roomCode,
       });
-      socket.emit('join_room', roomCode);
+      // Use the socket instance from the context to emit
+      if (socket) {
+        socket.emit('join_room', roomCode);
+      } else {
+        console.log('Socket not found in StartNewRoom.jsx');
+      }
       navigate('/room');
     }, 1000);
   };

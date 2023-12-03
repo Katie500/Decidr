@@ -4,9 +4,7 @@ import LoadingBackdrop from '../components/global/LoadingBackdrop';
 import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
-
-const socket = io.connect('http://localhost:3001');
-
+import { SocketContext } from '../contexts/SocketContext';
 // TODO:
 
 const MainPage = () => {
@@ -14,28 +12,37 @@ const MainPage = () => {
   const [room, setRoom] = useState('');
   const [error, setError] = useState('');
   const { updateUserDetails } = useContext(UserContext);
+  const socket = useContext(SocketContext);
+
   const navigate = useNavigate();
 
   const handleVerify = () => {
     setPending(true);
     if (room) {
-      socket.emit('check_room', room, (roomExists) => {
-        if (roomExists) {
-          updateUserDetails({
-            userID: 'User12345', // TODO: Change this to actual user ID
-            roomID: room,
-            isAdmin: false,
-            nickname: '',
-          });
+      const lowercaseRoom = room.toLowerCase();
 
-          socket.emit('join_room', room);
+      if (socket) {
+        socket.emit('check_room', lowercaseRoom, (roomExists) => {
+          if (roomExists) {
+            updateUserDetails({
+              userID: 'User12345', // TODO: Change this to actual user ID
+              roomID: lowercaseRoom,
+              isAdmin: false,
+              nickname: '',
+            });
 
-          navigate('/Nickname');
-        } else {
-          setError('Room does not exist.');
-          setPending(false);
-        }
-      });
+            socket.emit('join_room', lowercaseRoom);
+
+            navigate('/Nickname');
+          } else {
+            setError('Room does not exist.');
+            setPending(false);
+          }
+        });
+      } else {
+        setError('Socket not found in MainPage.jsx.');
+        setPending(false);
+      }
     } else {
       setError('Please enter a room code.');
       setPending(false);
@@ -75,19 +82,19 @@ const MainPage = () => {
         <Box className="contentBox widthConstraint">
           <Typography variant="h6">Enter code for an existing room:</Typography>
           <Box className="inputBox">
-            <TextField
-              fullWidth
-              label="Room Code"
-              variant="outlined"
-              size="small"
-              value={room}
-              onChange={(e) => {
+              <TextField
+                fullWidth
+                label="Room Code"
+                variant="outlined"
+                size="small"
+                value={room}
+                onChange={(e) => {
                 setRoom(e.target.value);
                 setError('');
               }}
-              error={error ? true : false}
-              helperText={error}
-            />
+                error={error ? true : false}
+                helperText={error}
+              />
             <Button variant="contained" onClick={handleVerify} size="small">
               Verify
             </Button>

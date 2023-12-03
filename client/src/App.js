@@ -1,15 +1,15 @@
-
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import { ThemeProvider, createTheme } from '@mui/material';
 import NicknamePage from './pages/NicknamePage';
 import '../src/styles/SharedStyles.css';
-import Room from './pages/Room';
 import StartNewRoom from './pages/StartNewRoom';
 import { UserProvider } from './contexts/UserContext';
-
+import Room from './pages/Room/RoomPage';
 import TestUser from './components/Test/apiTest';
 import TestRoom from './components/Test/apiTest2';
+import { SocketProvider } from './contexts/SocketContext';
+
 
 function App() {
   const theme = createTheme({
@@ -28,20 +28,22 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <UserProvider>
-        <BrowserRouter>
-          <Routes>
 
-            <Route path="/" element={<MainPage />} />
-            <Route path="/nickname" element={<NicknamePage />} />
-            <Route path="/startnewroom" element={<StartNewRoom />} />
-            <Route path="/room" element={<Room />} />
-            <Route path="/testUser" element={<TestUser />} />
-            <Route path="/testRoom" element={<TestRoom />} />
+      <SocketProvider>
+        <UserProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<MainPage />} />
+              <Route path="/nickname" element={<NicknamePage />} />
+              <Route path="/startnewroom" element={<StartNewRoom />} />
+              <Route path="/room" element={<Room />} />
+              <Route path="/testUser" element={<TestUser />} />
+              <Route path="/testRoom" element={<TestRoom />} />
+            </Routes>
+          </BrowserRouter>
+        </UserProvider>
+      </SocketProvider>
 
-          </Routes>
-        </BrowserRouter>
-      </UserProvider>
     </ThemeProvider>
   );
 }
