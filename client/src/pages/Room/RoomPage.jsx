@@ -6,10 +6,11 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
+import { SocketContext } from '../../contexts/SocketContext';
 import PermanentDrawerLeft from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
@@ -48,7 +49,9 @@ const Room = ({}) => {
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
   const [notifications, setNotifications] = useState([]);
+  const [notificationList, setNotificationList] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
+  const socket = useContext(SocketContext);
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
   );
@@ -87,28 +90,29 @@ const Room = ({}) => {
   const handleAddVote = (optionID) => {
     // Check if the user has any votes left
     if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
-      return;
+        return;
     }
     const votedOption = votionOptions.find(
-      (option) => option.optionID === optionID
+        (option) => option.optionID === optionID
     );
 
     setVotingOptions((prevOptions) =>
-      prevOptions.map((option) =>
-        option.optionID === optionID
-          ? { ...option, votes: [...option.votes, userID] }
-          : option
-      )
+        prevOptions.map((option) =>
+            option.optionID === optionID
+                ? { ...option, votes: [...option.votes, userID] }
+                : option
+        )
     );
     setUserVoteCount((prevCount) => prevCount + 1);
 
     // Add a notification for the vote
-    setNotifications((prevNotifications) => [
-      ...prevNotifications,
-      `${username} voted for ${votedOption.text}`,
-    ]);
-  };
+    const newNotification = `${username} voted for ${votedOption.text}`;
+    setNotifications((prevNotifications) => [newNotification]);
 
+    // Trigger broadcast immediately after updating state
+    sendBroadcast([newNotification]);
+};
+  
   const handleRemoveVote = (optionID) => {
     let unvoteSuccess = false;
     // NOTE: REMOVING ONLY THE FIRST OCCURRENCE OF THE USER'S VOTE
@@ -132,25 +136,53 @@ const Room = ({}) => {
         return option;
       })
     );
-
+  
     if (unvoteSuccess) {
-      setUserVoteCount((prevCount) => prevCount - 1); // Decrement the user's vote count
       // Add a notification for the unvote
       const optionText = votionOptions.find(
-        (option) => option.optionID === optionID
+          (option) => option.optionID === optionID
       ).text;
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        `${username} unvoted for ${optionText}`,
-      ]);
-    }
+      const newNotification = `${username} unvoted for ${optionText}`;
+      setNotifications((prevNotifications) => [newNotification]);
+
+      // Trigger broadcast immediately after updating state
+      sendBroadcast([newNotification]);
+  }
   };
+  
 
   const handleCancelSession = () => {
     console.log('Session cancelled!');
   };
 
   const sessionCancelled = false;
+
+
+
+  const sendBroadcast = async (notifications) => {
+    if (notifications.length > 0) {
+        const broadcastData = {
+            room: userDetails.roomID,
+            author: userDetails.nickname,
+            notifications: notifications,
+            time:
+                new Date(Date.now()).getHours() +
+                ":" +
+                new Date(Date.now()).getMinutes(),
+        };
+        console.log(notifications);
+        await socket.emit("send_message", broadcastData);
+        // setNotificationList((list) => [...list, broadcastData]);
+        setNotifications([]); // Clear notifications after sending
+    }
+};
+  
+
+useEffect(() => {
+  socket.on("receive_message", (data) => {
+      setNotificationList((list) => [...list, data]);
+  });
+}, [socket, notifications]);
 
   return (
     <>
@@ -239,6 +271,21 @@ const Room = ({}) => {
             >
               New Voting Option
             </Button>
+          </Box>
+          <Box>
+            {/* Call sendBroadcast only when needed, e.g., after a user adds/removes a vote
+            <Button variant="contained" color="success" onClick={sendBroadcast}>
+              Send Broadcast
+            </Button> */}
+
+            <Typography variant="h4">Notifications</Typography>
+            <ul>
+              {notificationList.map((broadcast, index) => (
+                <li key={index}>
+                  {broadcast.author} broadcasted: {broadcast.notifications.join(', ')}
+                </li>
+              ))}
+            </ul>
           </Box>
         </Box>
       </Grid>
