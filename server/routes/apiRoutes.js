@@ -2,21 +2,28 @@ const express = require("express");
 const router = express.Router();
 
 const User = require("../models/userSchema");
-//====================== GET ENDPOINTS =================//
+const Room = require("../models/roomSchema");
 
+//====================================================== GET ENDPOINTS ==============================//
+
+
+//--------------------------------------- GET Room Details ----------------------------//
 //1) GET Endpoint for room details
-router.get('/room', (req, res) => {
-  res.status(200).send({
-    roomID: '',
-    userIDs: '',
-    endTime: '',
-    ownerUserID: ''
-  });
+router.get('/rooms', async (req, res) => {
+  try {
+    // Query the database to get all users
+    const rooms = await Room.find();
+
+    // Send the users in the response
+    res.status(200).send(rooms);
+  } catch (error) {
+    console.error('Error fetching rooms from the database:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 });
 
-//2) GET Endpoint for creating room
 
-//3) getting all the users of a particular room
+//--------------------------------------- GET User Details ----------------------------//
 //3) getting all the users of a particular room
 router.get('/users', async (req, res) => {
   try {
@@ -37,8 +44,9 @@ router.get('/users', async (req, res) => {
 
 //7) Getting all the users of a particular room
 
-//====================== POST ENDPOINTS ==================//
+//====================================== POST ENDPOINTS =========================================//
 
+//--------------------------------------- POST User Details ----------------------------//
 //4) add a new user to the users endpoint
 router.post('/users', async (req, res) => {
   const { roomID, isAdmin, username } = req.body;
@@ -66,11 +74,36 @@ router.post('/users', async (req, res) => {
   }
 });
 
+//--------------------------------------- POST Room Details ----------------------------//
+//4) add a new room to the rooms endpoint
+router.post('/rooms', async (req, res) => {
+  const { roomID, question, endTime} = req.body;
 
+  if (!roomID || !question || !endTime) {
+    res.status(400).send({ message: 'Incomplete room data. Please provide roomID, question, endTime, and ownerUserID.' });
+    return;
+  }
+
+  try {
+    const newRoom = new Room({
+      roomID,
+      question,
+      endTime,
+    
+    });
+
+    const savedRoom = await newRoom.save();
+
+    res.status(201).send(savedRoom);
+  } catch (error) {
+    console.error('Error saving room to the database:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+});
 
 //====================== DELETE ENDPOINTS ==================//
 // DELETE Endpoint for deleting a room
-router.delete('/room/:id', (req, res) => {
+router.delete('/rooms/:id', (req, res) => {
   const { id } = req.params;
 
   deleteRoomFromDatabase(id);
