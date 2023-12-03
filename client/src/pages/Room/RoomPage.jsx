@@ -6,7 +6,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
@@ -14,6 +14,9 @@ import PermanentDrawerLeft from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
 import './RoomPage.css';
+import { getRoomDetails } from '../../api/getRoomDetails';
+import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 const dummyVotingOptions = [
   {
@@ -39,8 +42,8 @@ const dummyUsers = [
 ];
 
 const drawerWidth = 240;
-const Room = ({}) => {
-  const [pending, setPending] = useState(false);
+const Room = () => {
+  const [pending, setPending] = useState(true);
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
   const [users, setUsers] = useState(dummyUsers); // users state
   const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
@@ -49,19 +52,48 @@ const Room = ({}) => {
   const [newOptionText, setNewOptionText] = useState('');
   const [notifications, setNotifications] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
+  const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
   );
+  const navigate = useNavigate();
   const [roomDetails, setRoomDetails] = useState({
     roomID: '',
     question: '',
-    adminUserID: '',
-    numberOfVotesPerUser: 5,
+    ownerUserID: '',
+    numberOfVotesPerUser: 1,
     endTime: '',
   });
 
-  const userID = userDetails?.userID || '1';
-  const username = userDetails?.nickname || 'User1';
+  useEffect(() => {
+    if (userDetails.isAdmin) {
+      setPending(false);
+      return;
+    } else {
+      fetchRoomDetails();
+    }
+  }, [userDetails.roomID]); // Include userDetails.roomID in the dependency array if it can change
+
+  const fetchRoomDetails = async () => {
+    try {
+      if (!userDetails.room) {
+        navigate('/');
+        alert('Room ID not found. Please try again.');
+      }
+      if (!userDetails.userID) {
+        navigate('/');
+        alert('User ID not found. Please try again.');
+      }
+      const roomDetails = await getRoomDetails(userDetails.room);
+      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 1 });
+      setPending(false);
+    } catch (error) {
+      console.error('Failed to fetch room details:', error);
+    }
+  };
+
+  const userID = userDetails.userID;
+  const username = userDetails.nickname;
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
@@ -152,6 +184,36 @@ const Room = ({}) => {
 
   const sessionCancelled = false;
 
+  // Function to calculate remaining time in seconds
+  const calculateRemainingTimeInSeconds = (endTime) => {
+    const now = dayjs();
+    const end = dayjs(endTime);
+    const differenceInSeconds = end.diff(now, 'second');
+    return differenceInSeconds > 0 ? differenceInSeconds : 0;
+  };
+
+  // useEffect to set the remaining time and update it every second
+  useEffect(() => {
+    setRemainingTimeInSeconds(
+      calculateRemainingTimeInSeconds(roomDetails.endTime)
+    );
+
+    const interval = setInterval(() => {
+      setRemainingTimeInSeconds((prevTime) => {
+        return prevTime > 0 ? prevTime - 1 : 0;
+      });
+    }, 1000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
+  }, [roomDetails.endTime]); // Dependency on roomDetails.endTime
+  // Convert seconds to minutes and seconds for display
+  const minutes = Math.floor(remainingTimeInSeconds / 60);
+  const seconds = remainingTimeInSeconds % 60;
+
+  // Pad minutes and seconds to be two digits
+  const paddedMinutes = String(minutes).padStart(2, '0');
+  const paddedSeconds = String(seconds).padStart(2, '0');
   return (
     <>
       {!sessionCancelled && (
@@ -168,80 +230,84 @@ const Room = ({}) => {
           Session has been cancelled.
         </Typography>
       ) : (
-      <Grid
-        className="container roomWrapper"
-        sx={{
-          marginLeft: hideDesktopDrawer ? '0px' : '240px',
-        }}
-      >
-        <Box className="widthConstraint contentBox">
-          <Box className="headerBox">
-            {/* ONLY SHOW HAMBURGER ON MOBILE*/}
-            {hideDesktopDrawer && (
-              <IconButton
-                className="menuIcon"
-                onClick={() => setDrawerOpen(true)}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
+        <Grid
+          className="container roomWrapper"
+          sx={{
+            marginLeft: hideDesktopDrawer ? '0px' : '240px',
+          }}
+        >
+          <Box className="widthConstraint contentBox">
+            <Box className="headerBox">
+              {/* ONLY SHOW HAMBURGER ON MOBILE*/}
+              {hideDesktopDrawer && (
+                <IconButton
+                  className="menuIcon"
+                  onClick={() => setDrawerOpen(true)}
+                >
+                  <MenuIcon />
+                </IconButton>
+              )}
 
-            <Typography>
-              Room:
-              <span style={{ textTransform: 'uppercase', fontStyle: 'italic' }}>
-                {userDetails.roomID || 'XXXXXX'}
-              </span>
-            </Typography>
-            <Typography className="timeText">
-              Time Left:{' '}
-              <span style={{ fontWeight: 'bold', color: 'red' }}>00:00</span>
-            </Typography>
-          </Box>
-          <Typography
-            variant="h5"
-            fontStyle={'italic'}
-            width={'100%'}
-            textAlign={'center'}
-          >
-            Where do we wanna eat?
-          </Typography>
-          <Box
-            style={{
-              flexGrow: 1,
-              overflowY: 'scroll',
-            }}
-          >
-            {votionOptions.map((option, index) => (
-              <VotingOptionCard
-                key={index}
-                name={option.text}
-                votes={option.votes}
-                totalAvailableVotes={
-                  users.length * roomDetails.numberOfVotesPerUser
-                }
-                numerOfUserVotes={
-                  option.votes.filter((vote) => vote === userID).length
-                }
-                handleAddVote={() => handleAddVote(option.optionID)}
-                handleRemoveVote={() => handleRemoveVote(option.optionID)}
-              />
-            ))}
-          </Box>
-          <Box className="footerBox">
-            <Typography variant="h6" fontStyle={'italic'}>
-              You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
-              {roomDetails.numberOfVotesPerUser} votes left.
-            </Typography>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => setOpenNewOption(true)}
+              <Typography>
+                Room:
+                <span
+                  style={{ textTransform: 'uppercase', fontStyle: 'italic' }}
+                >
+                  {userDetails.room || 'XXXXXX'}
+                </span>
+              </Typography>
+              <Typography className="timeText">
+                Time Left:{' '}
+                <span style={{ fontWeight: 'bold', color: 'red' }}>
+                  {paddedMinutes}:{paddedSeconds}
+                </span>
+              </Typography>
+            </Box>
+            <Typography
+              variant="h5"
+              fontStyle={'italic'}
+              width={'100%'}
+              textAlign={'center'}
             >
-              New Voting Option
-            </Button>
+              {roomDetails.question}
+            </Typography>
+            <Box
+              style={{
+                flexGrow: 1,
+                overflowY: 'scroll',
+              }}
+            >
+              {votionOptions.map((option, index) => (
+                <VotingOptionCard
+                  key={index}
+                  name={option.text}
+                  votes={option.votes}
+                  totalAvailableVotes={
+                    users.length * roomDetails.numberOfVotesPerUser
+                  }
+                  numerOfUserVotes={
+                    option.votes.filter((vote) => vote === userID).length
+                  }
+                  handleAddVote={() => handleAddVote(option.optionID)}
+                  handleRemoveVote={() => handleRemoveVote(option.optionID)}
+                />
+              ))}
+            </Box>
+            <Box className="footerBox">
+              <Typography variant="h6" fontStyle={'italic'}>
+                You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
+                {roomDetails.numberOfVotesPerUser} votes left.
+              </Typography>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => setOpenNewOption(true)}
+              >
+                New Voting Option
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Grid>
+        </Grid>
       )}
       <AddNewOptionModal
         open={openNewOption}
