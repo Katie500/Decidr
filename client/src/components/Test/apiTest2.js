@@ -1,4 +1,3 @@
-// ApiTest2.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +7,7 @@ const ApiTest2 = () => {
     roomID: '',
     question: '',
     endTime: '',
+
   });
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const handleCreateRoom = async () => {
         roomID: newRoom.roomID,  // Ensure this is lowercase 'roomID'
         question: newRoom.question,
         endTime: newRoom.endTime,
-
+ 
       }),
     });
 
@@ -109,6 +109,7 @@ const handleCreateRoom = async () => {
         </label>
         <br />
         <br />
+
       </div>
       <br />
       <button onClick={handleCreateRoom}>Create Room</button>

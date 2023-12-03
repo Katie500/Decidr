@@ -14,7 +14,6 @@ const userSchema = new Schema({
     roomID: { type: String, required: true },
     isAdmin: { type: Boolean, required: true },
     username: { type: String, required: true },
-    ownerUserID: { type: String, required: true }, // Change type if necessary
 });
 
 const User = new mongoose.model('User', userSchema);
