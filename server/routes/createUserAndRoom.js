@@ -22,6 +22,7 @@ router.post('/', async (req, res) => {
       socketID,
       username,
       roomID,
+      profilePicture,
     });
 
     // Save the new user to the database

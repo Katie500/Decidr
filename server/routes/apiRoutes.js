@@ -49,7 +49,7 @@ router.get('/users', async (req, res) => {
 //--------------------------------------- POST User Details ----------------------------//
 //4) add a new user to the users endpoint
 router.post('/users', async (req, res) => {
-  const { roomID, isAdmin, username } = req.body;
+  const { roomID, isAdmin, username, profilePicture } = req.body;
 
   if (!roomID || !username) {
     res.status(400).send({ message: 'Incomplete user data. Please provide userID, roomID, and username.' });
@@ -62,6 +62,7 @@ router.post('/users', async (req, res) => {
       roomID,
       isAdmin,
       username,
+      profilePicture,
     });
 
     // Save the new user to the database

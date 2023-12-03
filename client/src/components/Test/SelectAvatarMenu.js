@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Box, Card, IconButton, Typography } from '@mui/material';
 import axios from 'axios';
 
-const AvatarCard = ({ avatar, index, selected, onClick }) => (
+// ... (your imports)
+
+const AvatarCard = ({ avatar, id, selected, onClick }) => (
     <div
         style={{
             display: 'flex',
@@ -11,11 +13,11 @@ const AvatarCard = ({ avatar, index, selected, onClick }) => (
             margin: '1rem',
             cursor: 'pointer',
         }}
-        onClick={() => onClick(index)}
+        onClick={() => onClick(id)}
     >
         <img
             src={`data:image/svg+xml;base64,${avatar}`}
-            alt={`Avatar ${index}`}
+            alt={`Avatar ${id}`}
             style={{ width: '80px', height: '80px', borderRadius: '50%' }}
         />
         {selected && (
@@ -32,7 +34,7 @@ const AvatarCard = ({ avatar, index, selected, onClick }) => (
     </div>
 );
 
-const AvatarTest = () => {
+const SelectAvatarMenu = ({ onSelect }) => {
     const api = `https://api.multiavatar.com/45678945`;
     const [avatars, setAvatars] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -43,9 +45,10 @@ const AvatarTest = () => {
             try {
                 const data = [];
                 await Promise.all(Array.from({ length: 4 }, async (_, index) => {
-                    const response = await axios.get(`${api}/${index}`, { responseType: 'arraybuffer' });
+                    const randomIndex = Math.round(Math.random() * 1000);
+                    const response = await axios.get(`${api}/${randomIndex}`, { responseType: 'arraybuffer' });
                     const base64 = arrayBufferToBase64(response.data);
-                    data.push(base64);
+                    data.push({ avatar: base64, id: randomIndex });
                 }));
 
                 setAvatars(data);
@@ -69,8 +72,12 @@ const AvatarTest = () => {
     };
 
     const setProfilePicture = () => {
-        // Implement the logic to set the selected avatar as the profile picture
-        console.log('Selected Avatar:', selectedAvatar);
+        if (selectedAvatar !== null) {
+            const selectedAvatarId = selectedAvatar;
+            const selectedAvatarURL = `${api}/${selectedAvatarId}`;
+            onSelect(selectedAvatarURL);
+            console.log('Selected Avatar URL:', selectedAvatarURL);
+        }
     };
 
     return (
@@ -91,12 +98,12 @@ const AvatarTest = () => {
                             flexDirection: 'row',
                         }}
                     >
-                        {avatars.map((avatar, index) => (
+                        {avatars.map(({ avatar, id }) => (
                             <AvatarCard
-                                key={index}
+                                key={id}
                                 avatar={avatar}
-                                index={index}
-                                selected={selectedAvatar === index}
+                                id={id}
+                                selected={selectedAvatar === id}
                                 onClick={setSelectedAvatar}
                             />
                         ))}
@@ -115,4 +122,4 @@ const AvatarTest = () => {
     );
 };
 
-export default AvatarTest;
+export default SelectAvatarMenu;
