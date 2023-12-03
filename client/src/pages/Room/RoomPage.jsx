@@ -6,14 +6,17 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
-import PermanentDrawerLeft from './Drawer';
+import CustomDrawer from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
 import './RoomPage.css';
+import { getRoomDetails } from '../../api/getRoomDetails';
+import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 const dummyVotingOptions = [
   {
@@ -27,41 +30,57 @@ const dummyVotingOptions = [
     votes: [], // Array of userIDs who voted for this option
   },
 ];
-const dummyUsers = [
-  {
-    userID: '1',
-    username: 'User1',
-  },
-  {
-    userID: '2',
-    username: 'User2',
-  },
-];
 
 const drawerWidth = 240;
-const Room = ({}) => {
-  const [pending, setPending] = useState(false);
+const Room = () => {
+  const [pending, setPending] = useState(true);
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
-  const [users, setUsers] = useState(dummyUsers); // users state
+  const [users, setUsers] = useState([]); // users state
   const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
   const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
   const [notifications, setNotifications] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
+  const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
+  const userID = userDetails.userID;
+  const username = userDetails.nickname;
+  const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
   );
   const [roomDetails, setRoomDetails] = useState({
     roomID: '',
     question: '',
-    adminUserID: '',
-    numberOfVotesPerUser: 5,
+    ownerUserID: '',
+    numberOfVotesPerUser: 1,
     endTime: '',
   });
 
-  const userID = userDetails?.userID || '1';
-  const username = userDetails?.nickname || 'User1';
+  useEffect(() => {
+    fetchRoomDetails();
+  }, [userDetails.roomID]); // Include userDetails.roomID in the dependency array if it can change
+
+  const fetchRoomDetails = async () => {
+    try {
+      if (!userDetails.roomID) {
+        navigate('/');
+        alert('Room ID not found. Please try again.');
+        return;
+      }
+      if (!userDetails.userID) {
+        navigate('/');
+        alert('User ID not found. Please try again.');
+        return;
+      }
+      const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
+      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 1 });
+      setUsers(users);
+      setPending(false);
+    } catch (error) {
+      console.error('Failed to fetch room details:', error);
+    }
+  };
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
@@ -152,14 +171,46 @@ const Room = ({}) => {
 
   const sessionCancelled = false;
 
+  // ===== HANDLING THE REMAINING TIME: ======//
+  // useEffect to set the remaining time and update it every second
+  useEffect(() => {
+    setRemainingTimeInSeconds(
+      calculateRemainingTimeInSeconds(roomDetails.endTime)
+    );
+    const interval = setInterval(() => {
+      setRemainingTimeInSeconds((prevTime) => {
+        return prevTime > 0 ? prevTime - 1 : 0;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [roomDetails.endTime]); // Dependency on roomDetails.endTime
+
+  // Function to calculate remaining time in seconds
+  const calculateRemainingTimeInSeconds = (endTime) => {
+    const now = dayjs();
+    const end = dayjs(endTime);
+    const differenceInSeconds = end.diff(now, 'second');
+    return differenceInSeconds > 0 ? differenceInSeconds : 0;
+  };
+
+  // Convert seconds to minutes and seconds for display
+  const minutes = Math.floor(remainingTimeInSeconds / 60);
+  const seconds = remainingTimeInSeconds % 60;
+  const paddedMinutes = String(minutes).padStart(2, '0');
+  const paddedSeconds = String(seconds).padStart(2, '0');
+  // ===== END OF HANDLING THE REMAINING TIME ===== //
+
   return (
     <>
       {!sessionCancelled && (
-        <PermanentDrawerLeft
+        <CustomDrawer
           drawerWidth={drawerWidth}
           open={drawerOpen}
           setDrawerOpen={setDrawerOpen}
           onCancelSession={handleCancelSession}
+          profileName={username}
+          users={users}
+          adminID={roomDetails.ownerUserID}
         />
       )}
       {sessionCancelled ? (
@@ -168,80 +219,84 @@ const Room = ({}) => {
           Session has been cancelled.
         </Typography>
       ) : (
-      <Grid
-        className="container roomWrapper"
-        sx={{
-          marginLeft: hideDesktopDrawer ? '0px' : '240px',
-        }}
-      >
-        <Box className="widthConstraint contentBox">
-          <Box className="headerBox">
-            {/* ONLY SHOW HAMBURGER ON MOBILE*/}
-            {hideDesktopDrawer && (
-              <IconButton
-                className="menuIcon"
-                onClick={() => setDrawerOpen(true)}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
+        <Grid
+          className="container roomWrapper"
+          sx={{
+            marginLeft: hideDesktopDrawer ? '0px' : '240px',
+          }}
+        >
+          <Box className="widthConstraint contentBox">
+            <Box className="headerBox">
+              {/* ONLY SHOW HAMBURGER ON MOBILE*/}
+              {hideDesktopDrawer && (
+                <IconButton
+                  className="menuIcon"
+                  onClick={() => setDrawerOpen(true)}
+                >
+                  <MenuIcon />
+                </IconButton>
+              )}
 
-            <Typography>
-              Room:
-              <span style={{ textTransform: 'uppercase', fontStyle: 'italic' }}>
-                {userDetails.roomID || 'XXXXXX'}
-              </span>
-            </Typography>
-            <Typography className="timeText">
-              Time Left:{' '}
-              <span style={{ fontWeight: 'bold', color: 'red' }}>00:00</span>
-            </Typography>
-          </Box>
-          <Typography
-            variant="h5"
-            fontStyle={'italic'}
-            width={'100%'}
-            textAlign={'center'}
-          >
-            Where do we wanna eat?
-          </Typography>
-          <Box
-            style={{
-              flexGrow: 1,
-              overflowY: 'scroll',
-            }}
-          >
-            {votionOptions.map((option, index) => (
-              <VotingOptionCard
-                key={index}
-                name={option.text}
-                votes={option.votes}
-                totalAvailableVotes={
-                  users.length * roomDetails.numberOfVotesPerUser
-                }
-                numerOfUserVotes={
-                  option.votes.filter((vote) => vote === userID).length
-                }
-                handleAddVote={() => handleAddVote(option.optionID)}
-                handleRemoveVote={() => handleRemoveVote(option.optionID)}
-              />
-            ))}
-          </Box>
-          <Box className="footerBox">
-            <Typography variant="h6" fontStyle={'italic'}>
-              You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
-              {roomDetails.numberOfVotesPerUser} votes left.
-            </Typography>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => setOpenNewOption(true)}
+              <Typography>
+                Room:
+                <span
+                  style={{ textTransform: 'uppercase', fontStyle: 'italic' }}
+                >
+                  {userDetails.roomID || 'XXXXXX'}
+                </span>
+              </Typography>
+              <Typography className="timeText">
+                Time Left:{' '}
+                <span style={{ fontWeight: 'bold', color: 'red' }}>
+                  {paddedMinutes}:{paddedSeconds}
+                </span>
+              </Typography>
+            </Box>
+            <Typography
+              variant="h5"
+              fontStyle={'italic'}
+              width={'100%'}
+              textAlign={'center'}
             >
-              New Voting Option
-            </Button>
+              {roomDetails.question}
+            </Typography>
+            <Box
+              style={{
+                flexGrow: 1,
+                overflowY: 'scroll',
+              }}
+            >
+              {votionOptions.map((option, index) => (
+                <VotingOptionCard
+                  key={index}
+                  name={option.text}
+                  votes={option.votes}
+                  totalAvailableVotes={
+                    users.length * roomDetails.numberOfVotesPerUser
+                  }
+                  numerOfUserVotes={
+                    option.votes.filter((vote) => vote === userID).length
+                  }
+                  handleAddVote={() => handleAddVote(option.optionID)}
+                  handleRemoveVote={() => handleRemoveVote(option.optionID)}
+                />
+              ))}
+            </Box>
+            <Box className="footerBox">
+              <Typography variant="h6" fontStyle={'italic'}>
+                You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
+                {roomDetails.numberOfVotesPerUser} votes left.
+              </Typography>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => setOpenNewOption(true)}
+              >
+                New Voting Option
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Grid>
+        </Grid>
       )}
       <AddNewOptionModal
         open={openNewOption}

@@ -1,7 +1,7 @@
-export const verifyRoom = async (roomID) => {
+export const getRoomDetails = async (roomID) => {
   try {
     const response = await fetch(
-      `http://localhost:3001/verifyRoom?roomID=${roomID}`,
+      `http://localhost:3001/getRoomDetails?roomID=${roomID}`,
       {
         method: 'GET',
       }
@@ -9,7 +9,8 @@ export const verifyRoom = async (roomID) => {
 
     if (response.ok) {
       const jsonResponse = await response.json();
-      return jsonResponse.isActive;
+      console.log('jsonResponse:', jsonResponse);
+      return jsonResponse;
     } else {
       console.error(
         'Failed to verify room:',

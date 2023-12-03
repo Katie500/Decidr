@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
@@ -12,25 +11,20 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import { IconButton, useMediaQuery } from '@mui/material';
-import { useEffect, useContext, useState } from 'react';
+import { useEffect } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { UserContext } from '../../contexts/UserContext';
 
-export default function PermanentDrawerLeft({
+export default function CustomDrawer({
   open,
   setDrawerOpen,
   drawerWidth,
   onCancelSession,
+  users,
+  profileName,
+  adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
-  const { userDetails, updateUserDetails } = useContext(UserContext);
-  const [users, setUsers] = useState([]); // Username state
-
-  const addUser = (newUser) => {
-    setUsers((prevUsers) => [...prevUsers, newUser]);
-  };
 
   useEffect(() => {
     // Update the drawer state based on screen size and passed `open` prop
@@ -64,18 +58,27 @@ export default function PermanentDrawerLeft({
             <AccountCircleIcon />
           </IconButton>
           <Typography noWrap component="div">
-            {userDetails?.nickname}
+            {profileName}
           </Typography>
         </Toolbar>
         <Divider />
         <List>
-          {['User1', 'User2', 'User3', 'User4'].map((text, index) => (
-            <ListItem key={text} disablePadding>
+          <ListItem key={-1} disablePadding>
+            <ListItemButton>
+              <ListItemText primary={'User List:'} />
+            </ListItemButton>
+          </ListItem>
+          {users?.map((user, index) => (
+            <ListItem key={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  <MailIcon />
+                  <AccountCircleIcon />
                 </ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText
+                  primary={`${user.username} ${
+                    user._id === adminID ? '(admin)' : ''
+                  }`}
+                />
               </ListItemButton>
             </ListItem>
           ))}

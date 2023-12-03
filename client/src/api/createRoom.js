@@ -19,8 +19,6 @@ export const createRoom = async (roomDetails) => {
         response.status,
         response.statusText
       );
-      const errorResponse = await response.text(); // or response.json() if the error response is also JSON
-      console.error('Error details:', errorResponse);
     }
   } catch (error) {
     console.error('Error creating user:', error);
