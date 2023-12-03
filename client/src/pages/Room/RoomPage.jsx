@@ -17,6 +17,7 @@ import './RoomPage.css';
 import { getRoomDetails } from '../../api/getRoomDetails';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import EventLog from './EventLog';
 
 const dummyVotingOptions = [
   {
@@ -31,6 +32,11 @@ const dummyVotingOptions = [
   },
 ];
 
+const views = {
+  VOTING: 'VOTING',
+  EVENT: 'EVENT',
+};
+
 const drawerWidth = 240;
 const Room = () => {
   const [pending, setPending] = useState(true);
@@ -43,6 +49,7 @@ const Room = () => {
   const [notifications, setNotifications] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
+  const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
   const username = userDetails.nickname;
   const navigate = useNavigate();
@@ -262,25 +269,60 @@ const Room = () => {
             </Typography>
             <Box
               style={{
+                width: '100%',
+                display: 'flex',
+                margin: '0.5rem',
+                gap: '0.5rem',
+              }}
+            >
+              <Button
+                variant={view === views.VOTING ? 'contained' : 'outlined'}
+                size="small"
+                color="success"
+                fullWidth
+                onClick={() => setView(views.VOTING)}
+              >
+                Voting
+              </Button>
+              <Button
+                variant={view === views.EVENT ? 'contained' : 'outlined'}
+                size="small"
+                color="success"
+                fullWidth
+                onClick={() => setView(views.EVENT)}
+              >
+                Event Log
+              </Button>
+            </Box>
+            <Box
+              style={{
                 flexGrow: 1,
                 overflowY: 'scroll',
               }}
             >
-              {votionOptions.map((option, index) => (
-                <VotingOptionCard
-                  key={index}
-                  name={option.text}
-                  votes={option.votes}
-                  totalAvailableVotes={
-                    users.length * roomDetails.numberOfVotesPerUser
-                  }
-                  numerOfUserVotes={
-                    option.votes.filter((vote) => vote === userID).length
-                  }
-                  handleAddVote={() => handleAddVote(option.optionID)}
-                  handleRemoveVote={() => handleRemoveVote(option.optionID)}
-                />
-              ))}
+              {
+                // Show the voting options if the view is VOTING
+                view === views.VOTING &&
+                  votionOptions.map((option, index) => (
+                    <VotingOptionCard
+                      key={index}
+                      name={option.text}
+                      votes={option.votes}
+                      totalAvailableVotes={
+                        users.length * roomDetails.numberOfVotesPerUser
+                      }
+                      numerOfUserVotes={
+                        option.votes.filter((vote) => vote === userID).length
+                      }
+                      handleAddVote={() => handleAddVote(option.optionID)}
+                      handleRemoveVote={() => handleRemoveVote(option.optionID)}
+                    />
+                  ))
+              }
+              {
+                // Show the notifications if the view is EVENT
+                view === views.EVENT && <EventLog logs={notifications} />
+              }
             </Box>
             <Box className="footerBox">
               <Typography variant="h6" fontStyle={'italic'}>
