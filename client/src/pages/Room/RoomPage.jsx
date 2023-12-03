@@ -10,7 +10,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
-import PermanentDrawerLeft from './Drawer';
+import CustomDrawer from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
 import './RoomPage.css';
@@ -30,22 +30,12 @@ const dummyVotingOptions = [
     votes: [], // Array of userIDs who voted for this option
   },
 ];
-const dummyUsers = [
-  {
-    userID: '1',
-    username: 'User1',
-  },
-  {
-    userID: '2',
-    username: 'User2',
-  },
-];
 
 const drawerWidth = 240;
 const Room = () => {
   const [pending, setPending] = useState(true);
   const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
-  const [users, setUsers] = useState(dummyUsers); // users state
+  const [users, setUsers] = useState([]); // users state
   const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
   const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
@@ -53,10 +43,12 @@ const Room = () => {
   const [notifications, setNotifications] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
+  const userID = userDetails.userID;
+  const username = userDetails.nickname;
+  const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
   );
-  const navigate = useNavigate();
   const [roomDetails, setRoomDetails] = useState({
     roomID: '',
     question: '',
@@ -66,13 +58,7 @@ const Room = () => {
   });
 
   useEffect(() => {
-    if (userDetails.isAdmin) {
-      setPending(false);
-      fetchRoomDetails();
-      return;
-    } else {
-      fetchRoomDetails();
-    }
+    fetchRoomDetails();
   }, [userDetails.roomID]); // Include userDetails.roomID in the dependency array if it can change
 
   const fetchRoomDetails = async () => {
@@ -80,21 +66,21 @@ const Room = () => {
       if (!userDetails.roomID) {
         navigate('/');
         alert('Room ID not found. Please try again.');
+        return;
       }
       if (!userDetails.userID) {
         navigate('/');
         alert('User ID not found. Please try again.');
+        return;
       }
-      const roomDetails = await getRoomDetails(userDetails.roomID);
+      const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
       setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 1 });
+      setUsers(users);
       setPending(false);
     } catch (error) {
       console.error('Failed to fetch room details:', error);
     }
   };
-
-  const userID = userDetails.userID;
-  const username = userDetails.nickname;
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
@@ -185,14 +171,6 @@ const Room = () => {
 
   const sessionCancelled = false;
 
-  // Function to calculate remaining time in seconds
-  const calculateRemainingTimeInSeconds = (endTime) => {
-    const now = dayjs();
-    const end = dayjs(endTime);
-    const differenceInSeconds = end.diff(now, 'second');
-    return differenceInSeconds > 0 ? differenceInSeconds : 0;
-  };
-
   // ===== HANDLING THE REMAINING TIME: ======//
   // useEffect to set the remaining time and update it every second
   useEffect(() => {
@@ -206,6 +184,15 @@ const Room = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [roomDetails.endTime]); // Dependency on roomDetails.endTime
+
+  // Function to calculate remaining time in seconds
+  const calculateRemainingTimeInSeconds = (endTime) => {
+    const now = dayjs();
+    const end = dayjs(endTime);
+    const differenceInSeconds = end.diff(now, 'second');
+    return differenceInSeconds > 0 ? differenceInSeconds : 0;
+  };
+
   // Convert seconds to minutes and seconds for display
   const minutes = Math.floor(remainingTimeInSeconds / 60);
   const seconds = remainingTimeInSeconds % 60;
@@ -216,11 +203,14 @@ const Room = () => {
   return (
     <>
       {!sessionCancelled && (
-        <PermanentDrawerLeft
+        <CustomDrawer
           drawerWidth={drawerWidth}
           open={drawerOpen}
           setDrawerOpen={setDrawerOpen}
           onCancelSession={handleCancelSession}
+          profileName={username}
+          users={users}
+          adminID={roomDetails.ownerUserID}
         />
       )}
       {sessionCancelled ? (
