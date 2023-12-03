@@ -27,8 +27,8 @@ router.get('/rooms', async (req, res) => {
 //3) getting all the users of a particular room
 router.get('/users', async (req, res) => {
   try {
-    // Query the database to get all users
-    const users = await User.find();
+    // Query the database to get all users of a specific room
+    const users = await User.find({ roomID });
 
     // Send the users in the response
     res.status(200).send(users);
@@ -102,24 +102,37 @@ router.post('/rooms', async (req, res) => {
 });
 
 //====================== DELETE ENDPOINTS ==================//
+
 // DELETE Endpoint for deleting a room
 router.delete('/rooms/:id', (req, res) => {
   const { id } = req.params;
 
-  deleteRoomFromDatabase(id);
+  try {
+    // Delete the room from the database
+    await Room.findByIdAndDelete(id);
+  } catch (error) {
+    console.error('Error deleting room from the database:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 
   res.status(204).send();
 });
 
 // DELETE Endpoint for deleting a user
-router.delete('/users/:userID', (req, res) => {
+router.delete('/users/:userID', async (req, res) => {
   const { userID } = req.params;
 
-  deleteUserFromDatabase(userID);
+  try {
+    // Delete the user from the database
+    await User.findByIdAndDelete(userID);
+  } catch (error) {
+    console.error('Error deleting user from the database:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 
   res.status(204).send();
 });
 
-
 //==================== PUT ENDPOINTS =====================//
+
 module.exports = router;
