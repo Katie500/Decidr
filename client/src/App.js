@@ -8,6 +8,8 @@ import { UserProvider } from './contexts/UserContext';
 import Room from './pages/Room/RoomPage';
 import TestUser from './components/Test/apiTest';
 import TestRoom from './components/Test/apiTest2';
+import TestAvatar from './components/Test/AvatarPage';
+import TestPage1 from './components/Test/page1';
 import { SocketProvider } from './contexts/SocketContext';
 
 
@@ -39,6 +41,8 @@ function App() {
               <Route path="/room" element={<Room />} />
               <Route path="/testUser" element={<TestUser />} />
               <Route path="/testRoom" element={<TestRoom />} />
+              <Route path="/testAvatar" element={<TestAvatar />} />
+              <Route path="/testPage1" element={<TestPage1 />} />
             </Routes>
           </BrowserRouter>
         </UserProvider>

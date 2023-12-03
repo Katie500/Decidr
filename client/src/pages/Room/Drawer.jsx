@@ -12,8 +12,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import { IconButton, useMediaQuery } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SelectAvatarMenu from './SelectAvatarMenu'; // Import your SelectAvatarMenu component
+
 
 export default function CustomDrawer({
   open,
@@ -35,6 +37,31 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
+
+//==================== profile picture algorithm ================//
+//open picture window
+const [isWindowOpen, setWindowOpen] = useState(false);
+const [selectedAvatar, setSelectedAvatar] = useState(null);
+
+const changeProfilePicture = () => {
+  setWindowOpen(!isWindowOpen);
+};
+
+const handleAvatarSelect = (avatarURL) => {
+  setSelectedAvatar(avatarURL);
+  // Additional logic if needed
+};
+
+const handleSetProfilePicture = () => {
+  // Additional logic if needed before setting the profile picture
+  console.log('Selected Avatar URL:', selectedAvatar);
+  // Set profile picture logic here
+  // ...
+  // Close the window after setting the profile picture
+  setWindowOpen(false);
+};
+
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -54,9 +81,28 @@ export default function CustomDrawer({
         anchor="left"
       >
         <Toolbar>
-          <IconButton>
-            <AccountCircleIcon />
-          </IconButton>
+
+        <div>
+          {/*Handle the profile picture here*/}
+        <IconButton onClick={changeProfilePicture}>
+        <AccountCircleIcon />
+        </IconButton>
+
+        {isWindowOpen && (
+        <SelectAvatarMenu onSelect={handleAvatarSelect} />
+      )}
+
+      {/* Render other components or content here */}
+
+      {/* Optionally, you can use a button to set the profile picture */}
+      {selectedAvatar && (
+        <button onClick={handleSetProfilePicture}>
+          Set Profile Picture
+        </button>
+      )}
+    </div>
+
+
           <Typography noWrap component="div">
             {profileName}
           </Typography>

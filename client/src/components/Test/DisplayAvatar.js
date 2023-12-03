@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Page1 = () => {
+const DisplayAvatar = () => {
   const multiavatarApi = `https://api.multiavatar.com`;
   const localApi = `http://localhost:3001/users`; // Replace with your actual API endpoint
   const [avatars, setAvatars] = useState([]);
@@ -14,7 +14,7 @@ const Page1 = () => {
         const users = localDataResponse.data;
 
         const avatarPromises = users.map(async (user) => {
-          const avatarUrl = user.profilePicture; // Adjust the field name based on your data structure
+          const avatarUrl = user.userAvatar; // Adjust the field name based on your data structure
           const response = await axios.get(`${multiavatarApi}/${avatarUrl}`, { responseType: 'arraybuffer' });
           const base64 = arrayBufferToBase64(response.data);
           return base64;
@@ -68,4 +68,4 @@ const Page1 = () => {
   );
 };
 
-export default Page1;
+export default DisplayAvatar;

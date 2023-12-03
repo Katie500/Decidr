@@ -4,9 +4,9 @@ const router = express.Router();
 const User = require('../models/userSchema');
 
 router.post('/', async (req, res) => {
-  const { socketID, username, roomID } = req.body;
+  const { socketID, username, roomID, profilePicture } = req.body;
 
-  if (!socketID || !username || !roomID) {
+  if (!socketID || !username || !roomID || !profilePicture) {
     res.status(400).send({
       message:
         'Incomplete user data. Please provide socketID, username and roomID.',
@@ -20,6 +20,7 @@ router.post('/', async (req, res) => {
       socketID,
       username,
       roomID,
+      profilePicture,
     });
 
     // Save the new user to the database
