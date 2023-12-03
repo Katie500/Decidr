@@ -1,14 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-mongoose.connect("mongodb://0.0.0.0:27017/decidr")
-.then(() => {
-    console.log('Room database connected!');
-})
-.catch(() => {
-    console.log('error');
-})
-
 const voteOptionSchema = new Schema({
   option: { type: String, required: true },
   userIDs: [{ type: Schema.Types.ObjectId, ref: 'User' }],
