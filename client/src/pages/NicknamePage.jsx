@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import createUser from '../api/createUser';
 import { SocketContext } from '../contexts/SocketContext';
+import SelectAvatarMenu from './Room/SelectAvatarMenu';
 
 const NicknamePage = () => {
   const [pending, setPending] = useState(false);
@@ -61,6 +62,7 @@ const NicknamePage = () => {
         const userID = await createUser({
           username: name,
           socketID: socket.id,
+          profilePicture: '',
           roomID: userDetails.roomID,
         });
         updateUserDetails({
@@ -87,12 +89,15 @@ const NicknamePage = () => {
           <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
-          <Typography variant="h6">Choosing a name</Typography>
+          <Typography variant="h6">Profile</Typography>
         </Box>
       </Box>
 
       <Grid className="container">
+
+
         <Box className="contentBox widthConstraint">
+                  <SelectAvatarMenu />
           <Typography variant="h6">Enter a nickname:</Typography>
           <Box className="inputBox">
             <TextField

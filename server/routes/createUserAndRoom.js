@@ -5,7 +5,7 @@ const User = require('../models/userSchema');
 const Room = require('../models/roomSchema');
 
 router.post('/', async (req, res) => {
-  const { roomID, socketID, username, question, endTime } = req.body;
+  const { roomID, socketID, username, profilePicture, question, endTime } = req.body;
 
   console.log('In /createUserAndRoom req.body', req.body);
   if (!socketID || !username || !roomID) {
