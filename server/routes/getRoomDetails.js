@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Room = require('../models/roomSchema');
+const User = require('../models/userSchema'); // Import the User model
 
 router.get('/', async (req, res) => {
   const { roomID } = req.query;
@@ -16,7 +17,14 @@ router.get('/', async (req, res) => {
       return res.status(404).send({ message: 'Room not found' });
     }
 
-    res.status(200).send(room);
+    // Fetch users in the room
+    const usersInRoom = await User.find({ roomID });
+
+    // Send room details along with the users
+    res.status(200).send({
+      roomDetails: room,
+      users: usersInRoom,
+    });
   } catch (error) {
     console.error('Error fetching room from the database:', error);
     res.status(500).send({ message: 'Internal server error' });
