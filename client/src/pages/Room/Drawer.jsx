@@ -161,7 +161,16 @@ export default function CustomDrawer({
             <ListItem key={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  <AccountCircleIcon />
+                {profileAvatar !== '' ? (
+                <img
+                  src={`data:image/svg+xml;base64,${svgContent}`}
+                  alt="Profile Picture"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                  onError={(e) => console.error('Error loading image:', e)}
+                />
+              ) : (
+                <AccountCircleIcon />
+              )}
                 </ListItemIcon>
                 <ListItemText
                   primary={`${user.username} ${user._id === adminID ? '(admin)' : ''
