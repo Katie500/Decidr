@@ -80,6 +80,11 @@ const Room = () => {
     if (userDetails.roomID !== localRoomID) {
       fetchRoomDetails();
       setLocalRoomID(userDetails.roomID);
+      sendBroadcast(
+        broadcastingEventTypes.USER_CONNECTED,
+        { userID, username },
+        `${username} has joined the room`
+      );
     }
   }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
@@ -215,7 +220,6 @@ const Room = () => {
       eventMessage: eventMessage,
       timeStamp: dayjs().format('HH:mm:ss'),
     };
-    console.log('BROADCASTING: ', broadcastData);
     await socket.emit('send_message', broadcastData);
   };
 
@@ -223,7 +227,6 @@ const Room = () => {
   useEffect(() => {
     const messageHandler = (data) => {
       if (data) {
-        console.log('RECEIVED: ', data);
         if (data.eventType === broadcastingEventTypes.ADD_VOTE) {
           // Update the state to reflect the new vote
           const { userID, optionID } = data.eventData;
@@ -233,6 +236,11 @@ const Room = () => {
           // Update the state to reflect the removed vote
           const { userID, optionID } = data.eventData;
           removeVote(userID, optionID);
+        }
+        if (data.eventType === broadcastingEventTypes.USER_CONNECTED) {
+          // Update the state to reflect the new user
+          const { userID, username } = data.eventData;
+          setUsers((prevUsers) => [...prevUsers, { userID, username }]);
         }
         setEventLog((list) => [...list, data]);
       } else {
