@@ -18,7 +18,9 @@ const EventLog = ({ logs }) => {
             padding: '10px',
           }}
         >
-          <Typography variant="body1">{log}</Typography>
+          <Typography variant="body1">
+            {log?.notification} at {log?.timeStamp}
+          </Typography>
         </Box>
       ))}
     </>

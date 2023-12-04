@@ -10,6 +10,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
+import { SocketContext } from '../../contexts/SocketContext';
 import CustomDrawer from './Drawer';
 import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
@@ -47,9 +48,11 @@ const Room = () => {
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
   const [notifications, setNotifications] = useState([]);
+  const [eventLog, setEventLog] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
   const [view, setView] = useState(views.VOTING); // View state
+  const socket = useContext(SocketContext);
   const userID = userDetails.userID;
   const username = userDetails.nickname;
   const navigate = useNavigate();
@@ -60,13 +63,17 @@ const Room = () => {
     roomID: '',
     question: '',
     ownerUserID: '',
-    numberOfVotesPerUser: 1,
+    numberOfVotesPerUser: 3,
     endTime: '',
   });
+  const [localRoomID, setLocalRoomID] = useState(null);
 
   useEffect(() => {
-    fetchRoomDetails();
-  }, [userDetails.roomID]); // Include userDetails.roomID in the dependency array if it can change
+    if (userDetails.roomID !== localRoomID) {
+      fetchRoomDetails();
+      setLocalRoomID(userDetails.roomID);
+    }
+  }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
   const fetchRoomDetails = async () => {
     try {
@@ -81,7 +88,7 @@ const Room = () => {
         return;
       }
       const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
-      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 1 });
+      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 3 });
       setUsers(users);
       setPending(false);
     } catch (error) {
@@ -111,6 +118,7 @@ const Room = () => {
   };
 
   const handleAddVote = (optionID) => {
+    console.log('handleAddVote: Adding vote for optionID: ', optionID);
     // Check if the user has any votes left
     if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
       return;
@@ -128,12 +136,44 @@ const Room = () => {
     );
     setUserVoteCount((prevCount) => prevCount + 1);
 
-    // Add a notification for the vote
-    setNotifications((prevNotifications) => [
-      ...prevNotifications,
-      `${username} voted for ${votedOption.text}`,
-    ]);
+    const newEvent = `${username} voted for ${votedOption.text}`;
+    sendBroadcast(newEvent);
+    //
   };
+
+  const sendBroadcast = async (event) => {
+    const broadcastData = {
+      room: userDetails.roomID,
+      author: userID,
+      notification: event,
+      timeStamp: dayjs().format('HH:mm:ss'),
+    };
+    console.log('BROADCASTING: ', broadcastData);
+    await socket.emit('send_message', broadcastData);
+  };
+
+  // LISTEN FOR BROADCASTS
+  useEffect(() => {
+    const messageHandler = (data) => {
+      if (data) {
+        console.log('RECEIVED: ', data);
+        setEventLog((list) => [...list, data]);
+      } else {
+        console.log('No data received but socket is connected');
+      }
+    };
+
+    if (socket) {
+      socket.on('receive_message', messageHandler);
+    } else {
+      console.error('SOCKET NOT FOUND in RoomPage');
+    }
+
+    // Cleanup function
+    return () => {
+      if (socket) socket.off('receive_message', messageHandler);
+    };
+  }, [socket]);
 
   const handleRemoveVote = (optionID) => {
     let unvoteSuccess = false;
@@ -321,7 +361,7 @@ const Room = () => {
               }
               {
                 // Show the notifications if the view is EVENT
-                view === views.EVENT && <EventLog logs={notifications} />
+                view === views.EVENT && <EventLog logs={eventLog} />
               }
             </Box>
             <Box className="footerBox">
