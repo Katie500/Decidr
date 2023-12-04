@@ -127,13 +127,9 @@ const Room = () => {
   };
 
   const addNewOption = (optionText, newOptionID) => {
-    setVotingOptions([
-      {
-        optionID: newOptionID,
-        text: optionText,
-        votes: [],
-      },
-      ...votionOptions,
+    setVotingOptions((prevOptions) => [
+      { optionID: newOptionID, text: optionText, votes: [] },
+      ...prevOptions,
     ]);
   };
   // ====== END OF ADDING NEW OPTION ====== //
