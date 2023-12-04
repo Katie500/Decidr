@@ -5,13 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { verifyRoom } from '../api/verifyRoom';
 
+
 const MainPage = () => {
   const [pending, setPending] = useState(false);
   const [room, setRoom] = useState('');
   const [error, setError] = useState('');
   const { updateUserDetails } = useContext(UserContext);
 
+
+  const musicAudio = new Audio('/PeaceTheme.mp3');
+
+
   const navigate = useNavigate();
+
+  function playMusicAudio(volume = 0.25) {
+    musicAudio.volume = volume;
+    musicAudio.play();
+  }
 
   const handleVerify = async () => {
     setPending(true);
@@ -37,6 +47,7 @@ const MainPage = () => {
   };
 
   const handleCreateRoom = () => {
+    playMusicAudio();
     updateUserDetails({
       isAdmin: true, // Creating a room, make this true
     });
@@ -45,6 +56,7 @@ const MainPage = () => {
 
   return (
     <>
+
       <Grid className="container">
         <Box>
           <Typography

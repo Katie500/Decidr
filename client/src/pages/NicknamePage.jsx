@@ -60,11 +60,11 @@ const NicknamePage = () => {
     }
 
   // Check if the user has selected a profile picture
- /* if (!avatar) {
+  if (!avatar) {
     setError('Please select a profile picture.');
     console.log("Please select avatar");
     return;
-  }*/
+  }
 
     setPending(true);
 
@@ -117,10 +117,11 @@ const NicknamePage = () => {
 
         <Box className="contentBox widthConstraint">        
 
-          <SelectAvatarMenu onSelect={(selectedAvatar) => {
+          <SelectAvatarMenu onSelectAvatar={(selectedAvatar) => {
         setAvatar(selectedAvatar);
         console.log('Avatar set in NicknamePage:', selectedAvatar);
       }} />  
+
                       
           <Typography variant="h6">Enter a nickname:</Typography>
           <Box className="inputBox">
