@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,10 +12,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import { IconButton, useMediaQuery } from '@mui/material';
-import { useEffect, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import SelectAvatarMenu from './SelectAvatarMenu'; // Import your SelectAvatarMenu component
-
+import SelectAvatarMenu from './SelectAvatarMenu';
+import { UserContext } from '../../contexts/UserContext';
 
 export default function CustomDrawer({
   open,
@@ -38,12 +37,19 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
-
   //==================== profile picture algorithm ================//
   //open picture window
   const [isWindowOpen, setWindowOpen] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [svgContent, setSvgContent] = useState(null);
+
+  const { userDetails, updateUserDetails } = useContext(UserContext);
+
+  useEffect(() => {
+    if (userDetails?.profilePicture) {
+      setAvatar(userDetails.profilePicture);
+    }
+  }, [userDetails]);
 
   useEffect(() => {
     const fetchSvg = async () => {
@@ -64,31 +70,19 @@ export default function CustomDrawer({
     fetchSvg();
   }, [profileAvatar]);
 
-
-
   const changeProfilePicture = () => {
+
+    console.log("avatar is:" + avatar);
+    updateUserDetails({
+      profilePicture: avatar,
+    });
+
     setWindowOpen(!isWindowOpen);
   };
-
-  const handleAvatarSelect = (avatarURL) => {
-    setSelectedAvatar(avatarURL);
-    // Additional logic if needed
-  };
-
-  const handleSetProfilePicture = () => {
-    // Additional logic if needed before setting the profile picture
-    console.log('Selected Avatar URL:', selectedAvatar);
-    // Set profile picture logic here
-    // ...
-    // Close the window after setting the profile picture
-    setWindowOpen(false);
-  };
-
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-
       <Drawer
         sx={{
           width: drawerWidth,
@@ -103,15 +97,10 @@ export default function CustomDrawer({
         onClose={() => setDrawerOpen(false)}
         anchor="left"
       >
-
-
         <Toolbar>
           <div>
-            {console.log('Profile Avatar URL:', svgContent)}
-
-
+            {/*console.log('Profile Avatar URL:', svgContent)*/}
             <IconButton onClick={changeProfilePicture}>
-
               {profileAvatar !== '' ? (
                 <img
                   src={`data:image/svg+xml;base64,${svgContent}`}
@@ -123,33 +112,19 @@ export default function CustomDrawer({
                 <AccountCircleIcon />
               )}
             </IconButton>
-
-
-
-
-
             {isWindowOpen && (
-              <SelectAvatarMenu onSelect={handleAvatarSelect} />
-            )}
-
-            {/* Render other components or content here */}
-
-            {/* Optionally, you can use a button to set the profile picture */}
-            {/* Optionally, you can use a button to set the profile picture */}
-            {selectedAvatar && (
-              <button onClick={handleSetProfilePicture}>
-                Set Profile Picture
-              </button>
+              <SelectAvatarMenu
+                onSelectAvatar={(selectedAvatar) => {
+                  setAvatar(selectedAvatar);
+                  console.log('Avatar set in Drawer Page:', selectedAvatar);
+                }}
+              />
             )}
           </div>
-
           <Typography noWrap component="div">
             {profileName}
           </Typography>
         </Toolbar>
-
-
-
         <Divider />
         <List>
           <ListItem key={-1} disablePadding>
@@ -161,20 +136,25 @@ export default function CustomDrawer({
             <ListItem key={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                {profileAvatar !== '' ? (
-                <img
-                  src={`data:image/svg+xml;base64,${svgContent}`}
-                  alt="Profile Picture"
-                  style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                  onError={(e) => console.error('Error loading image:', e)}
-                />
-              ) : (
-                <AccountCircleIcon />
-              )}
+                  {profileAvatar !== '' ? (
+                    <img
+                      src={`data:image/svg+xml;base64,${svgContent}`}
+                      alt="Profile Picture"
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                      }}
+                      onError={(e) => console.error('Error loading image:', e)}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )}
                 </ListItemIcon>
                 <ListItemText
-                  primary={`${user.username} ${user._id === adminID ? '(admin)' : ''
-                    }`}
+                  primary={`${user.username} ${
+                    user._id === adminID ? '(admin)' : ''
+                  }`}
                 />
               </ListItemButton>
             </ListItem>

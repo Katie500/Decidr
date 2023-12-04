@@ -122,7 +122,7 @@ const NicknamePage = () => {
         console.log('Avatar set in NicknamePage:', selectedAvatar);
       }} />  
 
-                      
+                      <br></br>
           <Typography variant="h6">Enter a nickname:</Typography>
           <Box className="inputBox">
             <TextField

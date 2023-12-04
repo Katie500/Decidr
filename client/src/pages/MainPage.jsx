@@ -36,6 +36,7 @@ const MainPage = () => {
       });
 
       if (roomIsActive) {
+        playMusicAudio();
         navigate('/Nickname');
       } else {
         setError('Room does not exist.');
