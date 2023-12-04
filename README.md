@@ -1,4 +1,5 @@
 # Decidr Application
+Default branch is "Dev"
 
 **SENG 513 Final Project**
 
