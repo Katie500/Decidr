@@ -19,6 +19,7 @@ import { getRoomDetails } from '../../api/getRoomDetails';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import EventLog from './EventLog';
+import { addNewOptionToDB } from '../../api/addNewOptionToDB';
 
 const views = {
   VOTING: 'VOTING',
@@ -103,7 +104,7 @@ const Room = () => {
   };
 
   // ====== ADDING NEW OPTION ====== //
-  const handleAddNewOption = () => {
+  const handleAddNewOption = async () => {
     if (!newOptionText) {
       setOpenNewOption(false);
       return;
@@ -111,8 +112,10 @@ const Room = () => {
 
     // TODO: Call API to update the vote in the database
     // votingOptionID SHOULD COME FROM THE DATABASE
-    const newOptionID = (votionOptions.length + 1).toString();
+    setPending(true);
+    const newOptionID = await addNewOptionToDB(newOptionText, roomDetails._id);
 
+    setPending(false);
     addNewOption(newOptionText, newOptionID);
     setNewOptionText('');
     setOpenNewOption(false);
@@ -128,7 +131,7 @@ const Room = () => {
 
   const addNewOption = (optionText, newOptionID) => {
     setVotingOptions((prevOptions) => [
-      { optionID: newOptionID, text: optionText, votes: [] },
+      { _id: newOptionID, optionText: optionText, votes: [] },
       ...prevOptions,
     ]);
   };
@@ -145,10 +148,8 @@ const Room = () => {
     setUserVoteCount((prevCount) => prevCount + 1);
 
     // TODO: Call API to update the vote in the database
-    const votedOption = votionOptions.find(
-      (option) => option.optionID === optionID
-    );
-    const eventMessage = `${username} voted for ${votedOption.text}`;
+    const votedOption = votionOptions.find((option) => option._id === optionID);
+    const eventMessage = `${username} voted for ${votedOption.optionText}`;
     sendBroadcast(
       broadcastingEventTypes.ADD_VOTE,
       { userID, optionID },
@@ -158,7 +159,7 @@ const Room = () => {
   const addVote = (userID, optionID) => {
     setVotingOptions((prevOptions) =>
       prevOptions.map((option) =>
-        option.optionID === optionID
+        option._id === optionID
           ? { ...option, votes: [...option.votes, userID] }
           : option
       )
@@ -175,8 +176,8 @@ const Room = () => {
 
       // Add a notification for the unvote
       const optionText = votionOptions.find(
-        (option) => option.optionID === optionID
-      ).text;
+        (option) => option._id === optionID
+      ).optionText;
       const eventMessage = `${username} unvoted for ${optionText}`;
       sendBroadcast(
         broadcastingEventTypes.REMOVE_VOTE,
@@ -191,7 +192,7 @@ const Room = () => {
     // NOTE: REMOVING ONLY THE FIRST OCCURRENCE OF THE USER'S VOTE
     setVotingOptions((prevOptions) =>
       prevOptions.map((option) => {
-        if (option.optionID === optionID) {
+        if (option._id === optionID) {
           // Find the index of the first occurrence of the user's vote
           const indexToRemove = option.votes.indexOf(userID);
           if (indexToRemove !== -1) {
@@ -223,7 +224,11 @@ const Room = () => {
       eventMessage: eventMessage,
       timeStamp: dayjs().format('HH:mm:ss'),
     };
-    await socket.emit('send_message', broadcastData);
+    if (socket) {
+      await socket.emit('send_message', broadcastData);
+    } else {
+      console.error('SOCKET NOT FOUND in RoomPage');
+    }
 
     // Update the event log with the new event
     setEventLog((prevLogs) => [...prevLogs, broadcastData]);
@@ -427,16 +432,17 @@ const Room = () => {
                 votionOptions.map((option, index) => (
                   <VotingOptionCard
                     key={index}
-                    name={option.text}
-                    votes={option.votes}
+                    name={option.optionText}
+                    votes={option.votes || []}
                     totalAvailableVotes={
                       users.length * roomDetails.numberOfVotesPerUser
                     }
-                    numerOfUserVotes={
-                      option.votes.filter((vote) => vote === userID).length
+                    numberOfUserVotes={
+                      option.votes?.filter((_userID) => _userID === userID)
+                        .length || 0
                     }
-                    handleAddVote={() => handleAddVote(option.optionID)}
-                    handleRemoveVote={() => handleRemoveVote(option.optionID)}
+                    handleAddVote={() => handleAddVote(option._id)}
+                    handleRemoveVote={() => handleRemoveVote(option._id)}
                   />
                 ))}
               {

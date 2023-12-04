@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const voteOptionSchema = new Schema({
-  option: { type: String, required: true },
-  userIDs: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  optionText: { type: String, required: true },
+  votes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
 const roomSchema = new Schema({

@@ -6,7 +6,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 const VotingOptionCard = ({
   name,
   votes,
-  numerOfUserVotes,
+  numberOfUserVotes,
   totalAvailableVotes,
   handleAddVote,
   handleRemoveVote,
@@ -31,7 +31,7 @@ const VotingOptionCard = ({
       </Typography>
       <Chip label={`${votes.length} / ${totalAvailableVotes}`} />
       <Chip
-        label={`${numerOfUserVotes}`}
+        label={`${numberOfUserVotes}`}
         sx={{ background: '#B7CFEE', color: '#2E419D' }}
       />
       <Box style={{ display: 'flex' }}>
