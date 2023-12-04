@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import EventLog from './EventLog';
 import { addNewOptionToDB } from '../../api/addNewOptionToDB';
 import { addVoteToDb } from '../../api/addVoteToDB';
+import { removeVoteFromDb } from '../../api/removeVoteFromDB';
 
 const views = {
   VOTING: 'VOTING',
@@ -164,7 +165,6 @@ const Room = () => {
       })
       .catch((error) => {
         // Handle any errors here
-        console.error('Failed to add vote:', error);
       });
   };
   const addVote = (userID, optionID) => {
@@ -181,48 +181,64 @@ const Room = () => {
   // ====== REMOVING VOTES ====== //
   const handleRemoveVote = (optionID) => {
     if (removeVote(userID, optionID)) {
-      setUserVoteCount((prevCount) => prevCount - 1); // Decrement the user's vote count
+      setPending(true);
+      removeVoteFromDb(roomDetails._id, optionID, userID)
+        .then(() => {
+          setUserVoteCount((prevCount) => prevCount - 1); // Decrement the user's vote count
 
-      // TODO: Call API to update the vote in the database
+          setPending(false);
 
-      // Add a notification for the unvote
-      const optionText = votionOptions.find(
-        (option) => option._id === optionID
-      ).optionText;
-      const eventMessage = `${username} unvoted for ${optionText}`;
-      sendBroadcast(
-        broadcastingEventTypes.REMOVE_VOTE,
-        { userID, optionID },
-        eventMessage
-      );
+          // Add a notification for the unvote
+          const optionText = votionOptions.find(
+            (option) => option._id === optionID
+          ).optionText;
+          const eventMessage = `${username} unvoted for ${optionText}`;
+          sendBroadcast(
+            broadcastingEventTypes.REMOVE_VOTE,
+            { userID, optionID },
+            eventMessage
+          );
+          setPending(false);
+        })
+        .catch((error) => {
+          console.error('Failed to add vote:', error);
+        });
+    } else {
+      console.log('Failed to remove vote');
     }
   };
-  const removeVote = (userID, optionID) => {
-    let unvoteSuccess = false;
 
-    // NOTE: REMOVING ONLY THE FIRST OCCURRENCE OF THE USER'S VOTE
-    setVotingOptions((prevOptions) =>
-      prevOptions.map((option) => {
-        if (option._id === optionID) {
-          // Find the index of the first occurrence of the user's vote
-          const indexToRemove = option.votes.indexOf(userID);
-          if (indexToRemove !== -1) {
-            unvoteSuccess = true;
-            // Create a new array excluding the first occurrence of the user's vote
-            return {
-              ...option,
-              votes: [
-                ...option.votes.slice(0, indexToRemove),
-                ...option.votes.slice(indexToRemove + 1),
-              ],
-            };
+  const removeVote = (userID, optionID) => {
+    // Find the option with the given optionID
+    const option = votionOptions.find((option) => option._id === optionID);
+
+    // Check if userID exists in the votes array of the found option
+    if (option && option.votes.includes(userID)) {
+      setVotingOptions((prevOptions) =>
+        prevOptions.map((option) => {
+          if (option._id === optionID) {
+            // Find the index of the first occurrence of the user's vote
+            const indexToRemove = option.votes.indexOf(userID);
+            if (indexToRemove !== -1) {
+              // Create a new array excluding the first occurrence of the user's vote
+              return {
+                ...option,
+                votes: [
+                  ...option.votes.slice(0, indexToRemove),
+                  ...option.votes.slice(indexToRemove + 1),
+                ],
+              };
+            }
           }
-        }
-        return option;
-      })
-    );
-    return unvoteSuccess;
+          return option;
+        })
+      );
+      return true; // Vote found and attempt to remove is made
+    } else {
+      return false; // Vote not found, no state update
+    }
   };
+
   // ====== END OF REMOVING VOTES ====== //
 
   // ====== BROADCASTING EVENTS ====== //

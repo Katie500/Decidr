@@ -23,6 +23,7 @@ const createUser = require('./routes/createUser');
 const getRoomDetails = require('./routes/getRoomDetails');
 const addNewOption = require('./routes/addNewOption');
 const addVote = require('./routes/addVote');
+const removeVote = require('./routes/removeVote');
 
 // Use the apiRoutes
 app.use('/', apiRoutes);
@@ -32,6 +33,7 @@ app.use('/createUser', createUser);
 app.use('/getRoomDetails', getRoomDetails);
 app.use('/addNewOption', addNewOption);
 app.use('/addVote', addVote);
+app.use('/removeVote', removeVote);
 
 const io = new Server(server, {
   cors: {
