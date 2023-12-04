@@ -38,6 +38,14 @@ const views = {
   EVENT: 'EVENT',
 };
 
+const broadcastingEventTypes = {
+  ADD_VOTE: 'ADD_VOTE',
+  REMOVE_VOTE: 'REMOVE_VOTE',
+  ADD_OPTION: 'ADD_OPTION',
+  USER_CONNECTED: 'USER_CONNECTED',
+  USER_DISCONNECTED: 'USER_DISCONNECTED',
+};
+
 const drawerWidth = 240;
 const Room = () => {
   const [pending, setPending] = useState(true);
@@ -118,15 +126,27 @@ const Room = () => {
   };
 
   const handleAddVote = (optionID) => {
-    console.log('handleAddVote: Adding vote for optionID: ', optionID);
     // Check if the user has any votes left
     if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
       return;
     }
+
+    addVote(userID, optionID);
+    setUserVoteCount((prevCount) => prevCount + 1);
+
+    // TODO: Call API to update the vote in the database
     const votedOption = votionOptions.find(
       (option) => option.optionID === optionID
     );
+    const eventMessage = `${username} voted for ${votedOption.text}`;
+    sendBroadcast(
+      broadcastingEventTypes.ADD_VOTE,
+      { userID, optionID },
+      eventMessage
+    );
+  };
 
+  const addVote = (userID, optionID) => {
     setVotingOptions((prevOptions) =>
       prevOptions.map((option) =>
         option.optionID === optionID
@@ -134,18 +154,15 @@ const Room = () => {
           : option
       )
     );
-    setUserVoteCount((prevCount) => prevCount + 1);
-
-    const newEvent = `${username} voted for ${votedOption.text}`;
-    sendBroadcast(newEvent);
-    //
   };
 
-  const sendBroadcast = async (event) => {
+  const sendBroadcast = async (eventType, eventData, eventMessage) => {
     const broadcastData = {
       room: userDetails.roomID,
       author: userID,
-      notification: event,
+      eventType: eventType,
+      eventData: eventData,
+      eventMessage: eventMessage,
       timeStamp: dayjs().format('HH:mm:ss'),
     };
     console.log('BROADCASTING: ', broadcastData);
@@ -157,6 +174,11 @@ const Room = () => {
     const messageHandler = (data) => {
       if (data) {
         console.log('RECEIVED: ', data);
+        if (data.eventType === broadcastingEventTypes.ADD_VOTE) {
+          // Update the state to reflect the new vote
+          const { userID, optionID } = data.eventData;
+          addVote(userID, optionID);
+        }
         setEventLog((list) => [...list, data]);
       } else {
         console.log('No data received but socket is connected');
