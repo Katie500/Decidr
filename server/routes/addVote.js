@@ -4,30 +4,27 @@ const router = express.Router();
 const Room = require('../models/roomSchema');
 
 router.put('/', async (req, res) => {
-  const { userId, voteOptionId } = req.query;
+  const { roomID, voteOptionID, userID } = req.query;
 
-  if (!userId || !voteOptionId) {
+  if (!userID || !voteOptionID || !roomID) {
     res.status(400).send({
-      message: 'Incomplete data. Please provide userId and voteOptionId.',
+      message:
+        'Incomplete data. Please provide userID, voteOptionID and roomID.',
     });
     return;
   }
 
   try {
-    // Find the room with the given vote option
-    const room = await Room.findOne({ 'voteOptions._id': voteOptionId });
+    // Update the room to add the userID to the specific vote option
+    const updateResult = await Room.updateOne(
+      { _id: roomID, 'voteOptions._id': voteOptionID },
+      { $push: { 'voteOptions.$.votes': userID } }
+    );
 
-    if (!room) {
-      res.status(404).send({ message: 'Vote option not found' });
+    if (updateResult.nModified === 0) {
+      res.status(404).send({ message: 'Room or vote option not found' });
       return;
     }
-
-    // Find the vote option and add the user ID to the userIDs array
-    const voteOption = room.voteOptions.id(voteOptionId);
-    voteOption.userIDs.push(userId);
-
-    // Save the updated room
-    await room.save();
 
     res.status(200).send({ message: 'Vote added successfully' });
   } catch (error) {

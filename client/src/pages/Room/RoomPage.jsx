@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import EventLog from './EventLog';
 import { addNewOptionToDB } from '../../api/addNewOptionToDB';
+import { addVoteToDb } from '../../api/addVoteToDB';
 
 const views = {
   VOTING: 'VOTING',
@@ -144,17 +145,27 @@ const Room = () => {
       return;
     }
 
-    addVote(userID, optionID);
-    setUserVoteCount((prevCount) => prevCount + 1);
+    setPending(true);
+    addVoteToDb(roomDetails._id, optionID, userID)
+      .then(() => {
+        addVote(userID, optionID);
+        setUserVoteCount((prevCount) => prevCount + 1);
+        setPending(false);
 
-    // TODO: Call API to update the vote in the database
-    const votedOption = votionOptions.find((option) => option._id === optionID);
-    const eventMessage = `${username} voted for ${votedOption.optionText}`;
-    sendBroadcast(
-      broadcastingEventTypes.ADD_VOTE,
-      { userID, optionID },
-      eventMessage
-    );
+        const votedOption = votionOptions.find(
+          (option) => option._id === optionID
+        );
+        const eventMessage = `${username} voted for ${votedOption.optionText}`;
+        sendBroadcast(
+          broadcastingEventTypes.ADD_VOTE,
+          { userID, optionID },
+          eventMessage
+        );
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error('Failed to add vote:', error);
+      });
   };
   const addVote = (userID, optionID) => {
     setVotingOptions((prevOptions) =>
