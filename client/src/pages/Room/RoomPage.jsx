@@ -75,6 +75,7 @@ const Room = () => {
     endTime: '',
   });
   const [localRoomID, setLocalRoomID] = useState(null);
+  const sessionCancelled = false;
 
   useEffect(() => {
     if (userDetails.roomID !== localRoomID) {
@@ -113,22 +114,41 @@ const Room = () => {
     setOpenNewOption(false);
   };
 
+  // ====== ADDING NEW OPTION ====== //
   const handleAddNewOption = () => {
     if (!newOptionText) {
       setOpenNewOption(false);
       return;
     }
+
+    // TODO: Call API to update the vote in the database
+    // votingOptionID SHOULD COME FROM THE DATABASE
+    const newOptionID = (votionOptions.length + 1).toString();
+
+    addNewOption(newOptionText, newOptionID);
+    setNewOptionText('');
+    setOpenNewOption(false);
+
+    // BROADCAST THE NEW OPTION:
+    const eventMessage = `${username} added a new option: ${newOptionText}`;
+    sendBroadcast(
+      broadcastingEventTypes.ADD_OPTION,
+      { optionText: newOptionText, optionID: newOptionID },
+      eventMessage
+    );
+  };
+
+  const addNewOption = (optionText, newOptionID) => {
     setVotingOptions([
       {
-        optionID: (votionOptions.length + 1).toString(),
-        text: newOptionText,
+        optionID: newOptionID,
+        text: optionText,
         votes: [],
       },
       ...votionOptions,
     ]);
-    setNewOptionText('');
-    setOpenNewOption(false);
   };
+  // ====== END OF ADDING NEW OPTION ====== //
 
   // ====== ADDING VOTES ====== //
   const handleAddVote = (optionID) => {
@@ -181,7 +201,6 @@ const Room = () => {
       );
     }
   };
-
   const removeVote = (userID, optionID) => {
     let unvoteSuccess = false;
 
@@ -208,9 +227,9 @@ const Room = () => {
     );
     return unvoteSuccess;
   };
-
   // ====== END OF REMOVING VOTES ====== //
 
+  // ====== BROADCASTING EVENTS ====== //
   const sendBroadcast = async (eventType, eventData, eventMessage) => {
     const broadcastData = {
       room: userDetails.roomID,
@@ -242,6 +261,11 @@ const Room = () => {
           const { userID, username } = data.eventData;
           setUsers((prevUsers) => [...prevUsers, { userID, username }]);
         }
+        if (data.eventType === broadcastingEventTypes.ADD_OPTION) {
+          // Update the state to reflect the new option
+          const { optionText, optionID } = data.eventData;
+          addNewOption(optionText, optionID);
+        }
         setEventLog((list) => [...list, data]);
       } else {
         console.log('No data received but socket is connected');
@@ -259,12 +283,7 @@ const Room = () => {
       if (socket) socket.off('receive_message', messageHandler);
     };
   }, [socket]);
-
-  const handleCancelSession = () => {
-    console.log('Session cancelled!');
-  };
-
-  const sessionCancelled = false;
+  // ====== END OF BROADCASTING EVENTS ====== //
 
   // ===== HANDLING THE REMAINING TIME: ======//
   // useEffect to set the remaining time and update it every second
@@ -295,6 +314,9 @@ const Room = () => {
   const paddedSeconds = String(seconds).padStart(2, '0');
   // ===== END OF HANDLING THE REMAINING TIME ===== //
 
+  const handleCancelSession = () => {
+    console.log('Session cancelled!');
+  };
   return (
     <>
       {!sessionCancelled && (
