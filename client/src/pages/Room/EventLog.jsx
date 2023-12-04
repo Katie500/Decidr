@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
 
-const EventLog = ({ logs }) => {
+const EventLog = ({ logs, userID }) => {
   return (
     <>
       <Typography variant="h6" textAlign={'center'}>
@@ -19,6 +19,7 @@ const EventLog = ({ logs }) => {
           }}
         >
           <Typography variant="body1">
+            {log?.author === userID ? '(You) ' : ''}
             {log?.eventMessage} at {log?.timeStamp}
           </Typography>
         </Box>

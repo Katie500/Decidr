@@ -71,7 +71,7 @@ const Room = () => {
       sendBroadcast(
         broadcastingEventTypes.USER_CONNECTED,
         { userID, username },
-        `${username} has joined the room`
+        `${username} has ${userDetails.isAdmin ? 'created' : 'joined'} the room`
       );
     }
   }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
@@ -224,6 +224,9 @@ const Room = () => {
       timeStamp: dayjs().format('HH:mm:ss'),
     };
     await socket.emit('send_message', broadcastData);
+
+    // Update the event log with the new event
+    setEventLog((prevLogs) => [...prevLogs, broadcastData]);
   };
 
   // LISTEN FOR BROADCASTS
@@ -438,7 +441,9 @@ const Room = () => {
                 ))}
               {
                 // Show the notifications if the view is EVENT
-                view === views.EVENT && <EventLog logs={eventLog} />
+                view === views.EVENT && (
+                  <EventLog logs={eventLog} userID={userID} />
+                )
               }
             </Box>
             <Box className="footerBox">
