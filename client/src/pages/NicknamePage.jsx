@@ -24,6 +24,7 @@ import SelectAvatarMenu from './Room/SelectAvatarMenu';
 const NicknamePage = () => {
   const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [error, setError] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const socket = useContext(SocketContext);
@@ -32,6 +33,12 @@ const NicknamePage = () => {
   useEffect(() => {
     if (userDetails?.nickname) {
       setName(userDetails.nickname);
+    }
+  }, [userDetails]);
+
+  useEffect(() => {
+    if (userDetails?.profilePicture) {
+      setAvatar(userDetails.profilePicture);
     }
   }, [userDetails]);
 
@@ -45,15 +52,26 @@ const NicknamePage = () => {
   };
 
   const handleStart = async () => {
+
+    // Check if user has a name
     if (!name) {
       setError('Please enter a name.');
       return;
     }
+
+  // Check if the user has selected a profile picture
+  if (!avatar) {
+    setError('Please select a profile picture.');
+    console.log("Please select avatar");
+    return;
+  }
+
     setPending(true);
 
     if (userDetails?.isAdmin) {
       updateUserDetails({
         nickname: name,
+        profilePicture: avatar,
       });
       navigate('/StartNewRoom');
     } else {
@@ -62,11 +80,12 @@ const NicknamePage = () => {
         const userID = await createUser({
           username: name,
           socketID: socket.id,
-          profilePicture: '',
+          profilePicture: avatar,
           roomID: userDetails.roomID,
         });
         updateUserDetails({
           nickname: name,
+          profilePicture: avatar,
           userID: userID,
         });
         socket.emit('join_room', userDetails.roomID);
@@ -96,8 +115,13 @@ const NicknamePage = () => {
       <Grid className="container">
 
 
-        <Box className="contentBox widthConstraint">
-                  <SelectAvatarMenu />
+        <Box className="contentBox widthConstraint">        
+
+          <SelectAvatarMenu onSelect={(selectedAvatar) => {
+        setAvatar(selectedAvatar);
+        console.log('Avatar set in NicknamePage:', selectedAvatar);
+      }} />  
+                      
           <Typography variant="h6">Enter a nickname:</Typography>
           <Box className="inputBox">
             <TextField
