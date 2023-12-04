@@ -1,4 +1,4 @@
-const createUser = async (newUser) => {
+export const createUser = async (newUser) => {
   try {
     // Make a POST request to create a new user
     const response = await fetch('http://localhost:3001/createUser', {
@@ -23,5 +23,3 @@ const createUser = async (newUser) => {
     console.error('Error creating user:', error);
   }
 };
-
-export default createUser;
