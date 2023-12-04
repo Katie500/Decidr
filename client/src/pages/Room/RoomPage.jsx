@@ -20,19 +20,6 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import EventLog from './EventLog';
 
-const dummyVotingOptions = [
-  {
-    optionID: '1',
-    text: 'Tim Hortons',
-    votes: [], // Array of userIDs who voted for this option
-  },
-  {
-    optionID: '2',
-    text: 'McDonalds',
-    votes: [], // Array of userIDs who voted for this option
-  },
-];
-
 const views = {
   VOTING: 'VOTING',
   EVENT: 'EVENT',
@@ -49,7 +36,7 @@ const broadcastingEventTypes = {
 const drawerWidth = 240;
 const Room = () => {
   const [pending, setPending] = useState(true);
-  const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
+  const [votionOptions, setVotingOptions] = useState([]);
   const [users, setUsers] = useState([]); // users state
   const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
   const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
@@ -103,6 +90,7 @@ const Room = () => {
       }
       const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
       setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 3 });
+      setVotingOptions(roomDetails.voteOptions || []);
       setUsers(users);
       setPending(false);
     } catch (error) {
@@ -412,23 +400,46 @@ const Room = () => {
             >
               {
                 // Show the voting options if the view is VOTING
-                view === views.VOTING &&
-                  votionOptions.map((option, index) => (
-                    <VotingOptionCard
-                      key={index}
-                      name={option.text}
-                      votes={option.votes}
-                      totalAvailableVotes={
-                        users.length * roomDetails.numberOfVotesPerUser
-                      }
-                      numerOfUserVotes={
-                        option.votes.filter((vote) => vote === userID).length
-                      }
-                      handleAddVote={() => handleAddVote(option.optionID)}
-                      handleRemoveVote={() => handleRemoveVote(option.optionID)}
-                    />
-                  ))
+                view === views.VOTING && votionOptions.length === 0 && (
+                  <Typography
+                    variant="h6"
+                    textAlign={'center'}
+                    marginTop={'1rem'}
+                  >
+                    No voting options added yet. <br />
+                    Click{' '}
+                    <span
+                      style={{
+                        cursor: 'pointer',
+                        color: '#007bff',
+                        textDecoration: 'underline',
+                        textStyle: 'italic',
+                      }}
+                      onClick={() => setOpenNewOption(true)}
+                    >
+                      here
+                    </span>{' '}
+                    to add one.
+                  </Typography>
+                )
               }
+              {view === views.VOTING &&
+                votionOptions.length > 0 &&
+                votionOptions.map((option, index) => (
+                  <VotingOptionCard
+                    key={index}
+                    name={option.text}
+                    votes={option.votes}
+                    totalAvailableVotes={
+                      users.length * roomDetails.numberOfVotesPerUser
+                    }
+                    numerOfUserVotes={
+                      option.votes.filter((vote) => vote === userID).length
+                    }
+                    handleAddVote={() => handleAddVote(option.optionID)}
+                    handleRemoveVote={() => handleRemoveVote(option.optionID)}
+                  />
+                ))}
               {
                 // Show the notifications if the view is EVENT
                 view === views.EVENT && <EventLog logs={eventLog} />
