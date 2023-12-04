@@ -19,7 +19,7 @@ const EventLog = ({ logs }) => {
           }}
         >
           <Typography variant="body1">
-            {log?.notification} at {log?.timeStamp}
+            {log?.eventMessage} at {log?.timeStamp}
           </Typography>
         </Box>
       ))}

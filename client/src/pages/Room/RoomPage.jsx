@@ -125,6 +125,7 @@ const Room = () => {
     setOpenNewOption(false);
   };
 
+  // ====== ADDING VOTES ====== //
   const handleAddVote = (optionID) => {
     // Check if the user has any votes left
     if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
@@ -145,7 +146,6 @@ const Room = () => {
       eventMessage
     );
   };
-
   const addVote = (userID, optionID) => {
     setVotingOptions((prevOptions) =>
       prevOptions.map((option) =>
@@ -155,6 +155,56 @@ const Room = () => {
       )
     );
   };
+  // ====== END OF ADDING VOTES ====== //
+
+  // ====== REMOVING VOTES ====== //
+  const handleRemoveVote = (optionID) => {
+    if (removeVote(userID, optionID)) {
+      setUserVoteCount((prevCount) => prevCount - 1); // Decrement the user's vote count
+
+      // TODO: Call API to update the vote in the database
+
+      // Add a notification for the unvote
+      const optionText = votionOptions.find(
+        (option) => option.optionID === optionID
+      ).text;
+      const eventMessage = `${username} unvoted for ${optionText}`;
+      sendBroadcast(
+        broadcastingEventTypes.REMOVE_VOTE,
+        { userID, optionID },
+        eventMessage
+      );
+    }
+  };
+
+  const removeVote = (userID, optionID) => {
+    let unvoteSuccess = false;
+
+    // NOTE: REMOVING ONLY THE FIRST OCCURRENCE OF THE USER'S VOTE
+    setVotingOptions((prevOptions) =>
+      prevOptions.map((option) => {
+        if (option.optionID === optionID) {
+          // Find the index of the first occurrence of the user's vote
+          const indexToRemove = option.votes.indexOf(userID);
+          if (indexToRemove !== -1) {
+            unvoteSuccess = true;
+            // Create a new array excluding the first occurrence of the user's vote
+            return {
+              ...option,
+              votes: [
+                ...option.votes.slice(0, indexToRemove),
+                ...option.votes.slice(indexToRemove + 1),
+              ],
+            };
+          }
+        }
+        return option;
+      })
+    );
+    return unvoteSuccess;
+  };
+
+  // ====== END OF REMOVING VOTES ====== //
 
   const sendBroadcast = async (eventType, eventData, eventMessage) => {
     const broadcastData = {
@@ -179,6 +229,11 @@ const Room = () => {
           const { userID, optionID } = data.eventData;
           addVote(userID, optionID);
         }
+        if (data.eventType === broadcastingEventTypes.REMOVE_VOTE) {
+          // Update the state to reflect the removed vote
+          const { userID, optionID } = data.eventData;
+          removeVote(userID, optionID);
+        }
         setEventLog((list) => [...list, data]);
       } else {
         console.log('No data received but socket is connected');
@@ -196,43 +251,6 @@ const Room = () => {
       if (socket) socket.off('receive_message', messageHandler);
     };
   }, [socket]);
-
-  const handleRemoveVote = (optionID) => {
-    let unvoteSuccess = false;
-    // NOTE: REMOVING ONLY THE FIRST OCCURRENCE OF THE USER'S VOTE
-    setVotingOptions((prevOptions) =>
-      prevOptions.map((option) => {
-        if (option.optionID === optionID) {
-          // Find the index of the first occurrence of the user's vote
-          const indexToRemove = option.votes.indexOf(userID);
-          if (indexToRemove !== -1) {
-            unvoteSuccess = true;
-            // Create a new array excluding the first occurrence of the user's vote
-            return {
-              ...option,
-              votes: [
-                ...option.votes.slice(0, indexToRemove),
-                ...option.votes.slice(indexToRemove + 1),
-              ],
-            };
-          }
-        }
-        return option;
-      })
-    );
-
-    if (unvoteSuccess) {
-      setUserVoteCount((prevCount) => prevCount - 1); // Decrement the user's vote count
-      // Add a notification for the unvote
-      const optionText = votionOptions.find(
-        (option) => option.optionID === optionID
-      ).text;
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        `${username} unvoted for ${optionText}`,
-      ]);
-    }
-  };
 
   const handleCancelSession = () => {
     console.log('Session cancelled!');
