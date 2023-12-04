@@ -24,6 +24,7 @@ export default function CustomDrawer({
   onCancelSession,
   users,
   profileName,
+  profileAvatar,
   adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -38,28 +39,50 @@ export default function CustomDrawer({
   }, [isMobile, open]);
 
 
-//==================== profile picture algorithm ================//
-//open picture window
-const [isWindowOpen, setWindowOpen] = useState(false);
-const [selectedAvatar, setSelectedAvatar] = useState(null);
+  //==================== profile picture algorithm ================//
+  //open picture window
+  const [isWindowOpen, setWindowOpen] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [svgContent, setSvgContent] = useState(null);
 
-const changeProfilePicture = () => {
-  setWindowOpen(!isWindowOpen);
-};
+  useEffect(() => {
+    const fetchSvg = async () => {
+      try {
+        const response = await fetch(profileAvatar);
+        if (response.ok) {
+          const svgText = await response.text();
+          const base64 = btoa(svgText);
+          setSvgContent(base64);
+        } else {
+          console.error('Failed to fetch SVG:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching SVG:', error);
+      }
+    };
 
-const handleAvatarSelect = (avatarURL) => {
-  setSelectedAvatar(avatarURL);
-  // Additional logic if needed
-};
+    fetchSvg();
+  }, [profileAvatar]);
 
-const handleSetProfilePicture = () => {
-  // Additional logic if needed before setting the profile picture
-  console.log('Selected Avatar URL:', selectedAvatar);
-  // Set profile picture logic here
-  // ...
-  // Close the window after setting the profile picture
-  setWindowOpen(false);
-};
+
+
+  const changeProfilePicture = () => {
+    setWindowOpen(!isWindowOpen);
+  };
+
+  const handleAvatarSelect = (avatarURL) => {
+    setSelectedAvatar(avatarURL);
+    // Additional logic if needed
+  };
+
+  const handleSetProfilePicture = () => {
+    // Additional logic if needed before setting the profile picture
+    console.log('Selected Avatar URL:', selectedAvatar);
+    // Set profile picture logic here
+    // ...
+    // Close the window after setting the profile picture
+    setWindowOpen(false);
+  };
 
 
   return (
@@ -80,33 +103,53 @@ const handleSetProfilePicture = () => {
         onClose={() => setDrawerOpen(false)}
         anchor="left"
       >
+
+
         <Toolbar>
+          <div>
+            {console.log('Profile Avatar URL:', svgContent)}
 
-        <div>
-          {/*Handle the profile picture here*/}
-        <IconButton onClick={changeProfilePicture}>
-        <AccountCircleIcon />
-        </IconButton>
 
-        {isWindowOpen && (
-        <SelectAvatarMenu onSelect={handleAvatarSelect} />
-      )}
+            <IconButton onClick={changeProfilePicture}>
 
-      {/* Render other components or content here */}
+              {profileAvatar !== '' ? (
+                <img
+                  src={`data:image/svg+xml;base64,${svgContent}`}
+                  alt="Profile Picture"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                  onError={(e) => console.error('Error loading image:', e)}
+                />
+              ) : (
+                <AccountCircleIcon />
+              )}
+            </IconButton>
 
-      {/* Optionally, you can use a button to set the profile picture */}
-      {selectedAvatar && (
-        <button onClick={handleSetProfilePicture}>
-          Set Profile Picture
-        </button>
-      )}
-    </div>
 
+
+
+
+            {isWindowOpen && (
+              <SelectAvatarMenu onSelect={handleAvatarSelect} />
+            )}
+
+            {/* Render other components or content here */}
+
+            {/* Optionally, you can use a button to set the profile picture */}
+            {/* Optionally, you can use a button to set the profile picture */}
+            {selectedAvatar && (
+              <button onClick={handleSetProfilePicture}>
+                Set Profile Picture
+              </button>
+            )}
+          </div>
 
           <Typography noWrap component="div">
             {profileName}
           </Typography>
         </Toolbar>
+
+
+
         <Divider />
         <List>
           <ListItem key={-1} disablePadding>
@@ -121,9 +164,8 @@ const handleSetProfilePicture = () => {
                   <AccountCircleIcon />
                 </ListItemIcon>
                 <ListItemText
-                  primary={`${user.username} ${
-                    user._id === adminID ? '(admin)' : ''
-                  }`}
+                  primary={`${user.username} ${user._id === adminID ? '(admin)' : ''
+                    }`}
                 />
               </ListItemButton>
             </ListItem>

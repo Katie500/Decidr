@@ -29,6 +29,7 @@ const AvatarCard = ({ avatar, id, selected, onClick }) => (
                 }}
             />
         )}
+            
     </div>
 );
 
@@ -37,87 +38,91 @@ const SelectAvatarMenu = ({ onSelect }) => {
     const [avatars, setAvatars] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
-
+  
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = [];
-                await Promise.all(Array.from({ length: 4 }, async (_, index) => {
-                    const randomIndex = Math.round(Math.random() * 1000);
-                    const response = await axios.get(`${api}/${randomIndex}`, { responseType: 'arraybuffer' });
-                    const base64 = arrayBufferToBase64(response.data);
-                    data.push({ avatar: base64, id: randomIndex });
-                }));
-
-                setAvatars(data);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching avatars:', error);
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
+      const fetchData = async () => {
+        try {
+          const data = [];
+          await Promise.all(Array.from({ length: 4 }, async (_, index) => {
+            const randomIndex = Math.round(Math.random() * 1000);
+            const response = await axios.get(`${api}/${randomIndex}`, { responseType: 'arraybuffer' });
+            const base64 = arrayBufferToBase64(response.data);
+            data.push({ avatar: base64, id: randomIndex });
+          }));
+  
+          setAvatars(data);
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error fetching avatars:', error);
+          setIsLoading(false);
+        }
+      };
+  
+      fetchData();
     }, [api]);
-
+  
     const arrayBufferToBase64 = (buffer) => {
-        let binary = '';
-        const bytes = new Uint8Array(buffer);
-        for (let i = 0; i < bytes.length; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        return btoa(binary);
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
     };
-
+  
     const setProfilePicture = () => {
-        if (selectedAvatar !== null) {
-            const selectedAvatarId = selectedAvatar;
-            const selectedAvatarURL = `${api}/${selectedAvatarId}`;
-            onSelect(selectedAvatarURL);
-            console.log('Selected Avatar URL:', selectedAvatarURL);
-        }
+      if (selectedAvatar !== null) {
+        const selectedAvatarId = selectedAvatar;
+        const selectedAvatarURL = `${api}/${selectedAvatarId}`;
+        onSelect(selectedAvatarURL);
+        console.log('Selected Avatar URL:', selectedAvatarURL);
+      } else {
+        // Handle the case where the user has not selected an avatar
+        console.error('No avatar selected');
+      }
     };
-
+  
     return (
-        <Box className="avatarContainer">
-            {isLoading ? (
-                <div className="loader-container">
-                    {/* Placeholder for loading animation or image */}
-                    Loading...
-                </div>
-            ) : (
-                <>
-                    <Card
-                        style={{
-                            padding: '1rem',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                        }}
-                    >
-                        {avatars.map(({ avatar, id }) => (
-                            <AvatarCard
-                                key={id}
-                                avatar={avatar}
-                                id={id}
-                                selected={selectedAvatar === id}
-                                onClick={setSelectedAvatar}
-                            />
-                        ))}
-                    </Card>
-
-                    <IconButton
-                        className="submit-btn"
-                        onClick={setProfilePicture}
-                        disabled={selectedAvatar === null}
-                    >
-                        Set as Profile Picture
-                    </IconButton>
-                </>
-            )}
-        </Box>
+      <Box className="avatarContainer">
+        {isLoading ? (
+          <div className="loader-container">
+            {/* Placeholder for loading animation or image */}
+            Loading...
+          </div>
+        ) : (
+          <>
+            <Card
+              style={{
+                padding: '1rem',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'row',
+              }}
+            >
+              {avatars.map(({ avatar, id }) => (
+                <AvatarCard
+                  key={id}
+                  avatar={avatar}
+                  id={id}
+                  selected={selectedAvatar === id}
+                  onClick={setSelectedAvatar}
+                />
+              ))}
+            </Card>
+  
+            <IconButton
+              className="submit-btn"
+              onClick={setProfilePicture}
+              disabled={selectedAvatar === null}
+            >
+              Set as Profile Picture
+            </IconButton>
+          </>
+        )}
+      </Box>
     );
-};
+  };
+  
 
 export default SelectAvatarMenu;
