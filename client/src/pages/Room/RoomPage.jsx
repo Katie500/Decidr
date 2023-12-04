@@ -45,6 +45,7 @@ const Room = () => {
   const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
   const userID = userDetails.userID;
   const username = userDetails.nickname;
+  const avatar = userDetails.profilePicture;
   const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
@@ -209,6 +210,7 @@ const Room = () => {
           setDrawerOpen={setDrawerOpen}
           onCancelSession={handleCancelSession}
           profileName={username}
+          profileAvatar={avatar}
           users={users}
           adminID={roomDetails.ownerUserID}
         />

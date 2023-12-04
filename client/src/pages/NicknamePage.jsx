@@ -60,11 +60,11 @@ const NicknamePage = () => {
     }
 
   // Check if the user has selected a profile picture
-  if (!avatar) {
+ /* if (!avatar) {
     setError('Please select a profile picture.');
     console.log("Please select avatar");
     return;
-  }
+  }*/
 
     setPending(true);
 

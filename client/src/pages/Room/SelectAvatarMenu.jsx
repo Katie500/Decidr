@@ -29,6 +29,7 @@ const AvatarCard = ({ avatar, id, selected, onClick }) => (
                 }}
             />
         )}
+            
     </div>
 );
 
