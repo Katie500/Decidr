@@ -15,6 +15,12 @@ const getPercentage = (total, value) => {
   return (value/total)*100;
 }
 
+
+const colorScale = (percent) => {
+  const color = d3.interpolate("lightgreen", "darkgreen")(percent/100);
+  return color;
+}
+
 const BubbleChart = ({
   votionOptions,
   handleAddVote,
@@ -44,6 +50,10 @@ const BubbleChart = ({
         };
         votionOptions[i].votes.length > 0 ? data.push(item) : data.push();
     }
+
+    // const colorScale = d3.scaleLinear().domain([0, 1]).range(['green', 'red']);
+
+   
 
     // Create a force simulation
     const simulation = d3
@@ -76,6 +86,7 @@ const BubbleChart = ({
       .append("circle")
       .attr("r", (d) => d.r)
       .style("fill", () => getRandomColor())
+      .style("fill", (d) => colorScale(d.r/growthFactor))
       .style('stroke', 'black') // Border color
       .style('stroke-width', 2) // Border width
       .call(
