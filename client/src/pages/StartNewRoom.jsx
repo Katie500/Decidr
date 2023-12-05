@@ -25,7 +25,7 @@ const StartNewRoom = () => {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [question, setQuestion] = useState('');
-  const [duration, setDuration] = useState(5);
+  const [duration, setDuration] = useState(0.20);
   const [votes, setVotes] = useState(1);
   const [roomID, setroomID] = useState(Math.random().toString(36).substring(7)); // TODO: Generate room code
   const [copySuccess, setCopySuccess] = useState(false); // Notifies user that room code has been copied by changing button text

@@ -31,6 +31,7 @@ const Room = () => {
   const userID = userDetails.userID;
   const username = userDetails.nickname;
 
+  const avatar = userDetails.profilePicture;
   const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
@@ -42,6 +43,25 @@ const Room = () => {
     numberOfVotesPerUser: 3,
     endTime: '',
   });
+
+
+  //==================== NAVIGATE TO RESULTS IF TIME ENDS ==================//
+  useEffect(() => {
+    // Check if the time has ended
+    const intervalId = setInterval(() => {
+      const currentTime = new Date();
+      const endTime = new Date(roomDetails.endTime);
+
+      if (currentTime >= endTime) {
+        // Time has ended, navigate to ResultPage
+        clearInterval(intervalId);
+        navigate('/resultpage'); // Adjust the path accordingly
+      }
+    }, 1000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [roomDetails.endTime, navigate]);
 
   const voteManagement = useVoteManagement(roomDetails, setPending);
   // addNewOption needs to be declared here because it needs to be passed to useBroadcast
@@ -75,7 +95,7 @@ const Room = () => {
     if (userDetails.roomID !== localRoomID) {
       fetchRoomDetails();
       setLocalRoomID(userDetails.roomID);
-      sendUserConnectedBroadcast();
+      sendUserConnectedBroadcast(); 
     }
   }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
@@ -103,6 +123,10 @@ const Room = () => {
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
+  };
+
+  const handleCancelSession = () => {
+    console.log('Session cancelled!');
   };
 
   const handleAddVote = async (optionID) => {
@@ -161,9 +185,9 @@ const Room = () => {
     const eventMessage = `${username} added a new option: ${newOptionText}`;
     sendBroadcast(
       broadcastingEventTypes.ADD_OPTION,
-      {
-        optionText: newOptionText,
-        optionID: newOptionID,
+      { 
+        optionText: newOptionText, 
+        optionID: newOptionID 
       },
       eventMessage
     );
@@ -172,6 +196,7 @@ const Room = () => {
 
   return (
     <>
+
       {sessionCancelled && (
         // We can fix closing a room(session) later
         <Typography variant="h4" align="center">
