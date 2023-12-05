@@ -9,8 +9,40 @@ const views = {
   VOTING: 'VOTING',
   EVENT: 'EVENT',
 };
-
 const drawerWidth = 240;
+
+const Timer = ({ endTime }) => {
+  const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
+
+  useEffect(() => {
+    setRemainingTimeInSeconds(calculateRemainingTimeInSeconds(endTime));
+    const interval = setInterval(() => {
+      setRemainingTimeInSeconds((prevTime) =>
+        prevTime > 0 ? prevTime - 1 : 0
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [endTime]);
+
+  const calculateRemainingTimeInSeconds = (endTime) => {
+    const now = dayjs();
+    const end = dayjs(endTime);
+    return Math.max(end.diff(now, 'second'), 0);
+  };
+
+  const minutes = Math.floor(remainingTimeInSeconds / 60);
+  const seconds = remainingTimeInSeconds % 60;
+  const paddedMinutes = String(minutes).padStart(2, '0');
+  const paddedSeconds = String(seconds).padStart(2, '0');
+
+  return (
+    <span style={{ fontWeight: 'bold', color: 'red' }}>
+      {paddedMinutes}:{paddedSeconds}
+    </span>
+  );
+};
+
 const RoomHeader = ({
   handleCancelSession,
   users,
@@ -21,36 +53,6 @@ const RoomHeader = ({
   hideDesktopDrawer,
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
-  const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
-
-  // ===== HANDLING THE REMAINING TIME: ======//
-  // useEffect to set the remaining time and update it every second
-  useEffect(() => {
-    setRemainingTimeInSeconds(
-      calculateRemainingTimeInSeconds(roomDetails.endTime)
-    );
-    const interval = setInterval(() => {
-      setRemainingTimeInSeconds((prevTime) => {
-        return prevTime > 0 ? prevTime - 1 : 0;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [roomDetails.endTime]); // Dependency on roomDetails.endTime
-
-  // Function to calculate remaining time in seconds
-  const calculateRemainingTimeInSeconds = (endTime) => {
-    const now = dayjs();
-    const end = dayjs(endTime);
-    const differenceInSeconds = end.diff(now, 'second');
-    return differenceInSeconds > 0 ? differenceInSeconds : 0;
-  };
-
-  // Convert seconds to minutes and seconds for display
-  const minutes = Math.floor(remainingTimeInSeconds / 60);
-  const seconds = remainingTimeInSeconds % 60;
-  const paddedMinutes = String(minutes).padStart(2, '0');
-  const paddedSeconds = String(seconds).padStart(2, '0');
-  // ===== END OF HANDLING THE REMAINING TIME ===== //
 
   return (
     <>
@@ -78,10 +80,7 @@ const RoomHeader = ({
           </span>
         </Typography>
         <Typography className="timeText">
-          Time Left:{' '}
-          <span style={{ fontWeight: 'bold', color: 'red' }}>
-            {paddedMinutes}:{paddedSeconds}
-          </span>
+          Time Left: <Timer endTime={roomDetails.endTime} />
         </Typography>
       </Box>
       <Typography
