@@ -11,7 +11,6 @@ import TestRoom from "./components/Test/apiTest2";
 import TestAvatar from "./components/Test/AvatarPage";
 import TestPage1 from "./components/Test/page1";
 import { SocketProvider } from "./contexts/SocketContext";
-import View1 from "./components/Views/view1";
 
 function App() {
   const theme = createTheme({
@@ -41,7 +40,6 @@ function App() {
               <Route path="/testUser" element={<TestUser />} />
               <Route path="/testRoom" element={<TestRoom />} />
               <Route path="/testAvatar" element={<TestAvatar />} />
-              <Route path="/testPage1" element={<View1 />} />
             </Routes>
           </BrowserRouter>
         </UserProvider>

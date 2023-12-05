@@ -8,6 +8,7 @@ import './RoomPage.css';
 const views = {
   VOTING: 'VOTING',
   EVENT: 'EVENT',
+  CHART: 'CHART',
 };
 const drawerWidth = 240;
 
@@ -108,6 +109,15 @@ const RoomHeader = ({
           onClick={() => setView(views.VOTING)}
         >
           Voting
+        </Button>
+        <Button
+          variant={view === views.CHART ? 'contained' : 'outlined'}
+          size="small"
+          color="success"
+          fullWidth
+          onClick={() => setView(views.CHART)}
+        >
+          Chart
         </Button>
         <Button
           variant={view === views.EVENT ? 'contained' : 'outlined'}

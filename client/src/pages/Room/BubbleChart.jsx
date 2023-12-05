@@ -1,6 +1,3 @@
-import View from "../UI/view";
-import styles from "./views.module.css";
-
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
@@ -13,18 +10,38 @@ const getRandomColor = () => {
   return color;
 };
 
-const BubbleChart = () => {
+const getPercentage = (total, value) => {
+  console.log(value + "/" + total);
+  return (value/total)*100;
+}
+
+const BubbleChart = ({
+  votionOptions,
+  handleAddVote,
+  handleRemoveVote,
+  handleAddOption,
+  userID,
+  totalAvailableVotes,
+}) => {
   const chartRef = useRef(null);
+
+  console.log("votionOptions",votionOptions);
+  console.log("Number of votes",votionOptions[0].votes.length);
+  // console.log("userID",userID);
+  console.log("totalAvailableVotes",totalAvailableVotes);
+
+  console.log(getPercentage(totalAvailableVotes, votionOptions[0].votes.length));
 
   useEffect(() => {
     const svg = d3.select(chartRef.current);
 
-    // Sample data with names
-    const data = [
-      { r: 20, name: "Circle 1" },
-      { r: 90, name: "Circle 2" },
-      { r: 50, name: "Circle 3" },
-    ];
+    let data = [];
+    for (let i=0; i<votionOptions.length; i++){
+        const item = {
+          r: getPercentage(totalAvailableVotes, votionOptions[i].votes.length), name: votionOptions[i].optionText
+        };
+        data.push(item);
+    }
 
     // Create a force simulation
     const simulation = d3
@@ -38,7 +55,7 @@ const BubbleChart = () => {
         d3
           .forceX()
           .strength(0.1)
-          .x(800 / 2)
+          .x(400 / 2)
       ) // Center on the x-axis
       .force(
         "y",
@@ -108,29 +125,10 @@ const BubbleChart = () => {
   }, []);
 
   return (
-    <svg ref={chartRef} width={1000} height={1000} onClick={() => alert("hi")}>
+    <svg ref={chartRef} width="100%" height="100%" onClick={() => alert("hi")}>
       {/* Any additional SVG elements can be added here */}
     </svg>
   );
 };
 
-const View1 = ({
-  votionOptions,
-  handleAddVote,
-  handleRemoveVote,
-  handleAddOption,
-  userID,
-  totalAvailableVotes,
-}) => {
-  return (
-    <View>
-      {/* {data.map((info) => (
-        <Bubble data={info} totalVotes={totalVotes} />
-        
-      ))} */}
-      <BubbleChart />
-    </View>
-  );
-};
-
-export default View1;
+export default BubbleChart;
