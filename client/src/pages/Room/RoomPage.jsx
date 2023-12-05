@@ -1,18 +1,8 @@
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  Typography,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
-import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
 import { SocketContext } from '../../contexts/SocketContext';
-import CustomDrawer from './Drawer';
-import VotingOptionCard from './VotingOptionsList';
 import AddNewOptionModal from './NewOptionModal';
 import './RoomPage.css';
 import { getRoomDetails } from '../../api/getRoomDetails';
@@ -20,36 +10,26 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import EventLog from './EventLog';
 import { addNewOptionToDB } from '../../api/addNewOptionToDB';
-import { addVoteToDb } from '../../api/addVoteToDB';
-import { removeVoteFromDb } from '../../api/removeVoteFromDB';
 import VotingOptionsList from './VotingOptionsList';
 import RoomHeader from './RoomHeader';
+import useVoteManagement from '../../hooks/useVoteManagement';
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
 
 const views = {
   VOTING: 'VOTING',
   EVENT: 'EVENT',
 };
 
-const broadcastingEventTypes = {
-  ADD_VOTE: 'ADD_VOTE',
-  REMOVE_VOTE: 'REMOVE_VOTE',
-  ADD_OPTION: 'ADD_OPTION',
-  USER_CONNECTED: 'USER_CONNECTED',
-  USER_DISCONNECTED: 'USER_DISCONNECTED',
-};
-
 const Room = () => {
   const [pending, setPending] = useState(true);
-  const [votionOptions, setVotingOptions] = useState([]);
+  // const [votionOptions, setVotingOptions] = useState([]);
   const [users, setUsers] = useState([]); // users state
-  const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
   const [eventLog, setEventLog] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
 
   const [view, setView] = useState(views.VOTING); // View state
-  const socket = useContext(SocketContext);
   const userID = userDetails.userID;
   const username = userDetails.nickname;
   const navigate = useNavigate();
@@ -63,6 +43,50 @@ const Room = () => {
     numberOfVotesPerUser: 3,
     endTime: '',
   });
+
+  // ====== ADDING NEW OPTION ====== //
+  const handleAddNewOption = async () => {
+    if (!newOptionText) {
+      setOpenNewOption(false);
+      return;
+    }
+
+    // TODO: Call API to update the vote in the database
+    // votingOptionID SHOULD COME FROM THE DATABASE
+    setPending(true);
+    const newOptionID = await addNewOptionToDB(newOptionText, roomDetails._id);
+
+    setPending(false);
+    addNewOption(newOptionText, newOptionID);
+    setNewOptionText('');
+    setOpenNewOption(false);
+
+    // BROADCAST THE NEW OPTION:
+    const eventMessage = `${username} added a new option: ${newOptionText}`;
+    sendBroadcast(
+      broadcastingEventTypes.ADD_OPTION,
+      { optionText: newOptionText, optionID: newOptionID },
+      eventMessage
+    );
+  };
+
+  const addNewOption = (optionText, newOptionID) => {
+    voteManagement.setVotingOptions((prevOptions) => [
+      { _id: newOptionID, optionText: optionText, votes: [] },
+      ...prevOptions,
+    ]);
+  };
+  // ====== END OF ADDING NEW OPTION ====== //
+
+  const voteManagement = useVoteManagement(roomDetails, setPending);
+  const { sendBroadcast } = useBroadcast(
+    voteManagement.processIncomingVote,
+    voteManagement.processIncomingVoteRemoval,
+    setUsers,
+    addNewOption,
+    setEventLog
+  );
+
   const [localRoomID, setLocalRoomID] = useState(null);
   const sessionCancelled = false;
 
@@ -92,7 +116,7 @@ const Room = () => {
       }
       const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
       setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 3 });
-      setVotingOptions(roomDetails.voteOptions || []);
+      voteManagement.setVotingOptions(roomDetails.voteOptions || []);
       setUsers(users);
       setPending(false);
     } catch (error) {
@@ -104,204 +128,41 @@ const Room = () => {
     setOpenNewOption(false);
   };
 
-  // ====== ADDING NEW OPTION ====== //
-  const handleAddNewOption = async () => {
-    if (!newOptionText) {
-      setOpenNewOption(false);
-      return;
-    }
+  const handleAddVote = async (optionID) => {
+    try {
+      await voteManagement.submitUserVote(optionID);
 
-    // TODO: Call API to update the vote in the database
-    // votingOptionID SHOULD COME FROM THE DATABASE
-    setPending(true);
-    const newOptionID = await addNewOptionToDB(newOptionText, roomDetails._id);
-
-    setPending(false);
-    addNewOption(newOptionText, newOptionID);
-    setNewOptionText('');
-    setOpenNewOption(false);
-
-    // BROADCAST THE NEW OPTION:
-    const eventMessage = `${username} added a new option: ${newOptionText}`;
-    sendBroadcast(
-      broadcastingEventTypes.ADD_OPTION,
-      { optionText: newOptionText, optionID: newOptionID },
-      eventMessage
-    );
-  };
-
-  const addNewOption = (optionText, newOptionID) => {
-    setVotingOptions((prevOptions) => [
-      { _id: newOptionID, optionText: optionText, votes: [] },
-      ...prevOptions,
-    ]);
-  };
-  // ====== END OF ADDING NEW OPTION ====== //
-
-  // ====== ADDING VOTES ====== //
-  const handleAddVote = (optionID) => {
-    // Check if the user has any votes left
-    if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
-      return;
-    }
-
-    setPending(true);
-    addVoteToDb(roomDetails._id, optionID, userID)
-      .then(() => {
-        addVote(userID, optionID);
-        setUserVoteCount((prevCount) => prevCount + 1);
-        setPending(false);
-
-        const votedOption = votionOptions.find(
-          (option) => option._id === optionID
-        );
-        const eventMessage = `${username} voted for ${votedOption.optionText}`;
-        sendBroadcast(
-          broadcastingEventTypes.ADD_VOTE,
-          { userID, optionID },
-          eventMessage
-        );
-      })
-      .catch((error) => {
-        // Handle any errors here
-      });
-  };
-  const addVote = (userID, optionID) => {
-    setVotingOptions((prevOptions) =>
-      prevOptions.map((option) =>
-        option._id === optionID
-          ? { ...option, votes: [...option.votes, userID] }
-          : option
-      )
-    );
-  };
-  // ====== END OF ADDING VOTES ====== //
-
-  // ====== REMOVING VOTES ====== //
-  const handleRemoveVote = (optionID) => {
-    if (removeVote(userID, optionID)) {
-      setPending(true);
-      removeVoteFromDb(roomDetails._id, optionID, userID)
-        .then(() => {
-          setUserVoteCount((prevCount) => prevCount - 1); // Decrement the user's vote count
-
-          setPending(false);
-
-          // Add a notification for the unvote
-          const optionText = votionOptions.find(
-            (option) => option._id === optionID
-          ).optionText;
-          const eventMessage = `${username} unvoted for ${optionText}`;
-          sendBroadcast(
-            broadcastingEventTypes.REMOVE_VOTE,
-            { userID, optionID },
-            eventMessage
-          );
-          setPending(false);
-        })
-        .catch((error) => {
-          console.error('Failed to add vote:', error);
-        });
-    } else {
-      console.log('Failed to remove vote');
-    }
-  };
-
-  const removeVote = (userID, optionID) => {
-    // Find the option with the given optionID
-    const option = votionOptions.find((option) => option._id === optionID);
-
-    // Check if userID exists in the votes array of the found option
-    if (option && option.votes.includes(userID)) {
-      setVotingOptions((prevOptions) =>
-        prevOptions.map((option) => {
-          if (option._id === optionID) {
-            // Find the index of the first occurrence of the user's vote
-            const indexToRemove = option.votes.indexOf(userID);
-            if (indexToRemove !== -1) {
-              // Create a new array excluding the first occurrence of the user's vote
-              return {
-                ...option,
-                votes: [
-                  ...option.votes.slice(0, indexToRemove),
-                  ...option.votes.slice(indexToRemove + 1),
-                ],
-              };
-            }
-          }
-          return option;
-        })
+      // BROADCAST THE VOTE:
+      const optionText = voteManagement.votingOptions.find(
+        (opt) => opt._id === optionID
+      )?.optionText;
+      sendBroadcast(
+        broadcastingEventTypes.ADD_VOTE,
+        { userID, optionID },
+        `${username} voted for ${optionText}`
       );
-      return true; // Vote found and attempt to remove is made
-    } else {
-      return false; // Vote not found, no state update
+    } catch (error) {
+      console.error('Error in voting:', error);
     }
   };
 
-  // ====== END OF REMOVING VOTES ====== //
+  const handleRemoveVote = async (optionID) => {
+    try {
+      await voteManagement.removeUserVote(optionID);
 
-  // ====== BROADCASTING EVENTS ====== //
-  const sendBroadcast = async (eventType, eventData, eventMessage) => {
-    const broadcastData = {
-      room: userDetails.roomID,
-      author: userID,
-      eventType: eventType,
-      eventData: eventData,
-      eventMessage: eventMessage,
-      timeStamp: dayjs().format('HH:mm:ss'),
-    };
-    if (socket) {
-      await socket.emit('send_message', broadcastData);
-    } else {
-      console.error('SOCKET NOT FOUND in RoomPage');
+      // BROADCAST vote removal
+      const optionText = voteManagement.votingOptions.find(
+        (opt) => opt._id === optionID
+      )?.optionText;
+      sendBroadcast(
+        broadcastingEventTypes.REMOVE_VOTE,
+        { userID, optionID },
+        `${username} unvoted for ${optionText}`
+      );
+    } catch (error) {
+      console.error('Error in removing vote:', error);
     }
-
-    // Update the event log with the new event
-    setEventLog((prevLogs) => [...prevLogs, broadcastData]);
   };
-
-  // LISTEN FOR BROADCASTS
-  useEffect(() => {
-    const messageHandler = (data) => {
-      if (data) {
-        if (data.eventType === broadcastingEventTypes.ADD_VOTE) {
-          // Update the state to reflect the new vote
-          const { userID, optionID } = data.eventData;
-          addVote(userID, optionID);
-        }
-        if (data.eventType === broadcastingEventTypes.REMOVE_VOTE) {
-          // Update the state to reflect the removed vote
-          const { userID, optionID } = data.eventData;
-          removeVote(userID, optionID);
-        }
-        if (data.eventType === broadcastingEventTypes.USER_CONNECTED) {
-          // Update the state to reflect the new user
-          const { userID, username } = data.eventData;
-          setUsers((prevUsers) => [...prevUsers, { userID, username }]);
-        }
-        if (data.eventType === broadcastingEventTypes.ADD_OPTION) {
-          // Update the state to reflect the new option
-          const { optionText, optionID } = data.eventData;
-          addNewOption(optionText, optionID);
-        }
-        setEventLog((list) => [...list, data]);
-      } else {
-        console.log('No data received but socket is connected');
-      }
-    };
-
-    if (socket) {
-      socket.on('receive_message', messageHandler);
-    } else {
-      console.error('SOCKET NOT FOUND in RoomPage');
-    }
-
-    // Cleanup function
-    return () => {
-      if (socket) socket.off('receive_message', messageHandler);
-    };
-  }, [socket]);
-  // ====== END OF BROADCASTING EVENTS ====== //
 
   return (
     <>
@@ -338,7 +199,7 @@ const Room = () => {
               >
                 {view === views.VOTING && (
                   <VotingOptionsList
-                    votionOptions={votionOptions}
+                    votionOptions={voteManagement.votingOptions}
                     totalAvailableVotes={
                       users.length * roomDetails.numberOfVotesPerUser
                     }
@@ -353,8 +214,10 @@ const Room = () => {
               </Box>
               <Box className="footerBox">
                 <Typography variant="h6" fontStyle={'italic'}>
-                  You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
-                  {roomDetails.numberOfVotesPerUser} votes left.
+                  You have{' '}
+                  {roomDetails.numberOfVotesPerUser -
+                    voteManagement.userVoteCount}
+                  /{roomDetails.numberOfVotesPerUser} votes left.
                 </Typography>
                 <Button
                   variant="contained"
