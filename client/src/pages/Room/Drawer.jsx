@@ -134,32 +134,49 @@ export default function CustomDrawer({
             </ListItemButton>
           </ListItem>
           {users?.map((user, index) => (
-            <ListItem key={index} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {avatar !== '' ? (
-                    <img
-                      src={`data:image/svg+xml;base64,${svgContent}`}
-                      alt="Profile Picture"
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                      }}
-                      onError={(e) => console.error('Error loading image:', e)}
-                    />
-                  ) : (
-                    <AccountCircleIcon />
-                  )}
-                </ListItemIcon>
-                <ListItemText
-                  primary={`${user.username} ${
-                    user._id === adminID ? '(admin)' : ''
-                  }`}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+  <ListItem key={index} disablePadding>
+    <ListItemButton>
+      <ListItemIcon>
+        {user._id === userDetails.userID ? (
+          // Display the avatar of the logged-in user
+          <img
+            src={`data:image/svg+xml;base64,${svgContent}`}
+            alt="Profile Picture"
+            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+            onError={(e) => console.error('Error loading image:', e)}
+          />
+        ) : (
+
+    // Display the received avatar for other users if found
+    avatarStates[user._id] ? (
+      <img
+        src={`data:image/svg+xml;base64,${avatarStates[user._id]}`}
+        alt="Profile Picture"
+        style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+        onError={(e) => console.error('Error loading image:', e)}
+      />
+    ) : (
+      //Otherwise display AccountCircleIcon
+      <AccountCircleIcon />
+    )
+  
+
+    
+        )}
+      </ListItemIcon>
+      <ListItemText
+        primary={`${user.username} ${
+          user._id === adminID ? '(admin)' : ''
+        }`}
+      />
+            {/* Add this line to log the profile picture URL */}
+            {console.log(`Profile picture URL for ${user.username}: ${avatarStates[user._id]}`)}
+    </ListItemButton>
+  </ListItem>
+))}
+
+
+
         </List>
         <Divider />
         <List>

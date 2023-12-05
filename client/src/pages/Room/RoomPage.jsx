@@ -166,7 +166,10 @@ const Room = () => {
     const eventMessage = `${username} added a new option: ${newOptionText}`;
     sendBroadcast(
       broadcastingEventTypes.ADD_OPTION,
-      { optionText: newOptionText, optionID: newOptionID },
+      { 
+        optionText: newOptionText, 
+        optionID: newOptionID 
+      },
       eventMessage
     );
   };

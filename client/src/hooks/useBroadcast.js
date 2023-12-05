@@ -1,5 +1,4 @@
-import React, { useContext, useEffect } from 'react';
-
+import React, { useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { UserContext } from '../contexts/UserContext';
 import { SocketContext } from '../contexts/SocketContext';
@@ -22,6 +21,8 @@ const useBroadcast = (
   const socket = useContext(SocketContext);
   const { userDetails } = useContext(UserContext);
   const userID = userDetails.userID;
+
+  const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
 
   // ====== BROADCASTING EVENTS ====== //
   const sendBroadcast = async (eventType, eventData, eventMessage) => {
@@ -57,12 +58,21 @@ const useBroadcast = (
           processIncomingVoteRemoval(userID, optionID);
         }
         if (eventType === broadcastingEventTypes.USER_CONNECTED) {
-          const { userID, username } = eventData;
+          
+          const { userID, username, userProfilePicture } = eventData;
           setUsers((prevUsers) => [...prevUsers, { userID, username }]);
+          setAvatarStates((prevStates) => ({
+            ...prevStates,
+            [userID]: userProfilePicture,
+          }));
         }
         if (eventType === broadcastingEventTypes.ADD_OPTION) {
-          const { optionText, optionID } = eventData;
+          const { optionText, optionID, userProfilePicture } = eventData;
           addNewOption(optionText, optionID);
+          setAvatarStates((prevStates) => ({
+            ...prevStates,
+            [data.author]: userProfilePicture,
+          }));
         }
         setEventLog((list) => [...list, data]);
       } else {
