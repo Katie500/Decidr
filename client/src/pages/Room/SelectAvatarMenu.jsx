@@ -45,24 +45,35 @@ const SelectAvatarMenu = ({ onSelectAvatar }) => {
       const fetchData = async () => {
         try {
           const data = [];
+          const usedIndexes = new Set();
+      
           await Promise.all(
-            Array.from({ length: 40 }, async (_, index) => {
-              const cachedImage = localStorage.getItem(`avatar_${index}`);
+            Array.from({ length: 40 }, async () => {
+              let randomIndex;
+              do {
+                randomIndex = Math.floor(Math.random() * 45);
+              } while (usedIndexes.has(randomIndex));
+      
+              const cachedImage = localStorage.getItem(`avatar_${randomIndex}`);
+      
               if (cachedImage) {
-                data.push({ avatar: cachedImage, id: index });
+                data.push({ avatar: cachedImage, id: randomIndex });
               } else {
-                const response = await axios.get(`${api}/${index}`, {
+                const response = await axios.get(`${api}/${randomIndex}`, {
                   responseType: 'arraybuffer',
                 });
                 const base64 = arrayBufferToBase64(response.data);
-                data.push({ avatar: base64, id: index });
-
+                data.push({ avatar: base64, id: randomIndex });
+      
                 // Cache the image in local storage
-                localStorage.setItem(`avatar_${index}`, base64);
+                localStorage.setItem(`avatar_${randomIndex}`, base64);
               }
+      
+              // Mark the index as used
+              usedIndexes.add(randomIndex);
             })
           );
-
+      
           setAvatars(data);
           setIsLoading(false);
           setAvatarsLoaded(true);
@@ -71,6 +82,7 @@ const SelectAvatarMenu = ({ onSelectAvatar }) => {
           setIsLoading(false);
         }
       };
+      
 
       fetchData();
     }
