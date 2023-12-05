@@ -31,7 +31,6 @@ const Room = () => {
   const userID = userDetails.userID;
   const username = userDetails.nickname;
 
-  const avatar = userDetails.profilePicture;
   const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
@@ -76,7 +75,7 @@ const Room = () => {
     if (userDetails.roomID !== localRoomID) {
       fetchRoomDetails();
       setLocalRoomID(userDetails.roomID);
-      sendUserConnectedBroadcast(); 
+      sendUserConnectedBroadcast();
     }
   }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
@@ -104,10 +103,6 @@ const Room = () => {
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
-  };
-
-  const handleCancelSession = () => {
-    console.log('Session cancelled!');
   };
 
   const handleAddVote = async (optionID) => {
@@ -166,9 +161,9 @@ const Room = () => {
     const eventMessage = `${username} added a new option: ${newOptionText}`;
     sendBroadcast(
       broadcastingEventTypes.ADD_OPTION,
-      { 
-        optionText: newOptionText, 
-        optionID: newOptionID 
+      {
+        optionText: newOptionText,
+        optionID: newOptionID,
       },
       eventMessage
     );
@@ -177,7 +172,6 @@ const Room = () => {
 
   return (
     <>
-
       {sessionCancelled && (
         // We can fix closing a room(session) later
         <Typography variant="h4" align="center">

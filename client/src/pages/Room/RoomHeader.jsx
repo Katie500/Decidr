@@ -87,17 +87,17 @@ const RoomHeader = ({
       <Typography
         variant="h5"
         fontStyle={'italic'}
-        width={'100%'}
         textAlign={'center'}
+        paddingTop={'0.5rem'}
       >
         {roomDetails.question}
       </Typography>
       <Box
         style={{
-          width: '100%',
           display: 'flex',
-          margin: '0.5rem',
+          padding: '1rem',
           gap: '0.5rem',
+          justifyContent: 'center',
         }}
       >
         <Button
