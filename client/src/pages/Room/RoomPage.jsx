@@ -23,6 +23,7 @@ import { addNewOptionToDB } from '../../api/addNewOptionToDB';
 import { addVoteToDb } from '../../api/addVoteToDB';
 import { removeVoteFromDb } from '../../api/removeVoteFromDB';
 import VotingOptionsList from './VotingOptionsList';
+import RoomHeader from './RoomHeader';
 
 const views = {
   VOTING: 'VOTING',
@@ -37,19 +38,16 @@ const broadcastingEventTypes = {
   USER_DISCONNECTED: 'USER_DISCONNECTED',
 };
 
-const drawerWidth = 240;
 const Room = () => {
   const [pending, setPending] = useState(true);
   const [votionOptions, setVotingOptions] = useState([]);
   const [users, setUsers] = useState([]); // users state
   const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
-  const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
-  const [notifications, setNotifications] = useState([]);
   const [eventLog, setEventLog] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
-  const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
+
   const [view, setView] = useState(views.VOTING); // View state
   const socket = useContext(SocketContext);
   const userID = userDetails.userID;
@@ -305,162 +303,72 @@ const Room = () => {
   }, [socket]);
   // ====== END OF BROADCASTING EVENTS ====== //
 
-  // ===== HANDLING THE REMAINING TIME: ======//
-  // useEffect to set the remaining time and update it every second
-  useEffect(() => {
-    setRemainingTimeInSeconds(
-      calculateRemainingTimeInSeconds(roomDetails.endTime)
-    );
-    const interval = setInterval(() => {
-      setRemainingTimeInSeconds((prevTime) => {
-        return prevTime > 0 ? prevTime - 1 : 0;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [roomDetails.endTime]); // Dependency on roomDetails.endTime
-
-  // Function to calculate remaining time in seconds
-  const calculateRemainingTimeInSeconds = (endTime) => {
-    const now = dayjs();
-    const end = dayjs(endTime);
-    const differenceInSeconds = end.diff(now, 'second');
-    return differenceInSeconds > 0 ? differenceInSeconds : 0;
-  };
-
-  // Convert seconds to minutes and seconds for display
-  const minutes = Math.floor(remainingTimeInSeconds / 60);
-  const seconds = remainingTimeInSeconds % 60;
-  const paddedMinutes = String(minutes).padStart(2, '0');
-  const paddedSeconds = String(seconds).padStart(2, '0');
-  // ===== END OF HANDLING THE REMAINING TIME ===== //
-
-  const handleCancelSession = () => {
-    console.log('Session cancelled!');
-  };
   return (
     <>
-      {!sessionCancelled && (
-        <CustomDrawer
-          drawerWidth={drawerWidth}
-          open={drawerOpen}
-          setDrawerOpen={setDrawerOpen}
-          onCancelSession={handleCancelSession}
-          profileName={username}
-          users={users}
-          adminID={roomDetails.ownerUserID}
-        />
-      )}
-      {sessionCancelled ? (
+      {sessionCancelled && (
         // We can fix closing a room(session) later
         <Typography variant="h4" align="center">
           Session has been cancelled.
         </Typography>
-      ) : (
-        <Grid
-          className="container roomWrapper"
-          sx={{
-            marginLeft: hideDesktopDrawer ? '0px' : '240px',
-          }}
-        >
-          <Box className="widthConstraint contentBox">
-            <Box className="headerBox">
-              {/* ONLY SHOW HAMBURGER ON MOBILE*/}
-              {hideDesktopDrawer && (
-                <IconButton
-                  className="menuIcon"
-                  onClick={() => setDrawerOpen(true)}
-                >
-                  <MenuIcon />
-                </IconButton>
-              )}
-
-              <Typography>
-                Room:
-                <span
-                  style={{ textTransform: 'uppercase', fontStyle: 'italic' }}
-                >
-                  {userDetails.roomID || 'XXXXXX'}
-                </span>
-              </Typography>
-              <Typography className="timeText">
-                Time Left:{' '}
-                <span style={{ fontWeight: 'bold', color: 'red' }}>
-                  {paddedMinutes}:{paddedSeconds}
-                </span>
-              </Typography>
-            </Box>
-            <Typography
-              variant="h5"
-              fontStyle={'italic'}
-              width={'100%'}
-              textAlign={'center'}
-            >
-              {roomDetails.question}
-            </Typography>
-            <Box
-              style={{
-                width: '100%',
-                display: 'flex',
-                margin: '0.5rem',
-                gap: '0.5rem',
-              }}
-            >
-              <Button
-                variant={view === views.VOTING ? 'contained' : 'outlined'}
-                size="small"
-                color="success"
-                fullWidth
-                onClick={() => setView(views.VOTING)}
-              >
-                Voting
-              </Button>
-              <Button
-                variant={view === views.EVENT ? 'contained' : 'outlined'}
-                size="small"
-                color="success"
-                fullWidth
-                onClick={() => setView(views.EVENT)}
-              >
-                Event Log
-              </Button>
-            </Box>
-            <Box
-              style={{
-                flexGrow: 1,
-                overflowY: 'scroll',
-              }}
-            >
-              {view === views.VOTING && (
-                <VotingOptionsList
-                  votionOptions={votionOptions}
-                  totalAvailableVotes={
-                    users.length * roomDetails.numberOfVotesPerUser
-                  }
-                  handleAddVote={handleAddVote}
-                  handleRemoveVote={handleRemoveVote}
-                  handleAddOption={() => setOpenNewOption(true)}
-                />
-              )}
-              {view === views.EVENT && (
-                <EventLog logs={eventLog} userID={userID} />
-              )}
-            </Box>
-            <Box className="footerBox">
-              <Typography variant="h6" fontStyle={'italic'}>
-                You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
-                {roomDetails.numberOfVotesPerUser} votes left.
-              </Typography>
-              <Button
-                variant="contained"
-                color="success"
-                onClick={() => setOpenNewOption(true)}
-              >
-                New Voting Option
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
       )}
+      {!sessionCancelled && (
+        <>
+          <Grid
+            className="container roomWrapper"
+            sx={{
+              marginLeft: hideDesktopDrawer ? '0px' : '240px',
+            }}
+          >
+            <Box className="widthConstraint contentBox">
+              <RoomHeader
+                sessionCancelled={sessionCancelled}
+                roomDetails={roomDetails}
+                users={users}
+                view={view}
+                setView={setView}
+                userDetails={userDetails}
+                handleCancelSession={() => console.log('Session cancelled!')}
+                hideDesktopDrawer={hideDesktopDrawer}
+              />
+              <Box
+                style={{
+                  flexGrow: 1,
+                  overflowY: 'scroll',
+                }}
+              >
+                {view === views.VOTING && (
+                  <VotingOptionsList
+                    votionOptions={votionOptions}
+                    totalAvailableVotes={
+                      users.length * roomDetails.numberOfVotesPerUser
+                    }
+                    handleAddVote={handleAddVote}
+                    handleRemoveVote={handleRemoveVote}
+                    handleAddOption={() => setOpenNewOption(true)}
+                  />
+                )}
+                {view === views.EVENT && (
+                  <EventLog logs={eventLog} userID={userID} />
+                )}
+              </Box>
+              <Box className="footerBox">
+                <Typography variant="h6" fontStyle={'italic'}>
+                  You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
+                  {roomDetails.numberOfVotesPerUser} votes left.
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => setOpenNewOption(true)}
+                >
+                  New Voting Option
+                </Button>
+              </Box>
+            </Box>
+          </Grid>
+        </>
+      )}
+
       <AddNewOptionModal
         open={openNewOption}
         handleAdd={handleAddNewOption}
