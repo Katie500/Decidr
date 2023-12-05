@@ -46,4 +46,48 @@ const VotingOptionCard = ({
   );
 };
 
-export default VotingOptionCard;
+const VotingOptionsList = ({
+  votionOptions,
+  handleAddVote,
+  handleRemoveVote,
+  handleAddOption,
+  userID,
+  totalAvailableVotes,
+}) => {
+  if (votionOptions.length === 0) {
+    return (
+      <Typography variant="h6" textAlign={'center'} marginTop={'1rem'}>
+        No voting options added yet. <br />
+        Click{' '}
+        <span
+          style={{
+            cursor: 'pointer',
+            color: '#007bff',
+            textDecoration: 'underline',
+            textStyle: 'italic',
+          }}
+          onClick={handleAddOption}
+        >
+          here
+        </span>{' '}
+        to add one.
+      </Typography>
+    );
+  }
+
+  return votionOptions.map((option, index) => (
+    <VotingOptionCard
+      key={index}
+      name={option.optionText}
+      votes={option.votes || []}
+      totalAvailableVotes={totalAvailableVotes}
+      numberOfUserVotes={
+        option.votes?.filter((_userID) => _userID === userID).length || 0
+      }
+      handleAddVote={() => handleAddVote(option._id)}
+      handleRemoveVote={() => handleRemoveVote(option._id)}
+    />
+  ));
+};
+
+export default VotingOptionsList;

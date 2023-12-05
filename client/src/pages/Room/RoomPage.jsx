@@ -12,7 +12,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
 import { SocketContext } from '../../contexts/SocketContext';
 import CustomDrawer from './Drawer';
-import VotingOptionCard from './VotingOptionCard';
+import VotingOptionCard from './VotingOptionsList';
 import AddNewOptionModal from './NewOptionModal';
 import './RoomPage.css';
 import { getRoomDetails } from '../../api/getRoomDetails';
@@ -22,6 +22,7 @@ import EventLog from './EventLog';
 import { addNewOptionToDB } from '../../api/addNewOptionToDB';
 import { addVoteToDb } from '../../api/addVoteToDB';
 import { removeVoteFromDb } from '../../api/removeVoteFromDB';
+import VotingOptionsList from './VotingOptionsList';
 
 const views = {
   VOTING: 'VOTING',
@@ -429,55 +430,20 @@ const Room = () => {
                 overflowY: 'scroll',
               }}
             >
-              {
-                // Show the voting options if the view is VOTING
-                view === views.VOTING && votionOptions.length === 0 && (
-                  <Typography
-                    variant="h6"
-                    textAlign={'center'}
-                    marginTop={'1rem'}
-                  >
-                    No voting options added yet. <br />
-                    Click{' '}
-                    <span
-                      style={{
-                        cursor: 'pointer',
-                        color: '#007bff',
-                        textDecoration: 'underline',
-                        textStyle: 'italic',
-                      }}
-                      onClick={() => setOpenNewOption(true)}
-                    >
-                      here
-                    </span>{' '}
-                    to add one.
-                  </Typography>
-                )
-              }
-              {view === views.VOTING &&
-                votionOptions.length > 0 &&
-                votionOptions.map((option, index) => (
-                  <VotingOptionCard
-                    key={index}
-                    name={option.optionText}
-                    votes={option.votes || []}
-                    totalAvailableVotes={
-                      users.length * roomDetails.numberOfVotesPerUser
-                    }
-                    numberOfUserVotes={
-                      option.votes?.filter((_userID) => _userID === userID)
-                        .length || 0
-                    }
-                    handleAddVote={() => handleAddVote(option._id)}
-                    handleRemoveVote={() => handleRemoveVote(option._id)}
-                  />
-                ))}
-              {
-                // Show the notifications if the view is EVENT
-                view === views.EVENT && (
-                  <EventLog logs={eventLog} userID={userID} />
-                )
-              }
+              {view === views.VOTING && (
+                <VotingOptionsList
+                  votionOptions={votionOptions}
+                  totalAvailableVotes={
+                    users.length * roomDetails.numberOfVotesPerUser
+                  }
+                  handleAddVote={handleAddVote}
+                  handleRemoveVote={handleRemoveVote}
+                  handleAddOption={() => setOpenNewOption(true)}
+                />
+              )}
+              {view === views.EVENT && (
+                <EventLog logs={eventLog} userID={userID} />
+              )}
             </Box>
             <Box className="footerBox">
               <Typography variant="h6" fontStyle={'italic'}>
