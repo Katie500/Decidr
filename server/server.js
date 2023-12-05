@@ -68,15 +68,6 @@ app.use('/addNewOption', addNewOption);
 app.use('/addVote', addVote);
 app.use('/removeVote', removeVote);
 
-
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT'],
-  },
-});
-
-
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
