@@ -30,6 +30,7 @@ const Room = () => {
   const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
   const username = userDetails.nickname;
+  const avatar = userDetails.profilePicture;
   const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
@@ -163,72 +164,164 @@ const Room = () => {
 
   return (
     <>
-      {sessionCancelled && (
+      {!sessionCancelled && (
+        <CustomDrawer
+          drawerWidth={drawerWidth}
+          open={drawerOpen}
+          setDrawerOpen={setDrawerOpen}
+          onCancelSession={handleCancelSession}
+          profileName={username}
+          profileAvatar={avatar}
+          users={users}
+          adminID={roomDetails.ownerUserID}
+        />
+      )}
+      {sessionCancelled ? (
         // We can fix closing a room(session) later
         <Typography variant="h4" align="center">
           Session has been cancelled.
         </Typography>
-      )}
-      {!sessionCancelled && (
-        <>
-          <Grid
-            className="container roomWrapper"
-            sx={{
-              marginLeft: hideDesktopDrawer ? '0px' : '240px',
-            }}
-          >
-            <Box className="widthConstraint contentBox">
-              <RoomHeader
-                sessionCancelled={sessionCancelled}
-                roomDetails={roomDetails}
-                users={users}
-                view={view}
-                setView={setView}
-                userDetails={userDetails}
-                handleCancelSession={() => console.log('Session cancelled!')}
-                hideDesktopDrawer={hideDesktopDrawer}
-              />
-              <Box
-                style={{
-                  flexGrow: 1,
-                  overflowY: 'scroll',
-                }}
+      ) : (
+        <Grid
+          className="container roomWrapper"
+          sx={{
+            marginLeft: hideDesktopDrawer ? '0px' : '240px',
+          }}
+        >
+          <Box className="widthConstraint contentBox">
+            <Box className="headerBox">
+              {/* ONLY SHOW HAMBURGER ON MOBILE*/}
+              {hideDesktopDrawer && (
+                <IconButton
+                  className="menuIcon"
+                  onClick={() => setDrawerOpen(true)}
+                >
+                  <MenuIcon />
+                </IconButton>
+              )}
+
+              <Typography>
+                Room:
+                <span
+                  style={{ textTransform: 'uppercase', fontStyle: 'italic' }}
+                >
+                  {userDetails.roomID || 'XXXXXX'}
+                </span>
+              </Typography>
+              <Typography className="timeText">
+                Time Left:{' '}
+                <span style={{ fontWeight: 'bold', color: 'red' }}>
+                  {paddedMinutes}:{paddedSeconds}
+                </span>
+              </Typography>
+            </Box>
+            <Typography
+              variant="h5"
+              fontStyle={'italic'}
+              width={'100%'}
+              textAlign={'center'}
+            >
+              {roomDetails.question}
+            </Typography>
+            <Box
+              style={{
+                width: '100%',
+                display: 'flex',
+                margin: '0.5rem',
+                gap: '0.5rem',
+              }}
+            >
+              <Button
+                variant={view === views.VOTING ? 'contained' : 'outlined'}
+                size="small"
+                color="success"
+                fullWidth
+                onClick={() => setView(views.VOTING)}
               >
-                {view === views.VOTING && (
-                  <VotingOptionsList
-                    votionOptions={voteManagement.votingOptions}
+                Voting
+              </Button>
+              <Button
+                variant={view === views.EVENT ? 'contained' : 'outlined'}
+                size="small"
+                color="success"
+                fullWidth
+                onClick={() => setView(views.EVENT)}
+              >
+                Event Log
+              </Button>
+            </Box>
+            <Box
+              style={{
+                flexGrow: 1,
+                overflowY: 'scroll',
+              }}
+            >
+              {
+                // Show the voting options if the view is VOTING
+                view === views.VOTING && votionOptions.length === 0 && (
+                  <Typography
+                    variant="h6"
+                    textAlign={'center'}
+                    marginTop={'1rem'}
+                  >
+                    No voting options added yet. <br />
+                    Click{' '}
+                    <span
+                      style={{
+                        cursor: 'pointer',
+                        color: '#007bff',
+                        textDecoration: 'underline',
+                        textStyle: 'italic',
+                      }}
+                      onClick={() => setOpenNewOption(true)}
+                    >
+                      here
+                    </span>{' '}
+                    to add one.
+                  </Typography>
+                )
+              }
+              {view === views.VOTING &&
+                votionOptions.length > 0 &&
+                votionOptions.map((option, index) => (
+                  <VotingOptionCard
+                    key={index}
+                    name={option.optionText}
+                    votes={option.votes || []}
                     totalAvailableVotes={
                       users.length * roomDetails.numberOfVotesPerUser
                     }
-                    handleAddVote={handleAddVote}
-                    handleRemoveVote={handleRemoveVote}
-                    handleAddOption={() => setOpenNewOption(true)}
+                    numberOfUserVotes={
+                      option.votes?.filter((_userID) => _userID === userID)
+                        .length || 0
+                    }
+                    handleAddVote={() => handleAddVote(option._id)}
+                    handleRemoveVote={() => handleRemoveVote(option._id)}
                   />
-                )}
-                {view === views.EVENT && (
+                ))}
+              {
+                // Show the notifications if the view is EVENT
+                view === views.EVENT && (
                   <EventLog logs={eventLog} userID={userID} />
-                )}
-              </Box>
-              <Box className="footerBox">
-                <Typography variant="h6" fontStyle={'italic'}>
-                  You have{' '}
-                  {roomDetails.numberOfVotesPerUser -
-                    voteManagement.userVoteCount}
-                  /{roomDetails.numberOfVotesPerUser} votes left.
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => setOpenNewOption(true)}
-                >
-                  New Voting Option
-                </Button>
-              </Box>
+                )
+              }
             </Box>
-          </Grid>
-        </>
+            <Box className="footerBox">
+              <Typography variant="h6" fontStyle={'italic'}>
+                You have {roomDetails.numberOfVotesPerUser - userVoteCount}/
+                {roomDetails.numberOfVotesPerUser} votes left.
+              </Typography>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => setOpenNewOption(true)}
+              >
+                New Voting Option
+              </Button>
+            </Box>
+          </Box>
+        </Grid>
       )}
-
       <AddNewOptionModal
         open={openNewOption}
         handleAdd={handleAddNewOption}

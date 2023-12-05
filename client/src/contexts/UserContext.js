@@ -7,6 +7,7 @@ export const UserProvider = ({ children }) => {
     userID: '',
     nickname: '',
     roomID: '',
+    profilePicture: '',
     isAdmin: false,
   });
 

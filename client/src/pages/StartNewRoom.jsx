@@ -57,6 +57,7 @@ const StartNewRoom = () => {
       roomID: roomID,
       socketID: socket.id,
       username: userDetails.nickname,
+      profilePicture: userDetails.profilePicture,
       question: question,
       endTime: new Date(Date.now() + duration * 60000),
     });

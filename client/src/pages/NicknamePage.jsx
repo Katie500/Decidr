@@ -19,10 +19,12 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { createUser } from '../api/createUser';
 import { SocketContext } from '../contexts/SocketContext';
+import SelectAvatarMenu from './Room/SelectAvatarMenu';
 
 const NicknamePage = () => {
   const [pending, setPending] = useState(false);
   const [name, setName] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [error, setError] = useState('');
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const socket = useContext(SocketContext);
@@ -31,6 +33,12 @@ const NicknamePage = () => {
   useEffect(() => {
     if (userDetails?.nickname) {
       setName(userDetails.nickname);
+    }
+  }, [userDetails]);
+
+  useEffect(() => {
+    if (userDetails?.profilePicture) {
+      setAvatar(userDetails.profilePicture);
     }
   }, [userDetails]);
 
@@ -44,15 +52,26 @@ const NicknamePage = () => {
   };
 
   const handleStart = async () => {
+
+    // Check if user has a name
     if (!name) {
       setError('Please enter a name.');
       return;
     }
+
+  // Check if the user has selected a profile picture
+  if (!avatar) {
+    setError('Please select a profile picture.');
+    console.log("Please select avatar");
+    return;
+  }
+
     setPending(true);
 
     if (userDetails?.isAdmin) {
       updateUserDetails({
         nickname: name,
+        profilePicture: avatar,
       });
       navigate('/StartNewRoom');
     } else {
@@ -61,11 +80,13 @@ const NicknamePage = () => {
         const userID = await createUser({
           username: name,
           socketID: socket.id,
+          profilePicture: avatar,
           roomID: userDetails.roomID,
         });
         console.log('userID', userID);
         updateUserDetails({
           nickname: name,
+          profilePicture: avatar,
           userID: userID,
         });
         socket.emit('join_room', userDetails.roomID);
@@ -88,12 +109,21 @@ const NicknamePage = () => {
           <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
-          <Typography variant="h6">Choosing a name</Typography>
+          <Typography variant="h6">Profile</Typography>
         </Box>
       </Box>
 
       <Grid className="container">
-        <Box className="contentBox widthConstraint">
+
+
+        <Box className="contentBox widthConstraint">        
+
+          <SelectAvatarMenu onSelectAvatar={(selectedAvatar) => {
+        setAvatar(selectedAvatar);
+        console.log('Avatar set in NicknamePage:', selectedAvatar);
+      }} />  
+
+                      <br></br>
           <Typography variant="h6">Enter a nickname:</Typography>
           <Box className="inputBox">
             <TextField

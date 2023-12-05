@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Room = require('../models/roomSchema');
+
 const { default: mongoose } = require('mongoose');
 
 router.post('/', async (req, res) => {
@@ -11,11 +12,13 @@ router.post('/', async (req, res) => {
     res.status(400).send({
       message:
         'Incomplete data. Please provide newOptionText and roomObjectID.',
+
     });
     return;
   }
 
   try {
+
     const newOptionID = new mongoose.Types.ObjectId(); // Generate a new ObjectId
     const newOption = {
       _id: newOptionID,
@@ -35,6 +38,7 @@ router.post('/', async (req, res) => {
       message: 'New option added successfully',
       optionID: newOptionID,
     });
+
   } catch (error) {
     console.error('Error adding new option:', error);
     res.status(500).send({ message: 'Internal server error' });

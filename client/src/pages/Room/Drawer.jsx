@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,8 +12,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import { IconButton, useMediaQuery } from '@mui/material';
-import { useEffect } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SelectAvatarMenu from './SelectAvatarMenu';
+import { UserContext } from '../../contexts/UserContext';
 
 export default function CustomDrawer({
   open,
@@ -22,6 +23,7 @@ export default function CustomDrawer({
   onCancelSession,
   users,
   profileName,
+  profileAvatar,
   adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -35,10 +37,52 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
+  //==================== profile picture algorithm ================//
+  //open picture window
+  const [isWindowOpen, setWindowOpen] = useState(false);
+  const [avatar, setAvatar] = useState(null);
+  const [svgContent, setSvgContent] = useState(null);
+
+  const { userDetails, updateUserDetails } = useContext(UserContext);
+
+  useEffect(() => {
+    if (userDetails?.profilePicture) {
+      setAvatar(userDetails.profilePicture);
+    }
+  }, [userDetails]);
+
+  useEffect(() => {
+    const fetchSvg = async () => {
+      try {
+        const response = await fetch(profileAvatar);
+        if (response.ok) {
+          const svgText = await response.text();
+          const base64 = btoa(svgText);
+          setSvgContent(base64);
+        } else {
+          console.error('Failed to fetch SVG:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching SVG:', error);
+      }
+    };
+
+    fetchSvg();
+  }, [profileAvatar]);
+
+  const changeProfilePicture = () => {
+
+    console.log("avatar is:" + avatar);
+    updateUserDetails({
+      profilePicture: avatar,
+    });
+
+    setWindowOpen(!isWindowOpen);
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-
       <Drawer
         sx={{
           width: drawerWidth,
@@ -54,9 +98,29 @@ export default function CustomDrawer({
         anchor="left"
       >
         <Toolbar>
-          <IconButton>
-            <AccountCircleIcon />
-          </IconButton>
+          <div>
+            {/*console.log('Profile Avatar URL:', svgContent)*/}
+            <IconButton onClick={changeProfilePicture}>
+              {profileAvatar !== '' ? (
+                <img
+                  src={`data:image/svg+xml;base64,${svgContent}`}
+                  alt="Profile Picture"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                  onError={(e) => console.error('Error loading image:', e)}
+                />
+              ) : (
+                <AccountCircleIcon />
+              )}
+            </IconButton>
+            {isWindowOpen && (
+              <SelectAvatarMenu
+                onSelectAvatar={(selectedAvatar) => {
+                  setAvatar(selectedAvatar);
+                  console.log('Avatar set in Drawer Page:', selectedAvatar);
+                }}
+              />
+            )}
+          </div>
           <Typography noWrap component="div">
             {profileName}
           </Typography>
@@ -72,7 +136,20 @@ export default function CustomDrawer({
             <ListItem key={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  <AccountCircleIcon />
+                  {profileAvatar !== '' ? (
+                    <img
+                      src={`data:image/svg+xml;base64,${svgContent}`}
+                      alt="Profile Picture"
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                      }}
+                      onError={(e) => console.error('Error loading image:', e)}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )}
                 </ListItemIcon>
                 <ListItemText
                   primary={`${user.username} ${
