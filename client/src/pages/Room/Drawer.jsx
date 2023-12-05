@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -80,6 +81,13 @@ export default function CustomDrawer({
     });
 
     setWindowOpen(!isWindowOpen);
+  };
+
+  const leaveRoom = () => {
+
+    onCancelSession();
+    // Optionally, close the drawer after leaving the room
+    setDrawerOpen(false);
   };
 
   return (
@@ -173,11 +181,23 @@ export default function CustomDrawer({
         <Divider />
         <List>
           <ListItem disablePadding>
+            {adminID === userDetails.userID && (
             <ListItemButton onClick={onCancelSession}>
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
               <ListItemText primary={'Cancel Session'} />
+            </ListItemButton>
+           )}
+          </ListItem>
+        </List>
+        <List>
+          <ListItem disablePadding>
+          <ListItemButton onClick={leaveRoom} component={Link} to="/">
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'red' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Leave the room'} />
             </ListItemButton>
           </ListItem>
         </List>
