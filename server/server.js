@@ -1,15 +1,48 @@
 const express = require('express');
-const app = express();
-const http = require('http');
+const axios = require('axios');
+const sharp = require('sharp');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
+const http = require('http');
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
 const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
 
-const server = http.createServer(app);
+app.get('/api/avatar/:id/:size', async (req, res) => {
+  const { id, size } = req.params;
+  const imageUrl = `https://api.multiavatar.com/${id}/${size}`;
+
+  try {
+    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+
+    // Resize the image to a smaller size
+    const resizedImageBuffer = await sharp(response.data)
+      .resize(100) // Set your desired size
+      .toBuffer();
+
+    // Compress the image
+    const compressedImageBuffer = await sharp(resizedImageBuffer)
+      .jpeg({ quality: 80 }) // Adjust the quality as needed
+      .toBuffer();
+
+    // Send the compressed image to the client
+    res.type('image/jpeg').send(compressedImageBuffer);
+  } catch (error) {
+    console.error('Error fetching or processing the image:', error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 // Database Schemas
 const User = require('./models/userSchema');
@@ -29,14 +62,7 @@ app.use('/verifyRoom', verifyRoom);
 app.use('/createUser', createUser);
 app.use('/getRoomDetails', getRoomDetails);
 
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-  },
-});
-
-//==================================== ROOM CONNECTION =========================//
+// Room Connection
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
@@ -59,10 +85,9 @@ io.on('connection', (socket) => {
   });
 });
 
-//============================ SERVER RESPONSE =============================//
+// Server Response
 
 // Connect to MongoDB using mongoose
-
 mongoose
   .connect('mongodb://0.0.0.0:27017/decidr')
   .then(() => {

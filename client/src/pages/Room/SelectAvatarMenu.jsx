@@ -38,32 +38,43 @@ const SelectAvatarMenu = ({ onSelectAvatar }) => {
   const [avatars, setAvatars] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [avatarsLoaded, setAvatarsLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = [];
-        await Promise.all(
-          Array.from({ length: 4 }, async (_, index) => {
-            const randomIndex = Math.round(Math.random() * 1000);
-            const response = await axios.get(`${api}/${randomIndex}`, {
-              responseType: 'arraybuffer',
-            });
-            const base64 = arrayBufferToBase64(response.data);
-            data.push({ avatar: base64, id: randomIndex });
-          })
-        );
+    if (!avatarsLoaded) {
+      const fetchData = async () => {
+        try {
+          const data = [];
+          await Promise.all(
+            Array.from({ length: 40 }, async (_, index) => {
+              const cachedImage = localStorage.getItem(`avatar_${index}`);
+              if (cachedImage) {
+                data.push({ avatar: cachedImage, id: index });
+              } else {
+                const response = await axios.get(`${api}/${index}`, {
+                  responseType: 'arraybuffer',
+                });
+                const base64 = arrayBufferToBase64(response.data);
+                data.push({ avatar: base64, id: index });
 
-        setAvatars(data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching avatars:', error);
-        setIsLoading(false);
-      }
-    };
+                // Cache the image in local storage
+                localStorage.setItem(`avatar_${index}`, base64);
+              }
+            })
+          );
 
-    fetchData();
-  }, [api]);
+          setAvatars(data);
+          setIsLoading(false);
+          setAvatarsLoaded(true);
+        } catch (error) {
+          console.error('Error fetching avatars:', error);
+          setIsLoading(false);
+        }
+      };
+
+      fetchData();
+    }
+  }, [api, avatarsLoaded]);
 
   const arrayBufferToBase64 = (buffer) => {
     let binary = '';
@@ -82,18 +93,16 @@ const SelectAvatarMenu = ({ onSelectAvatar }) => {
   };
 
   return (
-    <Box className="avatarContainer">
-      {isLoading ? (
-        <div className="loader-container">Loading...</div>
-      ) : (
+    <Box className="avatarContainer" style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
+      {avatarsLoaded ? (
         <>
           <Card
             style={{
-              padding: '1rem',
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
               alignItems: 'center',
-              flexDirection: 'row',
+              padding: '1rem',
+              overflowX: 'auto',
             }}
           >
             {avatars.map(({ avatar, id }) => (
@@ -102,11 +111,14 @@ const SelectAvatarMenu = ({ onSelectAvatar }) => {
                 avatar={avatar}
                 id={id}
                 selected={selectedAvatar === id}
-                onClick={handleAvatarClick} // Pass the onClick handler
+                onClick={handleAvatarClick}
+                style={{ marginRight: '10px' }} // Adjust spacing between avatars
               />
             ))}
           </Card>
         </>
+      ) : (
+        <div className="loader-container">Loading...</div>
       )}
     </Box>
   );
