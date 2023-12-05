@@ -44,6 +44,7 @@ export default function CustomDrawer({
   const [svgContent, setSvgContent] = useState(null);
 
   const { userDetails, updateUserDetails } = useContext(UserContext);
+    const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
 
   useEffect(() => {
     if (userDetails?.profilePicture) {
@@ -54,7 +55,7 @@ export default function CustomDrawer({
   useEffect(() => {
     const fetchSvg = async () => {
       try {
-        const response = await fetch(profileAvatar);
+        const response = await fetch(avatar);
         if (response.ok) {
           const svgText = await response.text();
           const base64 = btoa(svgText);
@@ -68,7 +69,7 @@ export default function CustomDrawer({
     };
 
     fetchSvg();
-  }, [profileAvatar]);
+  }, [avatar]);
 
   const changeProfilePicture = () => {
 
@@ -101,7 +102,7 @@ export default function CustomDrawer({
           <div>
             {/*console.log('Profile Avatar URL:', svgContent)*/}
             <IconButton onClick={changeProfilePicture}>
-              {profileAvatar !== '' ? (
+              {avatar !== '' ? (
                 <img
                   src={`data:image/svg+xml;base64,${svgContent}`}
                   alt="Profile Picture"
@@ -136,7 +137,7 @@ export default function CustomDrawer({
             <ListItem key={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  {profileAvatar !== '' ? (
+                  {avatar !== '' ? (
                     <img
                       src={`data:image/svg+xml;base64,${svgContent}`}
                       alt="Profile Picture"

@@ -12,7 +12,6 @@ import VotingOptionsList from './VotingOptionsList';
 import RoomHeader from './RoomHeader';
 import useVoteManagement from '../../hooks/useVoteManagement';
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
-import CustomDrawer from './Drawer';
 
 const views = {
   VOTING: 'VOTING',
@@ -31,9 +30,6 @@ const Room = () => {
   const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
   const username = userDetails.nickname;
-  //States for drawing profile picture
-  const drawerWidth = 240;
-  const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
 
   const avatar = userDetails.profilePicture;
   const navigate = useNavigate();
@@ -67,15 +63,20 @@ const Room = () => {
   const [localRoomID, setLocalRoomID] = useState(null);
   const sessionCancelled = false;
 
+  const sendUserConnectedBroadcast = () => {
+    sendBroadcast(
+      broadcastingEventTypes.USER_CONNECTED,
+      { userID, username, avatar: userDetails.profilePicture },
+      `${username} has ${userDetails.isAdmin ? 'created' : 'joined'} the room`,
+      userDetails.profilePicture // Include the avatar in the broadcast
+    );
+  };
+
   useEffect(() => {
     if (userDetails.roomID !== localRoomID) {
       fetchRoomDetails();
       setLocalRoomID(userDetails.roomID);
-      sendBroadcast(
-        broadcastingEventTypes.USER_CONNECTED,
-        { userID, username, avatar },
-        `${username} has ${userDetails.isAdmin ? 'created' : 'joined'} the room`
-      );
+      sendUserConnectedBroadcast(); 
     }
   }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
@@ -173,18 +174,7 @@ const Room = () => {
 
   return (
     <>
-     {!sessionCancelled && (
-        <CustomDrawer
-        drawerWidth={drawerWidth}
-        open={drawerOpen}
-        setDrawerOpen={setDrawerOpen}
-        onCancelSession={handleCancelSession}
-        profileName={username}
-        profileAvatar={avatar}
-        users={users}
-        adminID={roomDetails.ownerUserID}
-      />
-      )}    
+
       {sessionCancelled && (
         // We can fix closing a room(session) later
         <Typography variant="h4" align="center">
