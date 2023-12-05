@@ -17,7 +17,7 @@ import {
 } from 'unique-names-generator';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
-import createUser from '../api/createUser';
+import { createUser } from '../api/createUser';
 import { SocketContext } from '../contexts/SocketContext';
 import SelectAvatarMenu from './Room/SelectAvatarMenu';
 
@@ -83,6 +83,7 @@ const NicknamePage = () => {
           profilePicture: avatar,
           roomID: userDetails.roomID,
         });
+        console.log('userID', userID);
         updateUserDetails({
           nickname: name,
           profilePicture: avatar,

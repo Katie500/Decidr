@@ -3,30 +3,42 @@ const router = express.Router();
 
 const Room = require('../models/roomSchema');
 
-router.post('/', async (req, res) => {
-  const { newOptionText, roomID } = req.body;
+const { default: mongoose } = require('mongoose');
 
-  if (!newOptionText || !roomID) {
+router.post('/', async (req, res) => {
+  const { newOptionText, roomObjectID } = req.body;
+
+  if (!newOptionText || !roomObjectID) {
     res.status(400).send({
-      message: 'Incomplete data. Please provide newOptionText and roomID.',
+      message:
+        'Incomplete data. Please provide newOptionText and roomObjectID.',
+
     });
     return;
   }
 
   try {
-    // Find the room by ID and add the new option to the voteOptions array
-    const room = await Room.findByIdAndUpdate(
-      roomID,
-      { $push: { voteOptions: { option: newOptionText, userIDs: [] } } },
+
+    const newOptionID = new mongoose.Types.ObjectId(); // Generate a new ObjectId
+    const newOption = {
+      _id: newOptionID,
+      optionText: newOptionText,
+      votes: [],
+    };
+
+    // Update the document with the new option
+    await Room.findByIdAndUpdate(
+      roomObjectID,
+      { $push: { voteOptions: newOption } },
       { new: true }
     );
 
-    if (!room) {
-      res.status(404).send({ message: 'Room not found' });
-      return;
-    }
+    // No need for another query; use the generated newOptionID
+    res.status(201).send({
+      message: 'New option added successfully',
+      optionID: newOptionID,
+    });
 
-    res.status(201).send({ message: 'New option added successfully' });
   } catch (error) {
     console.error('Error adding new option:', error);
     res.status(500).send({ message: 'Internal server error' });

@@ -54,6 +54,9 @@ const createUserAndRoom = require('./routes/createUserAndRoom');
 const verifyRoom = require('./routes/verifyRoom');
 const createUser = require('./routes/createUser');
 const getRoomDetails = require('./routes/getRoomDetails');
+const addNewOption = require('./routes/addNewOption');
+const addVote = require('./routes/addVote');
+const removeVote = require('./routes/removeVote');
 
 // Use the apiRoutes
 app.use('/', apiRoutes);
@@ -61,8 +64,19 @@ app.use('/createUserAndRoom', createUserAndRoom);
 app.use('/verifyRoom', verifyRoom);
 app.use('/createUser', createUser);
 app.use('/getRoomDetails', getRoomDetails);
+app.use('/addNewOption', addNewOption);
+app.use('/addVote', addVote);
+app.use('/removeVote', removeVote);
 
-// Room Connection
+
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT'],
+  },
+});
+
+
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
 

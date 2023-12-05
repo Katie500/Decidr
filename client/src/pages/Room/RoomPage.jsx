@@ -1,48 +1,33 @@
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  Typography,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
-import MenuIcon from '@mui/icons-material/Menu';
 import { UserContext } from '../../contexts/UserContext';
-import CustomDrawer from './Drawer';
-import VotingOptionCard from './VotingOptionCard';
 import AddNewOptionModal from './NewOptionModal';
 import './RoomPage.css';
 import { getRoomDetails } from '../../api/getRoomDetails';
 import { useNavigate } from 'react-router-dom';
-import dayjs from 'dayjs';
+import EventLog from './EventLog';
+import { addNewOptionToDB } from '../../api/addNewOptionToDB';
+import VotingOptionsList from './VotingOptionsList';
+import RoomHeader from './RoomHeader';
+import useVoteManagement from '../../hooks/useVoteManagement';
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
 
-const dummyVotingOptions = [
-  {
-    optionID: '1',
-    text: 'Tim Hortons',
-    votes: [], // Array of userIDs who voted for this option
-  },
-  {
-    optionID: '2',
-    text: 'McDonalds',
-    votes: [], // Array of userIDs who voted for this option
-  },
-];
+const views = {
+  VOTING: 'VOTING',
+  EVENT: 'EVENT',
+};
 
-const drawerWidth = 240;
 const Room = () => {
   const [pending, setPending] = useState(true);
-  const [votionOptions, setVotingOptions] = useState(dummyVotingOptions);
+  // const [votionOptions, setVotingOptions] = useState([]);
   const [users, setUsers] = useState([]); // users state
-  const [userVoteCount, setUserVoteCount] = useState(0); // User vote count state
-  const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState('');
-  const [notifications, setNotifications] = useState([]);
+  const [eventLog, setEventLog] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
-  const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
+
+  const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
   const username = userDetails.nickname;
   const avatar = userDetails.profilePicture;
@@ -54,13 +39,40 @@ const Room = () => {
     roomID: '',
     question: '',
     ownerUserID: '',
-    numberOfVotesPerUser: 1,
+    numberOfVotesPerUser: 3,
     endTime: '',
   });
 
+  const voteManagement = useVoteManagement(roomDetails, setPending);
+  // addNewOption needs to be declared here because it needs to be passed to useBroadcast
+  const addNewOption = (optionText, newOptionID) => {
+    voteManagement.setVotingOptions((prevOptions) => [
+      { _id: newOptionID, optionText: optionText, votes: [] },
+      ...prevOptions,
+    ]);
+  };
+  const { sendBroadcast } = useBroadcast(
+    voteManagement.processIncomingVote,
+    voteManagement.processIncomingVoteRemoval,
+    setUsers,
+    addNewOption,
+    setEventLog
+  );
+
+  const [localRoomID, setLocalRoomID] = useState(null);
+  const sessionCancelled = false;
+
   useEffect(() => {
-    fetchRoomDetails();
-  }, [userDetails.roomID]); // Include userDetails.roomID in the dependency array if it can change
+    if (userDetails.roomID !== localRoomID) {
+      fetchRoomDetails();
+      setLocalRoomID(userDetails.roomID);
+      sendBroadcast(
+        broadcastingEventTypes.USER_CONNECTED,
+        { userID, username },
+        `${username} has ${userDetails.isAdmin ? 'created' : 'joined'} the room`
+      );
+    }
+  }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
   const fetchRoomDetails = async () => {
     try {
@@ -75,7 +87,8 @@ const Room = () => {
         return;
       }
       const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
-      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 1 });
+      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 3 });
+      voteManagement.setVotingOptions(roomDetails.voteOptions || []);
       setUsers(users);
       setPending(false);
     } catch (error) {
@@ -87,119 +100,67 @@ const Room = () => {
     setOpenNewOption(false);
   };
 
-  const handleAddNewOption = () => {
+  const handleAddVote = async (optionID) => {
+    try {
+      await voteManagement.submitUserVote(optionID);
+
+      // BROADCAST THE VOTE:
+      const optionText = voteManagement.votingOptions.find(
+        (opt) => opt._id === optionID
+      )?.optionText;
+      sendBroadcast(
+        broadcastingEventTypes.ADD_VOTE,
+        { userID, optionID },
+        `${username} voted for ${optionText}`
+      );
+    } catch (error) {
+      console.error('Error in voting:', error);
+    }
+  };
+
+  const handleRemoveVote = async (optionID) => {
+    try {
+      await voteManagement.removeUserVote(optionID);
+
+      // BROADCAST vote removal
+      const optionText = voteManagement.votingOptions.find(
+        (opt) => opt._id === optionID
+      )?.optionText;
+      sendBroadcast(
+        broadcastingEventTypes.REMOVE_VOTE,
+        { userID, optionID },
+        `${username} unvoted for ${optionText}`
+      );
+    } catch (error) {
+      console.error('Error in removing vote:', error);
+    }
+  };
+
+  // ====== ADDING NEW OPTION ====== //
+  const handleAddNewOption = async () => {
     if (!newOptionText) {
       setOpenNewOption(false);
       return;
     }
-    setVotingOptions([
-      {
-        optionID: (votionOptions.length + 1).toString(),
-        text: newOptionText,
-        votes: [],
-      },
-      ...votionOptions,
-    ]);
+
+    // votingOptionID SHOULD COME FROM THE DATABASE
+    setPending(true);
+    const newOptionID = await addNewOptionToDB(newOptionText, roomDetails._id);
+
+    setPending(false);
+    addNewOption(newOptionText, newOptionID);
     setNewOptionText('');
     setOpenNewOption(false);
-  };
 
-  const handleAddVote = (optionID) => {
-    // Check if the user has any votes left
-    if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
-      return;
-    }
-    const votedOption = votionOptions.find(
-      (option) => option.optionID === optionID
+    // BROADCAST THE NEW OPTION:
+    const eventMessage = `${username} added a new option: ${newOptionText}`;
+    sendBroadcast(
+      broadcastingEventTypes.ADD_OPTION,
+      { optionText: newOptionText, optionID: newOptionID },
+      eventMessage
     );
-
-    setVotingOptions((prevOptions) =>
-      prevOptions.map((option) =>
-        option.optionID === optionID
-          ? { ...option, votes: [...option.votes, userID] }
-          : option
-      )
-    );
-    setUserVoteCount((prevCount) => prevCount + 1);
-
-    // Add a notification for the vote
-    setNotifications((prevNotifications) => [
-      ...prevNotifications,
-      `${username} voted for ${votedOption.text}`,
-    ]);
   };
-
-  const handleRemoveVote = (optionID) => {
-    let unvoteSuccess = false;
-    // NOTE: REMOVING ONLY THE FIRST OCCURRENCE OF THE USER'S VOTE
-    setVotingOptions((prevOptions) =>
-      prevOptions.map((option) => {
-        if (option.optionID === optionID) {
-          // Find the index of the first occurrence of the user's vote
-          const indexToRemove = option.votes.indexOf(userID);
-          if (indexToRemove !== -1) {
-            unvoteSuccess = true;
-            // Create a new array excluding the first occurrence of the user's vote
-            return {
-              ...option,
-              votes: [
-                ...option.votes.slice(0, indexToRemove),
-                ...option.votes.slice(indexToRemove + 1),
-              ],
-            };
-          }
-        }
-        return option;
-      })
-    );
-
-    if (unvoteSuccess) {
-      setUserVoteCount((prevCount) => prevCount - 1); // Decrement the user's vote count
-      // Add a notification for the unvote
-      const optionText = votionOptions.find(
-        (option) => option.optionID === optionID
-      ).text;
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        `${username} unvoted for ${optionText}`,
-      ]);
-    }
-  };
-
-  const handleCancelSession = () => {
-    console.log('Session cancelled!');
-  };
-
-  const sessionCancelled = false;
-
-  // ===== HANDLING THE REMAINING TIME: ======//
-  // useEffect to set the remaining time and update it every second
-  useEffect(() => {
-    setRemainingTimeInSeconds(
-      calculateRemainingTimeInSeconds(roomDetails.endTime)
-    );
-    const interval = setInterval(() => {
-      setRemainingTimeInSeconds((prevTime) => {
-        return prevTime > 0 ? prevTime - 1 : 0;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [roomDetails.endTime]); // Dependency on roomDetails.endTime
-
-  // Function to calculate remaining time in seconds
-  const calculateRemainingTimeInSeconds = (endTime) => {
-    const now = dayjs();
-    const end = dayjs(endTime);
-    const differenceInSeconds = end.diff(now, 'second');
-    return differenceInSeconds > 0 ? differenceInSeconds : 0;
-  };
-
-  // Convert seconds to minutes and seconds for display
-  const minutes = Math.floor(remainingTimeInSeconds / 60);
-  const seconds = remainingTimeInSeconds % 60;
-  const paddedMinutes = String(minutes).padStart(2, '0');
-  const paddedSeconds = String(seconds).padStart(2, '0');
-  // ===== END OF HANDLING THE REMAINING TIME ===== //
+  // ====== END OF ADDING NEW OPTION ====== //
 
   return (
     <>
@@ -264,25 +225,86 @@ const Room = () => {
             </Typography>
             <Box
               style={{
+                width: '100%',
+                display: 'flex',
+                margin: '0.5rem',
+                gap: '0.5rem',
+              }}
+            >
+              <Button
+                variant={view === views.VOTING ? 'contained' : 'outlined'}
+                size="small"
+                color="success"
+                fullWidth
+                onClick={() => setView(views.VOTING)}
+              >
+                Voting
+              </Button>
+              <Button
+                variant={view === views.EVENT ? 'contained' : 'outlined'}
+                size="small"
+                color="success"
+                fullWidth
+                onClick={() => setView(views.EVENT)}
+              >
+                Event Log
+              </Button>
+            </Box>
+            <Box
+              style={{
                 flexGrow: 1,
                 overflowY: 'scroll',
               }}
             >
-              {votionOptions.map((option, index) => (
-                <VotingOptionCard
-                  key={index}
-                  name={option.text}
-                  votes={option.votes}
-                  totalAvailableVotes={
-                    users.length * roomDetails.numberOfVotesPerUser
-                  }
-                  numerOfUserVotes={
-                    option.votes.filter((vote) => vote === userID).length
-                  }
-                  handleAddVote={() => handleAddVote(option.optionID)}
-                  handleRemoveVote={() => handleRemoveVote(option.optionID)}
-                />
-              ))}
+              {
+                // Show the voting options if the view is VOTING
+                view === views.VOTING && votionOptions.length === 0 && (
+                  <Typography
+                    variant="h6"
+                    textAlign={'center'}
+                    marginTop={'1rem'}
+                  >
+                    No voting options added yet. <br />
+                    Click{' '}
+                    <span
+                      style={{
+                        cursor: 'pointer',
+                        color: '#007bff',
+                        textDecoration: 'underline',
+                        textStyle: 'italic',
+                      }}
+                      onClick={() => setOpenNewOption(true)}
+                    >
+                      here
+                    </span>{' '}
+                    to add one.
+                  </Typography>
+                )
+              }
+              {view === views.VOTING &&
+                votionOptions.length > 0 &&
+                votionOptions.map((option, index) => (
+                  <VotingOptionCard
+                    key={index}
+                    name={option.optionText}
+                    votes={option.votes || []}
+                    totalAvailableVotes={
+                      users.length * roomDetails.numberOfVotesPerUser
+                    }
+                    numberOfUserVotes={
+                      option.votes?.filter((_userID) => _userID === userID)
+                        .length || 0
+                    }
+                    handleAddVote={() => handleAddVote(option._id)}
+                    handleRemoveVote={() => handleRemoveVote(option._id)}
+                  />
+                ))}
+              {
+                // Show the notifications if the view is EVENT
+                view === views.EVENT && (
+                  <EventLog logs={eventLog} userID={userID} />
+                )
+              }
             </Box>
             <Box className="footerBox">
               <Typography variant="h6" fontStyle={'italic'}>
