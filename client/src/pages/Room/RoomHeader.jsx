@@ -66,21 +66,22 @@ const RoomHeader = ({
         adminID={roomDetails.ownerUserID}
       />
       <Box className="headerBox">
-        {/* ONLY SHOW HAMBURGER ON MOBILE*/}
-        {hideDesktopDrawer && (
-          <IconButton className="menuIcon" onClick={() => setDrawerOpen(true)}>
-            <MenuIcon />
-          </IconButton>
-        )}
+        <IconButton
+          className="menuIcon"
+          onClick={() => setDrawerOpen(true)}
+          disabled={!hideDesktopDrawer} // ONLY SHOW HAMBURGER ON MOBILE
+        >
+          <MenuIcon />
+        </IconButton>
 
         <Typography>
           Room:
           <span style={{ textTransform: 'uppercase', fontStyle: 'italic' }}>
-            {userDetails.roomID || 'XXXXXX'}
+            {userDetails.roomID || 'ERROR'}
           </span>
         </Typography>
         <Typography className="timeText">
-          Time Left: <Timer endTime={roomDetails.endTime} />
+          <Timer endTime={roomDetails.endTime} />
         </Typography>
       </Box>
       <Typography
