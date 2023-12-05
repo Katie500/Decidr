@@ -40,11 +40,11 @@ export default function CustomDrawer({
   //==================== profile picture algorithm ================//
   //open picture window
   const [isWindowOpen, setWindowOpen] = useState(false);
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState('');
   const [svgContent, setSvgContent] = useState(null);
 
   const { userDetails, updateUserDetails } = useContext(UserContext);
-    const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
+  const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
 
   useEffect(() => {
     if (userDetails?.profilePicture) {
@@ -55,13 +55,15 @@ export default function CustomDrawer({
   useEffect(() => {
     const fetchSvg = async () => {
       try {
-        const response = await fetch(avatar);
-        if (response.ok) {
-          const svgText = await response.text();
-          const base64 = btoa(svgText);
-          setSvgContent(base64);
-        } else {
-          console.error('Failed to fetch SVG:', response.status);
+        if (avatar) {
+          const response = await fetch(avatar);
+          if (response.ok) {
+            const svgText = await response.text();
+            const base64 = btoa(svgText);
+            setSvgContent(base64);
+          } else {
+            console.error('Failed to fetch SVG:', response.status);
+          }
         }
       } catch (error) {
         console.error('Error fetching SVG:', error);
@@ -72,8 +74,7 @@ export default function CustomDrawer({
   }, [avatar]);
 
   const changeProfilePicture = () => {
-
-    console.log("avatar is:" + avatar);
+    console.log('avatar is:' + avatar);
     updateUserDetails({
       profilePicture: avatar,
     });
@@ -134,49 +135,40 @@ export default function CustomDrawer({
             </ListItemButton>
           </ListItem>
           {users?.map((user, index) => (
-  <ListItem key={index} disablePadding>
-    <ListItemButton>
-      <ListItemIcon>
-        {user._id === userDetails.userID ? (
-          // Display the avatar of the logged-in user
-          <img
-            src={`data:image/svg+xml;base64,${svgContent}`}
-            alt="Profile Picture"
-            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-            onError={(e) => console.error('Error loading image:', e)}
-          />
-        ) : (
+            <ListItem key={index} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  {user._id === userDetails.userID && svgContent ? (
+                    <img
+                      src={`data:image/svg+xml;base64,${svgContent}`}
+                      alt="Profile Picture"
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                      }}
+                      onError={(e) => console.error('Error loading image:', e)}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )}
+                </ListItemIcon>
 
-    // Display the received avatar for other users if found
-    avatarStates[user._id] ? (
-      <img
-        src={`data:image/svg+xml;base64,${avatarStates[user._id]}`}
-        alt="Profile Picture"
-        style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-        onError={(e) => console.error('Error loading image:', e)}
-      />
-    ) : (
-      //Otherwise display AccountCircleIcon
-      <AccountCircleIcon />
-    )
-  
-
-    
-        )}
-      </ListItemIcon>
-      <ListItemText
-        primary={`${user.username} ${
-          user._id === adminID ? '(admin)' : ''
-        }`}
-      />
-            {/* Add this line to log the profile picture URL */}
-            {console.log(`Profile picture URL for ${user.username}: ${avatarStates[user._id]}`)}
-    </ListItemButton>
-  </ListItem>
-))}
-
-
-
+                {/* avatarStates[user._id] ? (<img
+                      src={`data:image/svg+xml;base64,${avatarStates[user._id]}`}
+                      alt="Profile Picture"
+                      style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                      onError={(e) => console.error('Error loading image:', e)}
+                    />): <> </> 
+                )  */}
+                <ListItemText
+                  primary={`${user.username} ${
+                    user._id === adminID ? '(admin)' : ''
+                  }`}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
         </List>
         <Divider />
         <List>

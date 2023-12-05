@@ -52,19 +52,18 @@ const NicknamePage = () => {
   };
 
   const handleStart = async () => {
-
     // Check if user has a name
     if (!name) {
       setError('Please enter a name.');
       return;
     }
 
-  // Check if the user has selected a profile picture
-  if (!avatar) {
-    setError('Please select a profile picture.');
-    console.log("Please select avatar");
-    return;
-  }
+    // Check if the user has selected a profile picture
+    if (!avatar) {
+      // setError('Please select a profile picture.');
+      // console.log('Please select avatar');
+      // return;
+    }
 
     setPending(true);
 
@@ -114,16 +113,15 @@ const NicknamePage = () => {
       </Box>
 
       <Grid className="container">
+        <Box className="contentBox widthConstraint">
+          <SelectAvatarMenu
+            onSelectAvatar={(selectedAvatar) => {
+              setAvatar(selectedAvatar);
+              console.log('Avatar set in NicknamePage:', selectedAvatar);
+            }}
+          />
 
-
-        <Box className="contentBox widthConstraint">        
-
-          <SelectAvatarMenu onSelectAvatar={(selectedAvatar) => {
-        setAvatar(selectedAvatar);
-        console.log('Avatar set in NicknamePage:', selectedAvatar);
-      }} />  
-
-                      <br></br>
+          <br></br>
           <Typography variant="h6">Enter a nickname:</Typography>
           <Box className="inputBox">
             <TextField
