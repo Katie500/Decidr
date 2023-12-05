@@ -2,12 +2,10 @@ import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import { UserContext } from '../../contexts/UserContext';
-import { SocketContext } from '../../contexts/SocketContext';
 import AddNewOptionModal from './NewOptionModal';
 import './RoomPage.css';
 import { getRoomDetails } from '../../api/getRoomDetails';
 import { useNavigate } from 'react-router-dom';
-import dayjs from 'dayjs';
 import EventLog from './EventLog';
 import { addNewOptionToDB } from '../../api/addNewOptionToDB';
 import VotingOptionsList from './VotingOptionsList';
@@ -44,41 +42,14 @@ const Room = () => {
     endTime: '',
   });
 
-  // ====== ADDING NEW OPTION ====== //
-  const handleAddNewOption = async () => {
-    if (!newOptionText) {
-      setOpenNewOption(false);
-      return;
-    }
-
-    // TODO: Call API to update the vote in the database
-    // votingOptionID SHOULD COME FROM THE DATABASE
-    setPending(true);
-    const newOptionID = await addNewOptionToDB(newOptionText, roomDetails._id);
-
-    setPending(false);
-    addNewOption(newOptionText, newOptionID);
-    setNewOptionText('');
-    setOpenNewOption(false);
-
-    // BROADCAST THE NEW OPTION:
-    const eventMessage = `${username} added a new option: ${newOptionText}`;
-    sendBroadcast(
-      broadcastingEventTypes.ADD_OPTION,
-      { optionText: newOptionText, optionID: newOptionID },
-      eventMessage
-    );
-  };
-
+  const voteManagement = useVoteManagement(roomDetails, setPending);
+  // addNewOption needs to be declared here because it needs to be passed to useBroadcast
   const addNewOption = (optionText, newOptionID) => {
     voteManagement.setVotingOptions((prevOptions) => [
       { _id: newOptionID, optionText: optionText, votes: [] },
       ...prevOptions,
     ]);
   };
-  // ====== END OF ADDING NEW OPTION ====== //
-
-  const voteManagement = useVoteManagement(roomDetails, setPending);
   const { sendBroadcast } = useBroadcast(
     voteManagement.processIncomingVote,
     voteManagement.processIncomingVoteRemoval,
@@ -163,6 +134,32 @@ const Room = () => {
       console.error('Error in removing vote:', error);
     }
   };
+
+  // ====== ADDING NEW OPTION ====== //
+  const handleAddNewOption = async () => {
+    if (!newOptionText) {
+      setOpenNewOption(false);
+      return;
+    }
+
+    // votingOptionID SHOULD COME FROM THE DATABASE
+    setPending(true);
+    const newOptionID = await addNewOptionToDB(newOptionText, roomDetails._id);
+
+    setPending(false);
+    addNewOption(newOptionText, newOptionID);
+    setNewOptionText('');
+    setOpenNewOption(false);
+
+    // BROADCAST THE NEW OPTION:
+    const eventMessage = `${username} added a new option: ${newOptionText}`;
+    sendBroadcast(
+      broadcastingEventTypes.ADD_OPTION,
+      { optionText: newOptionText, optionID: newOptionID },
+      eventMessage
+    );
+  };
+  // ====== END OF ADDING NEW OPTION ====== //
 
   return (
     <>
