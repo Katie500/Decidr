@@ -25,6 +25,8 @@ const BubbleChart = ({
 }) => {
   const chartRef = useRef(null);
 
+  const growthFactor = 2.5;
+
   console.log("votionOptions",votionOptions);
   console.log("Number of votes",votionOptions[0].votes.length);
   // console.log("userID",userID);
@@ -38,9 +40,9 @@ const BubbleChart = ({
     let data = [];
     for (let i=0; i<votionOptions.length; i++){
         const item = {
-          r: getPercentage(totalAvailableVotes, votionOptions[i].votes.length), name: votionOptions[i].optionText
+          r: getPercentage(totalAvailableVotes, votionOptions[i].votes.length) * growthFactor, name: votionOptions[i].optionText
         };
-        data.push(item);
+        votionOptions[i].votes.length > 0 ? data.push(item) : data.push();
     }
 
     // Create a force simulation
@@ -48,6 +50,7 @@ const BubbleChart = ({
       .forceSimulation(data)
       .force(
         "collide",
+        //dividing radius by growth factor because we multiply it above
         d3.forceCollide().radius((d) => d.r + 2)
       ) // Adjust the padding as needed
       .force(
@@ -73,6 +76,8 @@ const BubbleChart = ({
       .append("circle")
       .attr("r", (d) => d.r)
       .style("fill", () => getRandomColor())
+      .style('stroke', 'black') // Border color
+      .style('stroke-width', 2) // Border width
       .call(
         d3
           .drag() // Enable dragging for circles
