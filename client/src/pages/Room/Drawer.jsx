@@ -16,6 +16,7 @@ import { IconButton, useMediaQuery } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SelectAvatarMenu from './SelectAvatarMenu';
 import { UserContext } from '../../contexts/UserContext';
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
 
 export default function CustomDrawer({
   open,
@@ -25,6 +26,7 @@ export default function CustomDrawer({
   users,
   profileName,
   profileAvatar,
+  sendBroadcast,
   adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -84,8 +86,15 @@ export default function CustomDrawer({
   };
 
   const leaveRoom = () => {
-
     onCancelSession();
+
+    // Broadcast that the user left the room
+    sendBroadcast(
+      broadcastingEventTypes.USER_DISCONNECTED,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} left the room`
+    );
+
     // Optionally, close the drawer after leaving the room
     setDrawerOpen(false);
   };

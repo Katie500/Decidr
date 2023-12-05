@@ -49,6 +49,7 @@ const RoomHeader = ({
   roomDetails,
   userDetails,
   view,
+  sendBroadcast,
   setView,
   hideDesktopDrawer,
 }) => {
@@ -61,6 +62,7 @@ const RoomHeader = ({
         open={drawerOpen}
         setDrawerOpen={setDrawerOpen}
         onCancelSession={handleCancelSession}
+        sendBroadcast={sendBroadcast}
         profileName={userDetails.nickname || 'ERROR IN ROOM HEADER'}
         users={users}
         adminID={roomDetails.ownerUserID}

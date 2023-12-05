@@ -194,6 +194,7 @@ const Room = () => {
                 view={view}
                 setView={setView}
                 userDetails={userDetails}
+                sendBroadcast={sendBroadcast}
                 handleCancelSession={() => console.log('Session cancelled!')}
                 hideDesktopDrawer={hideDesktopDrawer}
               />
