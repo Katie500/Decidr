@@ -16,7 +16,6 @@ import TestPage2 from "./components/Test/page2";
 import { SocketProvider } from "./contexts/SocketContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 
-
 function App() {
   const theme = createTheme({
     components: {
@@ -43,7 +42,8 @@ function App() {
                 <Route path="/nickname" element={<NicknamePage />} />
                 <Route path="/startnewroom" element={<StartNewRoom />} />
                 <Route path="/room" element={<Room />} />
-                
+                <Route path="/resultpage" element={<ResultPage />} />
+
                 {/* Testing code */}
                 <Route path="/testUser" element={<TestUser />} />
                 <Route path="/testRoom" element={<TestRoom />} />

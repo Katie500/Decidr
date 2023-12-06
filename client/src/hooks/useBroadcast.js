@@ -6,6 +6,8 @@ import {
   notificationColors,
   useNotification,
 } from "../contexts/NotificationContext";
+import { useNavigate } from "react-router-dom";
+import { Button, Typography } from "@mui/material";
 
 export const broadcastingEventTypes = {
   ADD_VOTE: "ADD_VOTE",
@@ -54,9 +56,8 @@ const useBroadcast = (
 
   const cancelSession = () => {
     setShowWarningPopup(true);
-  }
+  };
   const [showWarningPopup, setShowWarningPopup] = useState(false);
-
 
   // LISTEN FOR BROADCASTS
   useEffect(() => {
@@ -75,7 +76,10 @@ const useBroadcast = (
         }
         if (eventType === broadcastingEventTypes.USER_CONNECTED) {
           const { userID, username, profilePicture } = eventData;
-          setUsers((prevUsers) => [...prevUsers, { userID, username, profilePicture }]);
+          setUsers((prevUsers) => [
+            ...prevUsers,
+            { userID, username, profilePicture },
+          ]);
           setAvatarStates((prevStates) => ({
             ...prevStates,
           }));
@@ -85,22 +89,26 @@ const useBroadcast = (
           const { optionText, optionID } = eventData;
           addNewOption(optionText, optionID);
           setAvatarStates((prevStates) => ({
-            ...prevStates
+            ...prevStates,
           }));
           displayNotification(eventMessage, notificationColors.PRIMARY);
         }
         if (eventType === broadcastingEventTypes.ADMIN_CANCELLED_SESSION) {
           setShowWarningPopup(true);
           <div className="popup-container">
-          <div className="popup-content">
-            <Typography variant="h4" align="center">
-              Session has been ended by the admin.
-            </Typography>
-            <Button variant="contained" color="primary" onClick={cancelSession}>
-              OK
-            </Button>
-          </div>
-        </div>
+            <div className="popup-content">
+              <Typography variant="h4" align="center">
+                Session has been ended by the admin.
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={cancelSession}
+              >
+                OK
+              </Button>
+            </div>
+          </div>;
           navigate("/");
         }
         setEventLog((list) => [...list, data]);
