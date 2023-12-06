@@ -53,12 +53,22 @@ const ResultPage = () => {
 
   return (
     <>
+    <Box display="flex" justifyContent="center" alignItems="center" >
+        <img
+              src="/Decider-Logo-Only.jpg" 
+              alt="Decidr JPG" 
+              style={{ width: '100%', maxWidth: '250px', display: 'block', marginInlineStart: '35%' }}
+              className='title'
+            />
+            
+    </Box>
+    <Box paddingTop={"10%"}>
       <Box className="topBarContainer">
         <Box className="topBar widthConstraint">
           <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
-          <Typography variant="h6">Results</Typography>
+          <Typography variant="h6"></Typography>
         </Box>
       </Box>
 
@@ -72,17 +82,19 @@ const ResultPage = () => {
                 <Typography
                   variant="h4"
                   textAlign="center"
-                  fontStyle="italic"
-                  marginTop={1}
+
+                  fontStyle="bold"
+                  marginTop={1.5}
                 >
                   Top Suggestions
                 </Typography>
                 {/* Adjusted marginTop value */}
                 <Typography
-                  variant="h4"
+                  variant="h5"
                   textAlign="center"
                   fontStyle="italic"
-                  marginTop={0.5}
+
+                  marginTop={2.5}
                 >
 
                   Question: {roomDetails.question}
@@ -91,10 +103,32 @@ const ResultPage = () => {
               </Grid>
               <Grid item xs={12}>
 
+                <Typography variant="h6" align="center" paddingBottom={"15px"}>
+                  <strong>Question:</strong> {roomDetails.question}
+                </Typography>
+                <Typography 
+                  variant="h6"
+                  fontsize = "1.1rem"
+                  paddingLeft={"10%"}
+                  >
+                  <strong>Results:</strong>
+                </Typography>
                 {roomDetails.voteOptions.map((option, index) => (
                   <div key={option._id}>
-                    <Typography variant="body1">
-                      <strong>{option.optionText}:</strong> {option.votes.length} votes
+                    <Typography 
+                    variant="body1"
+                    paddingLeft={"15%"} 
+                    
+                    >
+                      <strong>{index + 1}: {option.optionText} </strong> 
+                    </Typography>
+                    <Typography 
+                    variant="body1"
+                    paddingLeft={"20%"}
+                    paddingTop={"5px"}
+                    paddingBottom={"5px"}
+                    >
+                        Votes: {option.votes.length}
                     </Typography>
                   </div>
                 ))}
@@ -113,6 +147,7 @@ const ResultPage = () => {
           )}
         </Box>
       </Grid>
+    </Box>
     </>
   );
 };

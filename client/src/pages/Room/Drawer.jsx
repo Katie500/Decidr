@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {Button, Box} from '@mui/material';
+import { Link } from 'react-router-dom';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,6 +10,7 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import { IconButton, useMediaQuery, Modal } from '@mui/material';
@@ -16,17 +18,24 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SelectAvatarMenu from './SelectAvatarMenu';
 import { UserContext } from '../../contexts/UserContext';
 
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+
+import { useNavigate } from 'react-router-dom';
+
 export default function CustomDrawer({
   open,
   setDrawerOpen,
   drawerWidth,
   onCancelSession,
+  handleAdminCancelledSession,
   users,
   profileName,
   profileAvatar,
+  sendBroadcast,
   adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Update the drawer state based on screen size and passed `open` prop
@@ -37,6 +46,11 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
+
+
+  const toResultspage = () => {
+    navigate('/resultpage');
+  };
   //==================== profile picture algorithm ================//
   //open picture window
   const [isWindowOpen, setWindowOpen] = useState(false);
@@ -139,6 +153,34 @@ const changeProfilePicture = async () => {
   // Default to an empty array if svgContent2 is null
   const svgContent2Array = svgContent2 || [];
 
+  const handleCancelSession = () => {
+    // Trigger the pop-up window in RoomPage.jsx
+    sendBroadcast(
+      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} cancelled the session`
+    );
+    handleAdminCancelledSession();
+  };
+
+  const handleAddTime = () => {
+
+  }
+
+  const leaveRoom = () => {
+    onCancelSession();
+
+    // Broadcast that the user left the room
+    sendBroadcast(
+      broadcastingEventTypes.USER_DISCONNECTED,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} left the room`
+    );
+
+    // Optionally, close the drawer after leaving the room
+    setDrawerOpen(false);
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -235,14 +277,61 @@ const changeProfilePicture = async () => {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={onCancelSession}>
+
+          {adminID !== userDetails.userID && (
+          <ListItemButton onClick={leaveRoom} component={Link} to="/">
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'red' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Leave the room'} />
+            </ListItemButton>
+          )}
+          </ListItem>
+          <List>
+            <ListItem disablePadding>
+
+              {adminID === userDetails.userID && (
+              <ListItemButton onClick={handleAddTime}>
+
+                <ListItemIcon>
+                <AddAlarmIcon sx={{ color: 'blue' }} />
+              </ListItemIcon>
+                <ListItemText primary={'Add Time'} />
+              </ListItemButton>
+            )}
+            </ListItem>
+          </List>
+          <Divider />
+          <ListItem disablePadding>
+            {adminID === userDetails.userID && (
+
+            <ListItemButton onClick={toResultspage}>
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'orange' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Finish Session'} />
+            </ListItemButton>
+
+           )}
+
+          </ListItem>
+        </List>
+        <Divider />
+        <List>
+          <ListItem disablePadding>
+
+            {adminID === userDetails.userID && (
+            <ListItemButton onClick={handleCancelSession}>
+
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
               <ListItemText primary={'Cancel Session'} />
             </ListItemButton>
+           )}
           </ListItem>
         </List>
+        
       </Drawer>
     </Box>
   );
