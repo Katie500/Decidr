@@ -10,6 +10,7 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import { IconButton, useMediaQuery } from '@mui/material';
@@ -46,9 +47,6 @@ export default function CustomDrawer({
   }, [isMobile, open]);
 
 
-  const backToHomepage = () => {
-    navigate('/');
-  };
 
   const toResultspage = () => {
     navigate('/resultpage');
@@ -107,6 +105,10 @@ export default function CustomDrawer({
     );
     handleAdminCancelledSession();
   };
+
+  const handleAddTime = () => {
+
+  }
 
   const leaveRoom = () => {
     onCancelSession();
@@ -223,7 +225,21 @@ export default function CustomDrawer({
             </ListItemButton>
           )}
           </ListItem>
-        
+          <List>
+            <ListItem disablePadding>
+
+              {adminID === userDetails.userID && (
+              <ListItemButton onClick={handleAddTime}>
+
+                <ListItemIcon>
+                <AddAlarmIcon sx={{ color: 'blue' }} />
+              </ListItemIcon>
+                <ListItemText primary={'Add Time'} />
+              </ListItemButton>
+            )}
+            </ListItem>
+          </List>
+          <Divider />
           <ListItem disablePadding>
             {adminID === userDetails.userID && (
 
@@ -244,7 +260,7 @@ export default function CustomDrawer({
 
             {adminID === userDetails.userID && (
             <ListItemButton onClick={handleCancelSession}>
-              
+
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
