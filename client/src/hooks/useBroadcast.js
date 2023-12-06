@@ -14,6 +14,8 @@ export const broadcastingEventTypes = {
   ADD_OPTION: "ADD_OPTION",
   USER_CONNECTED: "USER_CONNECTED",
   USER_DISCONNECTED: "USER_DISCONNECTED",
+  SESSION_CANCELLED: "SESSION_CANCELLED",
+  SESSION_FINISHED: "SESSION_FINISHED",
 };
 
 const useBroadcast = (
@@ -87,9 +89,13 @@ const useBroadcast = (
           }));
           displayNotification(eventMessage, notificationColors.PRIMARY);
         }
-        if (eventType === broadcastingEventTypes.ADMIN_CANCELLED_SESSION) {
+        if (eventType === broadcastingEventTypes.SESSION_CANCELLED) {
           navigate("/");
           displayNotification(eventMessage, notificationColors.ERROR);
+        }
+        if (eventType === broadcastingEventTypes.SESSION_FINISHED) {
+          navigate("/resultPage");
+          displayNotification(eventMessage, notificationColors.WARNING);
         }
         setEventLog((list) => [...list, data]);
       } else {

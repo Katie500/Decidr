@@ -41,9 +41,6 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
-  const toResultspage = () => {
-    navigate("/resultpage");
-  };
   //==================== profile picture algorithm ================//
   const [profilePicture, setProfilePicture] = useState("");
   const [svgContent, setSvgContent] = useState(null);
@@ -143,13 +140,20 @@ export default function CustomDrawer({
   const svgContent2Array = svgContent2 || [];
 
   const handleCancelSession = () => {
-    // Trigger the pop-up window in RoomPage.jsx
     sendBroadcast(
-      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      broadcastingEventTypes.SESSION_CANCELLED,
       { userID: userDetails.userID, username: userDetails.nickname },
       `${userDetails.nickname}(admin) cancelled the session`
     );
     navigate("/");
+  };
+  const handleFinishSession = () => {
+    sendBroadcast(
+      broadcastingEventTypes.SESSION_FINISHED,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname}(admin) finished the session early.`
+    );
+    navigate("/resultPage");
   };
 
   return (
@@ -256,11 +260,11 @@ export default function CustomDrawer({
           <>
             <List>
               <ListItem disablePadding>
-                <ListItemButton onClick={toResultspage}>
+                <ListItemButton onClick={handleFinishSession}>
                   <ListItemIcon>
                     <CheckCircleIcon sx={{ color: "orange" }} />
                   </ListItemIcon>
-                  <ListItemText primary={"Finish Session Now"} />
+                  <ListItemText primary={"Finish session now"} />
                 </ListItemButton>
               </ListItem>
             </List>
@@ -271,7 +275,7 @@ export default function CustomDrawer({
                   <ListItemIcon>
                     <CancelIcon sx={{ color: "red" }} />
                   </ListItemIcon>
-                  <ListItemText primary={"Cancel Session"} />
+                  <ListItemText primary={"Cancel session"} />
                 </ListItemButton>
               </ListItem>
             </List>
