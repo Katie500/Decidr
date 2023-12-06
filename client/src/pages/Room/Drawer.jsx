@@ -215,9 +215,7 @@ export default function CustomDrawer({
             </ListItemButton>
           )}
           </ListItem>
-        </List>
-        <Divider />
-        <List>
+        
           <ListItem disablePadding>
             {adminID === userDetails.userID && (
             <ListItemButton onClick={toResultspage}>
