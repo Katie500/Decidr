@@ -12,7 +12,11 @@ import VotingOptionsList from "./VotingOptionsList";
 import RoomHeader from "./RoomHeader";
 import useVoteManagement from "../../hooks/useVoteManagement";
 import useBroadcast, { broadcastingEventTypes } from "../../hooks/useBroadcast";
-import CustomSnackbar, { notificationColors } from "./CustomSnackbar";
+import CustomSnackbar from "./CustomSnackbar";
+import {
+  notificationColors,
+  useNotification,
+} from "../../contexts/NotificationContext";
 
 const views = {
   VOTING: "VOTING",
@@ -44,7 +48,8 @@ const Room = () => {
     endTime: "",
   });
 
-  const [notification, setNotification] = useState({ message: "", color: "" });
+  const { notification, displayNotification } = useNotification();
+
   const voteManagement = useVoteManagement(roomDetails, setPending);
   // addNewOption needs to be declared here because it needs to be passed to useBroadcast
   const addNewOption = (optionText, newOptionID) => {
@@ -172,22 +177,6 @@ const Room = () => {
     );
   };
   // ====== END OF ADDING NEW OPTION ====== //
-
-  /**
-   *
-   * @param {*} color Primary, Secondary, Success, Error, Warning, Info
-   */
-  const displayNotification = (message, color) => {
-    if (message === notification.message) {
-      // Reset the snackbar message to ensure the new message triggers the Snackbar
-      setNotification(null);
-      setTimeout(() => {
-        setNotification({ message, color });
-      }, 50); // A short delay to ensure the state is reset before setting the new message
-    } else {
-      setNotification({ message, color });
-    }
-  };
 
   return (
     <>

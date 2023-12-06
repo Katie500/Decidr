@@ -2,15 +2,6 @@ import * as React from "react";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 
-export const notificationColors = {
-  SUCCESS: "success",
-  ERROR: "error",
-  WARNING: "warning",
-  INFO: "info",
-  PRIMARY: "primary",
-  SECONDARY: "secondary",
-};
-
 export default function CustomSnackbar({ message, color }) {
   const [open, setOpen] = React.useState(false);
 
