@@ -44,8 +44,8 @@ const Room = () => {
   const [roomDetails, setRoomDetails] = useState({
     roomID: "",
     question: "",
-    ownerUserID: "",
-    numberOfVotesPerUser: 3,
+    adminUserID: "",
+    numberOfVotesPerUser: 1,
     endTime: "",
   });
 
@@ -116,7 +116,7 @@ const Room = () => {
         return;
       }
       const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
-      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 3 });
+      setRoomDetails({ ...roomDetails });
       voteManagement.setVotingOptions(roomDetails.voteOptions || []);
       setUsers(users);
       setPending(false);

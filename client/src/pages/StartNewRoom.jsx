@@ -60,6 +60,7 @@ const StartNewRoom = () => {
       profilePicture: userDetails.profilePicture,
       question: question,
       endTime: new Date(Date.now() + duration * 60000),
+      numberOfVotesPerUser: votes,
     });
 
     updateUserDetails({
@@ -101,17 +102,6 @@ const StartNewRoom = () => {
   return (
     <>
       <Box>
-        {/* <Box margin={"5%"}>
-          <Box className="topBar widthConstraint">
-            <IconButton className="topBarIcon" onClick={handleBack}>
-              <ArrowBackOutlinedIcon />
-              <Typography variant="body2">
-                {userDetails?.nickname}'s <br /> new room
-              </Typography>
-            </IconButton>
-          </Box>
-        </Box> */}
-
         <Grid className="container alignInitial">
           <Box className="contentBox widthConstraint">
             <Box className="headerBox">

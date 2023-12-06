@@ -64,7 +64,7 @@ const RoomHeader = ({
         sendBroadcast={sendBroadcast}
         profileName={userDetails.nickname || "ERROR IN ROOM HEADER"}
         users={users}
-        adminID={roomDetails.ownerUserID}
+        adminID={roomDetails.adminUserID}
       />
       <Box className="headerBox">
         <IconButton
