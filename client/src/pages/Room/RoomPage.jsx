@@ -29,7 +29,7 @@ const Room = () => {
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState("");
   const [eventLog, setEventLog] = useState([]);
-  const { userDetails, updateUserDetails } = useContext(UserContext);
+  const { userDetails } = useContext(UserContext);
 
   const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
@@ -47,7 +47,7 @@ const Room = () => {
     endTime: "",
   });
 
-  const { notification, displayNotification } = useNotification();
+  const { displayNotification } = useNotification();
 
   const voteManagement = useVoteManagement(roomDetails, setPending);
   // addNewOption needs to be declared here because it needs to be passed to useBroadcast
