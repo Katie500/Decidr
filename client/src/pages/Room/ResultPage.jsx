@@ -55,7 +55,7 @@ const ResultPage = () => {
           <IconButton className="topBarIcon" onClick={handleBack}>
             <ArrowBackOutlinedIcon />
           </IconButton>
-          <Typography variant="h6">Results</Typography>
+          <Typography variant="h6"></Typography>
         </Box>
       </Box>
 
@@ -68,34 +68,48 @@ const ResultPage = () => {
                 <Typography
                   variant="h4"
                   textAlign="center"
-                  fontStyle="italic"
+                  fontStyle="bold"
                   marginTop={1.5}
+                  
                 >
                   Top Suggestions
                 </Typography>
                 <Typography
-                  variant="h4"
+                  variant="h5"
                   textAlign="center"
                   fontStyle="italic"
-                  marginTop={1.5}
+                  marginTop={2.5}
                 >
                   Room ID: {roomDetails.roomID}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="body1">
+                <Typography variant="h6" align="center" paddingBottom={"15px"}>
                   <strong>Question:</strong> {roomDetails.question}
                 </Typography>
-                <Typography variant="body1">
-                  <strong>Options:</strong>
+                <Typography 
+                  variant="h6"
+                  fontsize = "1.1rem"
+                  paddingLeft={"10%"}
+                  >
+                  <strong>Results:</strong>
                 </Typography>
                 {roomDetails.voteOptions.map((option, index) => (
                   <div key={option._id}>
-                    <Typography variant="body1">
-                      <strong>Option {index + 1}:</strong> {option.optionText}
+                    <Typography 
+                    variant="body1"
+                    paddingLeft={"15%"} 
+                    
+                    >
+                      <strong>{index + 1}: {option.optionText} </strong> 
                     </Typography>
-                    <Typography variant="body1">
-                      <strong>Votes:</strong> {option.votes.length}
+                    <Typography 
+                    variant="body1"
+                    paddingLeft={"20%"}
+                    paddingTop={"5px"}
+                    paddingBottom={"5px"}
+                    >
+                        Votes: {option.votes.length}
                     </Typography>
                   </div>
                 ))}
