@@ -12,7 +12,6 @@ import VotingOptionsList from "./VotingOptionsList";
 import RoomHeader from "./RoomHeader";
 import useVoteManagement from "../../hooks/useVoteManagement";
 import useBroadcast, { broadcastingEventTypes } from "../../hooks/useBroadcast";
-import CustomSnackbar from "./CustomSnackbar";
 import {
   notificationColors,
   useNotification,
@@ -252,10 +251,6 @@ const Room = () => {
         handleClose={closeNewOptionModal}
         newOptionText={newOptionText}
         setNewOptionText={setNewOptionText}
-      />
-      <CustomSnackbar
-        message={notification?.message || ""}
-        color={notification?.color || ""}
       />
       <LoadingBackdrop open={pending} />
     </>

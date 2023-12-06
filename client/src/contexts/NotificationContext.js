@@ -1,5 +1,6 @@
 // NotificationContext.js
 import React, { createContext, useContext, useState } from "react";
+import CustomSnackbar from "../pages/Room/CustomSnackbar";
 
 export const notificationColors = {
   SUCCESS: "success",
@@ -36,6 +37,10 @@ export const NotificationProvider = ({ children }) => {
   return (
     <NotificationContext.Provider value={{ notification, displayNotification }}>
       {children}
+      <CustomSnackbar
+        message={notification?.message || ""}
+        color={notification?.color || ""}
+      />
     </NotificationContext.Provider>
   );
 };
