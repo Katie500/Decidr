@@ -12,14 +12,17 @@ import VotingOptionsList from "./VotingOptionsList";
 import RoomHeader from "./RoomHeader";
 import useVoteManagement from "../../hooks/useVoteManagement";
 import useBroadcast, { broadcastingEventTypes } from "../../hooks/useBroadcast";
+import WarningPopup from '../../hooks/WarningPopup';
+import BubbleChart from './BubbleChart';
 import {
   notificationColors,
   useNotification,
 } from "../../contexts/NotificationContext";
 
 const views = {
-  VOTING: "VOTING",
-  EVENT: "EVENT",
+  VOTING: 'VOTING',
+  EVENT: 'EVENT',
+  CHART: 'CHART',
 };
 
 const Room = () => {
@@ -30,11 +33,13 @@ const Room = () => {
   const [newOptionText, setNewOptionText] = useState("");
   const [eventLog, setEventLog] = useState([]);
   const { userDetails } = useContext(UserContext);
+  const [sessionCancelledByAdmin, setSessionCancelledByAdmin] = useState(false);
+  const [showWarningPopup, setShowWarningPopup] = useState(false);
 
   const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
   const username = userDetails.nickname;
-
+  const profilePicture = userDetails.avatar;
   const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down("md")
@@ -47,7 +52,28 @@ const Room = () => {
     endTime: "",
   });
 
+
   const { displayNotification } = useNotification();
+
+
+  //==================== NAVIGATE TO RESULTS IF TIME ENDS ==================//
+  useEffect(() => {
+    // Check if the time has ended
+    const intervalId = setInterval(() => {
+      const currentTime = new Date();
+      const endTime = new Date(roomDetails.endTime);
+
+      if (currentTime >= endTime) {
+        // Time has ended, navigate to ResultPage
+        clearInterval(intervalId);
+        navigate('/resultpage'); // Adjust the path accordingly
+      }
+    }, 1000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [roomDetails.endTime, navigate]);
+
 
   const voteManagement = useVoteManagement(roomDetails, setPending);
   // addNewOption needs to be declared here because it needs to be passed to useBroadcast
@@ -66,14 +92,12 @@ const Room = () => {
   );
 
   const [localRoomID, setLocalRoomID] = useState(null);
-  const sessionCancelled = false;
 
   const sendUserConnectedBroadcast = () => {
     sendBroadcast(
       broadcastingEventTypes.USER_CONNECTED,
-      { userID, username, avatar: userDetails.profilePicture },
-      `${username} has ${userDetails.isAdmin ? "created" : "joined"} the room`,
-      userDetails.profilePicture // Include the avatar in the broadcast
+      { userID, username, profilePicture },
+      `${username} has ${userDetails.isAdmin ? 'created' : 'joined'} the room`,
     );
   };
 
@@ -81,7 +105,7 @@ const Room = () => {
     if (userDetails.roomID !== localRoomID) {
       fetchRoomDetails();
       setLocalRoomID(userDetails.roomID);
-      sendUserConnectedBroadcast();
+      sendUserConnectedBroadcast(); 
     }
   }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
@@ -109,6 +133,10 @@ const Room = () => {
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
+  };
+
+  const handleCancelSession = () => {
+    console.log('Session cancelled!');
   };
 
   const handleAddVote = async (optionID) => {
@@ -169,24 +197,48 @@ const Room = () => {
     const eventMessage = `${username} added a new option: ${newOptionText}`;
     sendBroadcast(
       broadcastingEventTypes.ADD_OPTION,
-      {
-        optionText: newOptionText,
-        optionID: newOptionID,
+      { 
+        optionText: newOptionText, 
+        optionID: newOptionID 
       },
       eventMessage
     );
   };
   // ====== END OF ADDING NEW OPTION ====== //
 
+  const handleAdminCancelledSession = () => {
+    setSessionCancelledByAdmin(true);
+
+    // Broadcast the event to notify other users
+    sendBroadcast(
+      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `Admin has canceled the session`
+    );
+  };
+
+  const cancelSession = () => {
+    navigate("/");
+    setSessionCancelledByAdmin(true);
+  };
+
   return (
     <>
-      {sessionCancelled && (
-        // We can fix closing a room(session) later
-        <Typography variant="h4" align="center">
-          Session has been cancelled.
-        </Typography>
+
+      {sessionCancelledByAdmin && (
+        <div className="popup-container">
+          <div className="popup-content">
+            <Typography variant="h4" align="center">
+              Session has been ended by the admin.
+            </Typography>
+            <Button variant="contained" color="primary" onClick={cancelSession}>
+              OK
+            </Button>
+          </div>
+        </div>
+
       )}
-      {!sessionCancelled && (
+      {!sessionCancelledByAdmin && (
         <>
           <Grid
             className="container roomWrapper"
@@ -196,13 +248,14 @@ const Room = () => {
           >
             <Box className="widthConstraint contentBox">
               <RoomHeader
-                sessionCancelled={sessionCancelled}
+                sessionCancelledByAdmin={sessionCancelledByAdmin}
                 roomDetails={roomDetails}
+                handleAdminCancelledSession={handleAdminCancelledSession}
                 users={users}
                 view={view}
                 setView={setView}
                 userDetails={userDetails}
-                handleCancelSession={() => console.log("Session cancelled!")}
+                handleCancelSession={() => console.log('Session cancelled!')}
                 hideDesktopDrawer={hideDesktopDrawer}
               />
               <Box
@@ -222,9 +275,20 @@ const Room = () => {
                     handleAddOption={() => setOpenNewOption(true)}
                   />
                 )}
+                {view === views.CHART && (
+                  <BubbleChart votionOptions={voteManagement.votingOptions}
+                  totalAvailableVotes={
+                    users.length * roomDetails.numberOfVotesPerUser
+                  }
+                  handleAddVote={handleAddVote}
+                  handleRemoveVote={handleRemoveVote}
+                  handleAddOption={() => setOpenNewOption(true)}
+                />
+                )}
                 {view === views.EVENT && (
                   <EventLog logs={eventLog} userID={userID} />
                 )}
+                
               </Box>
               <Box className="footerBox">
                 <Typography variant="h6" fontStyle={"italic"}>

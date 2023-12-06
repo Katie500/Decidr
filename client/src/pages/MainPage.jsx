@@ -1,27 +1,31 @@
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
-import LoadingBackdrop from '../components/global/LoadingBackdrop';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../contexts/UserContext';
-import { verifyRoom } from '../api/verifyRoom';
-
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import React, { useContext, useState } from "react";
+import LoadingBackdrop from "../components/global/LoadingBackdrop";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
+import { verifyRoom } from "../api/verifyRoom";
 
 const MainPage = () => {
   const [pending, setPending] = useState(false);
-  const [room, setRoom] = useState('');
-  const [error, setError] = useState('');
+  const [room, setRoom] = useState("");
+  const [error, setError] = useState("");
   const { updateUserDetails } = useContext(UserContext);
+  const [musicPlayed, setMusicPlayed] = useState(false);
 
+  const musicAudio = new Audio("/PeaceTheme.mp3");
+  function playMusicAudio(volume = 1) {
+    musicAudio.volume = volume;
 
-  const musicAudio = new Audio('/PeaceTheme.mp3');
-
+    // Check if the music has been played in this session
+    const musicPlayedInSession = sessionStorage.getItem("musicPlayedInSession");
+    if (!musicPlayedInSession) {
+      musicAudio.loop = true;
+      musicAudio.play();
+      sessionStorage.setItem("musicPlayedInSession", "true");
+    }
+  }
 
   const navigate = useNavigate();
-
-  function playMusicAudio(volume = 0.25) {
-    musicAudio.volume = volume;
-    musicAudio.play();
-  }
 
   const handleVerify = async () => {
     setPending(true);
@@ -37,12 +41,12 @@ const MainPage = () => {
 
       if (roomIsActive) {
         playMusicAudio();
-        navigate('/Nickname');
+        navigate("/Nickname");
       } else {
-        setError('Room does not exist.');
+        setError("Room does not exist.");
       }
     } else {
-      setError('Please enter a room code.');
+      setError("Please enter a room code.");
       setPending(false);
     }
   };
@@ -52,24 +56,27 @@ const MainPage = () => {
     updateUserDetails({
       isAdmin: true, // Creating a room, make this true
     });
-    navigate('/nickname');
+    navigate("/nickname");
   };
 
   return (
     <>
-
       <Grid className="container">
-        <Box>
-          <Typography
-            variant="h4"
-            className="title"
-            marginTop={2}
-            textAlign={'center'}
-          >
-            Decidr
-          </Typography>
-        </Box>
         <Box className="contentBox widthConstraint">
+          <Box
+            style={{
+              width: "100%",
+              marginBottom: "1rem",
+            }}
+          >
+            <img
+              src="/DecidrCropped.gif"
+              alt="Decidr GIF"
+              style={{
+                width: "100%",
+              }}
+            />
+          </Box>
           <Typography variant="h6">Enter code for an existing room:</Typography>
           <Box className="inputBox">
             <TextField
@@ -80,7 +87,7 @@ const MainPage = () => {
               value={room}
               onChange={(e) => {
                 setRoom(e.target.value);
-                setError('');
+                setError("");
               }}
               error={error ? true : false}
               helperText={error}
@@ -89,7 +96,7 @@ const MainPage = () => {
               Verify
             </Button>
           </Box>
-          <Typography variant="h6" margin={1} textAlign={'center'}>
+          <Typography variant="h6" margin={1} textAlign={"center"}>
             or
           </Typography>
           <Button

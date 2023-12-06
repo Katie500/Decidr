@@ -30,6 +30,8 @@ const useBroadcast = (
 
   const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
 
+  const navigate = useNavigate();
+
   // ====== BROADCASTING EVENTS ====== //
   const sendBroadcast = async (eventType, eventData, eventMessage) => {
     const broadcastData = {
@@ -50,6 +52,12 @@ const useBroadcast = (
     setEventLog((prevLogs) => [...prevLogs, broadcastData]);
   };
 
+  const cancelSession = () => {
+    setShowWarningPopup(true);
+  }
+  const [showWarningPopup, setShowWarningPopup] = useState(false);
+
+
   // LISTEN FOR BROADCASTS
   useEffect(() => {
     const messageHandler = (data) => {
@@ -66,20 +74,35 @@ const useBroadcast = (
           displayNotification(eventMessage, notificationColors.SECONDARY);
         }
         if (eventType === broadcastingEventTypes.USER_CONNECTED) {
-          const { userID, username, userProfilePicture } = eventData;
-          setUsers((prevUsers) => [...prevUsers, { userID, username }]);
+          const { userID, username, profilePicture } = eventData;
+          setUsers((prevUsers) => [...prevUsers, { userID, username, profilePicture }]);
           setAvatarStates((prevStates) => ({
             ...prevStates,
-            [userID]: userProfilePicture,
           }));
           displayNotification(eventMessage, notificationColors.INFO);
         }
         if (eventType === broadcastingEventTypes.ADD_OPTION) {
           const { optionText, optionID } = eventData;
           addNewOption(optionText, optionID);
+          setAvatarStates((prevStates) => ({
+            ...prevStates
+          }));
           displayNotification(eventMessage, notificationColors.PRIMARY);
         }
-
+        if (eventType === broadcastingEventTypes.ADMIN_CANCELLED_SESSION) {
+          setShowWarningPopup(true);
+          <div className="popup-container">
+          <div className="popup-content">
+            <Typography variant="h4" align="center">
+              Session has been ended by the admin.
+            </Typography>
+            <Button variant="contained" color="primary" onClick={cancelSession}>
+              OK
+            </Button>
+          </div>
+        </div>
+          navigate("/");
+        }
         setEventLog((list) => [...list, data]);
       } else {
         console.log("No data received but socket is connected");

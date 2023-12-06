@@ -5,27 +5,27 @@ import {
   IconButton,
   TextField,
   Typography,
-} from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
-import LoadingBackdrop from '../components/global/LoadingBackdrop';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+} from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import LoadingBackdrop from "../components/global/LoadingBackdrop";
+import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import {
   uniqueNamesGenerator,
   adjectives,
   colors,
   animals,
-} from 'unique-names-generator';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../contexts/UserContext';
-import { createUser } from '../api/createUser';
-import { SocketContext } from '../contexts/SocketContext';
-import SelectAvatarMenu from './Room/SelectAvatarMenu';
+} from "unique-names-generator";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
+import { createUser } from "../api/createUser";
+import { SocketContext } from "../contexts/SocketContext";
+import SelectAvatarMenu from "./Room/SelectAvatarMenu";
 
 const NicknamePage = () => {
   const [pending, setPending] = useState(false);
-  const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [error, setError] = useState("");
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const socket = useContext(SocketContext);
   const navigate = useNavigate();
@@ -48,22 +48,22 @@ const NicknamePage = () => {
       length: 2,
     }); // e.g big-donkey
     setName(shortName);
-    setError('');
+    setError("");
   };
 
   const handleStart = async () => {
     // Check if user has a name
     if (!name) {
-      setError('Please enter a name.');
+      setError("Please enter a name.");
       return;
     }
 
-    // Check if the user has selected a profile picture
-    if (!avatar) {
-      // setError('Please select a profile picture.');
-      // console.log('Please select avatar');
-      // return;
-    }
+    // AVATAR IS OPTIONAL:
+    // if (!avatar) {
+    //   setError('Please select a profile picture.');
+    //   console.log('Please select avatar');
+    //   return;
+    // }
 
     setPending(true);
 
@@ -72,7 +72,7 @@ const NicknamePage = () => {
         nickname: name,
         profilePicture: avatar,
       });
-      navigate('/StartNewRoom');
+      navigate("/StartNewRoom");
     } else {
       // CREATE USER HERE
       if (socket) {
@@ -82,79 +82,89 @@ const NicknamePage = () => {
           profilePicture: avatar,
           roomID: userDetails.roomID,
         });
-        console.log('userID', userID);
+        console.log("userID", userID);
         updateUserDetails({
           nickname: name,
           profilePicture: avatar,
           userID: userID,
         });
-        socket.emit('join_room', userDetails.roomID);
-        navigate('/room');
+        socket.emit("join_room", userDetails.roomID);
+        navigate("/room");
       } else {
-        console.error('SOCKET NOT FOUND in NicknamePage');
+        console.error("SOCKET NOT FOUND in NicknamePage");
         return;
       }
     }
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate("/");
   };
 
   return (
     <>
-      <Box className="topBarContainer">
-        <Box className="topBar widthConstraint">
-          <IconButton className="topBarIcon" onClick={handleBack}>
-            <ArrowBackOutlinedIcon />
-          </IconButton>
-          <Typography variant="h6">Profile</Typography>
-        </Box>
-      </Box>
+      <Box>
+        <Grid className="container alignInitial">
+          <Box className="contentBox widthConstraint">
+            <Box className="headerBox">
+              <IconButton className="menuIcon" onClick={handleBack}>
+                <ArrowBackOutlinedIcon />
+              </IconButton>
+              <img
+                src="/logoCropped.jpg"
+                alt="Decidr GIF"
+                style={{
+                  width: "100%",
+                  maxWidth: "150px",
+                  maxHeight: "150px",
+                }}
+              />
+            </Box>
+            <Box className="flexGrowBox">
+              <SelectAvatarMenu
+                onSelectAvatar={(selectedAvatar) => {
+                  setAvatar(selectedAvatar);
+                  console.log("Avatar set in NicknamePage:", selectedAvatar);
+                }}
+              />
 
-      <Grid className="container">
-        <Box className="contentBox widthConstraint">
-          <SelectAvatarMenu
-            onSelectAvatar={(selectedAvatar) => {
-              setAvatar(selectedAvatar);
-              console.log('Avatar set in NicknamePage:', selectedAvatar);
-            }}
-          />
-
-          <br></br>
-          <Typography variant="h6">Enter a nickname:</Typography>
-          <Box className="inputBox">
-            <TextField
-              fullWidth
-              label="Name"
-              variant="outlined"
-              size="small"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                setError('');
-              }}
-              error={error ? true : false}
-              helperText={error}
-            />
-            <Button variant="contained" onClick={handleStart}>
-              Go
-            </Button>
+              <Typography variant="h6" textAlign={"left"} width={"100%"}>
+                Enter a nickname:
+              </Typography>
+              <Box className="inputBox" style={{ width: "100%" }}>
+                <TextField
+                  fullWidth
+                  label="Name"
+                  variant="outlined"
+                  size="small"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setError("");
+                  }}
+                  error={error ? true : false}
+                  helperText={error}
+                />
+                <Button variant="contained" onClick={handleStart}>
+                  Go
+                </Button>
+              </Box>
+              <Typography variant="h6" margin={1} textAlign={"center"}>
+                or
+              </Typography>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={handleAnonymousName}
+                fullWidth
+              >
+                Give me an anonymous name
+              </Button>
+            </Box>
           </Box>
-          <Typography variant="h6" margin={1} textAlign={'center'}>
-            or
-          </Typography>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleAnonymousName}
-            fullWidth
-          >
-            Give me an anonymous name
-          </Button>
-        </Box>
-        <LoadingBackdrop open={pending} />
-      </Grid>
+          <LoadingBackdrop open={pending} />
+        </Grid>
+      </Box>
     </>
   );
 };
