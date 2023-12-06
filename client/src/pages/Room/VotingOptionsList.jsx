@@ -1,7 +1,7 @@
-import { Box, Card, Chip, IconButton, Typography } from '@mui/material';
-import React from 'react';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import { Box, Card, Chip, IconButton, Typography } from "@mui/material";
+import React from "react";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 const VotingOptionCard = ({
   name,
@@ -14,32 +14,32 @@ const VotingOptionCard = ({
   return (
     <Card
       style={{
-        padding: '1rem',
-        display: 'flex',
-        gap: '1rem',
-        alignItems: 'center',
-        margin: '0.5rem',
+        padding: "1rem",
+        display: "flex",
+        gap: "1rem",
+        alignItems: "center",
+        margin: "0.5rem",
       }}
     >
       <Typography
-        textAlign={'left'}
-        width={'45%'}
-        textOverflow={'ellipsis'}
-        overflow={'hidden'}
+        textAlign={"left"}
+        width={"45%"}
+        textOverflow={"ellipsis"}
+        overflow={"hidden"}
       >
         {name}
       </Typography>
       <Chip label={`${votes.length} / ${totalAvailableVotes}`} />
       <Chip
         label={`${numberOfUserVotes}`}
-        sx={{ background: '#B7CFEE', color: '#2E419D' }}
+        sx={{ background: "#B7CFEE", color: "#2E419D" }}
       />
-      <Box style={{ display: 'flex' }}>
+      <Box style={{ display: "flex" }}>
         <IconButton onClick={handleAddVote}>
-          <AddIcon sx={{ color: 'green' }} />
+          <AddIcon sx={{ color: "green" }} />
         </IconButton>
         <IconButton onClick={handleRemoveVote}>
-          <RemoveIcon sx={{ color: 'red' }} />
+          <RemoveIcon sx={{ color: "red" }} />
         </IconButton>
       </Box>
     </Card>
@@ -47,35 +47,35 @@ const VotingOptionCard = ({
 };
 
 const VotingOptionsList = ({
-  votionOptions,
+  votingOptions,
   handleAddVote,
   handleRemoveVote,
   handleAddOption,
   userID,
   totalAvailableVotes,
 }) => {
-  if (votionOptions.length === 0) {
+  if (votingOptions.length === 0) {
     return (
-      <Typography variant="h6" textAlign={'center'} marginTop={'1rem'}>
+      <Typography variant="h6" textAlign={"center"} marginTop={"1rem"}>
         No voting options added yet. <br />
-        Click{' '}
+        Click{" "}
         <span
           style={{
-            cursor: 'pointer',
-            color: '#007bff',
-            textDecoration: 'underline',
-            textStyle: 'italic',
+            cursor: "pointer",
+            color: "#007bff",
+            textDecoration: "underline",
+            textStyle: "italic",
           }}
           onClick={handleAddOption}
         >
           here
-        </span>{' '}
+        </span>{" "}
         to add one.
       </Typography>
     );
   }
 
-  return votionOptions.map((option, index) => (
+  return votingOptions.map((option, index) => (
     <VotingOptionCard
       key={index}
       name={option.optionText}

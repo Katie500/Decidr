@@ -1,17 +1,25 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const User = require('../models/userSchema');
-const Room = require('../models/roomSchema');
+const User = require("../models/userSchema");
+const Room = require("../models/roomSchema");
 
-router.post('/', async (req, res) => {
-  const { roomID, socketID, username, profilePicture, question, endTime } = req.body;
+router.post("/", async (req, res) => {
+  const {
+    roomID,
+    socketID,
+    username,
+    profilePicture,
+    question,
+    endTime,
+    numberOfVotesPerUser,
+  } = req.body;
 
-  console.log('In /createUserAndRoom req.body', req.body);
+  console.log("In /createUserAndRoom req.body", req.body);
   if (!socketID || !username || !roomID) {
     res.status(400).send({
       message:
-        'Incomplete user data. Please provide socketID, roomID, and username.',
+        "Incomplete user data. Please provide socketID, roomID, and username.",
     });
     return;
   }
@@ -33,7 +41,8 @@ router.post('/', async (req, res) => {
       roomID,
       question,
       endTime,
-      ownerUserID: savedUser._id,
+      adminUserID: savedUser._id,
+      numberOfVotesPerUser,
     });
     await newRoom.save();
 
@@ -43,8 +52,8 @@ router.post('/', async (req, res) => {
     // Send the roomID back to the client
     res.status(201).send({ roomId: newRoom.roomID, userID: savedUser._id });
   } catch (error) {
-    console.error('Error in createUserAndRoom.js to the database:', error);
-    res.status(500).send({ message: 'Internal server error' });
+    console.error("Error in createUserAndRoom.js to the database:", error);
+    res.status(500).send({ message: "Internal server error" });
   }
 });
 module.exports = router;

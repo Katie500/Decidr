@@ -1,7 +1,7 @@
-import { useContext, useState } from 'react';
-import { addVoteToDb } from '../api/addVoteToDB';
-import { removeVoteFromDb } from '../api/removeVoteFromDB';
-import { UserContext } from '../contexts/UserContext';
+import { useContext, useState } from "react";
+import { addVoteToDb } from "../api/addVoteToDB";
+import { removeVoteFromDb } from "../api/removeVoteFromDB";
+import { UserContext } from "../contexts/UserContext";
 
 const useVoteManagement = (roomDetails, setPending) => {
   const [votingOptions, setVotingOptions] = useState([]);
@@ -12,7 +12,7 @@ const useVoteManagement = (roomDetails, setPending) => {
   const submitUserVote = (optionID) => {
     return new Promise((resolve, reject) => {
       if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
-        reject('No more votes left');
+        reject("No more votes left");
         return;
       }
 
@@ -55,7 +55,7 @@ const useVoteManagement = (roomDetails, setPending) => {
           (option) => option._id === optionID && option.votes.includes(userID)
         )
       ) {
-        reject('Vote not found');
+        reject("All votes removed");
         return;
       }
 
@@ -79,34 +79,25 @@ const useVoteManagement = (roomDetails, setPending) => {
   };
 
   const removeVoteFromState = (userID, optionID) => {
-    // Find the option with the given optionID
-    const option = votingOptions.find((option) => option._id === optionID);
-
-    // Check if userID exists in the votes array of the found option
-    if (option && option.votes.includes(userID)) {
-      setVotingOptions((prevOptions) =>
-        prevOptions.map((option) => {
-          if (option._id === optionID) {
-            // Find the index of the first occurrence of the user's vote
-            const indexToRemove = option.votes.indexOf(userID);
-            if (indexToRemove !== -1) {
-              // Create a new array excluding the first occurrence of the user's vote
-              return {
-                ...option,
-                votes: [
-                  ...option.votes.slice(0, indexToRemove),
-                  ...option.votes.slice(indexToRemove + 1),
-                ],
-              };
-            }
+    setVotingOptions((prevOptions) =>
+      prevOptions.map((option) => {
+        if (option._id === optionID) {
+          // Find the index of the first occurrence of the user's vote
+          const indexToRemove = option.votes.indexOf(userID);
+          if (indexToRemove !== -1) {
+            // Create a new array excluding the first occurrence of the user's vote
+            return {
+              ...option,
+              votes: [
+                ...option.votes.slice(0, indexToRemove),
+                ...option.votes.slice(indexToRemove + 1),
+              ],
+            };
           }
-          return option;
-        })
-      );
-      return true; // Vote found and attempt to remove is made
-    } else {
-      return false; // Vote not found, no state update
-    }
+        }
+        return option;
+      })
+    );
   };
 
   // ====== END OF REMOVING VOTES ====== //

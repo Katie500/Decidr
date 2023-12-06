@@ -1,54 +1,53 @@
-import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
-import LoadingBackdrop from '../../components/global/LoadingBackdrop';
-import { UserContext } from '../../contexts/UserContext';
-import AddNewOptionModal from './NewOptionModal';
-import './RoomPage.css';
-import { getRoomDetails } from '../../api/getRoomDetails';
-import { useNavigate } from 'react-router-dom';
-import EventLog from './EventLog';
-import { addNewOptionToDB } from '../../api/addNewOptionToDB';
-import VotingOptionsList from './VotingOptionsList';
-import RoomHeader from './RoomHeader';
-import useVoteManagement from '../../hooks/useVoteManagement';
-import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
-import WarningPopup from '../../hooks/WarningPopup';
-import BubbleChart from './BubbleChart';
+import { Box, Button, Grid, Typography, useMediaQuery } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import LoadingBackdrop from "../../components/global/LoadingBackdrop";
+import { UserContext } from "../../contexts/UserContext";
+import AddNewOptionModal from "./NewOptionModal";
+import "./RoomPage.css";
+import { getRoomDetails } from "../../api/getRoomDetails";
+import { useNavigate } from "react-router-dom";
+import EventLog from "./EventLog";
+import { addNewOptionToDB } from "../../api/addNewOptionToDB";
+import VotingOptionsList from "./VotingOptionsList";
+import RoomHeader from "./RoomHeader";
+import useVoteManagement from "../../hooks/useVoteManagement";
+import useBroadcast, { broadcastingEventTypes } from "../../hooks/useBroadcast";
+import BubbleChart from "./BubbleChart";
+import {
+  notificationColors,
+  useNotification,
+} from "../../contexts/NotificationContext";
 
 const views = {
-  VOTING: 'VOTING',
-  EVENT: 'EVENT',
-  CHART: 'CHART',
+  VOTING: "VOTING",
+  EVENT: "EVENT",
+  CHART: "CHART",
 };
 
 const Room = () => {
   const [pending, setPending] = useState(true);
-  // const [votionOptions, setVotingOptions] = useState([]);
   const [users, setUsers] = useState([]); // users state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
-  const [newOptionText, setNewOptionText] = useState('');
+  const [newOptionText, setNewOptionText] = useState("");
   const [eventLog, setEventLog] = useState([]);
-  const { userDetails, updateUserDetails } = useContext(UserContext);
-  const [sessionCancelledByAdmin, setSessionCancelledByAdmin] = useState(false);
-  const [showWarningPopup, setShowWarningPopup] = useState(false);
-
+  const { userDetails } = useContext(UserContext);
   const [view, setView] = useState(views.VOTING); // View state
+  const [roomDetails, setRoomDetails] = useState({
+    roomID: "",
+    question: "",
+    adminUserID: "",
+    numberOfVotesPerUser: 1,
+    endTime: "",
+  });
+  const navigate = useNavigate();
+  const { displayNotification } = useNotification();
+
   const userID = userDetails.userID;
   const username = userDetails.nickname;
-
-  const avatar = userDetails.profilePicture;
-  const navigate = useNavigate();
+  const profilePicture = userDetails.avatar;
   const hideDesktopDrawer = useMediaQuery((theme) =>
-    theme.breakpoints.down('md')
+    theme.breakpoints.down("md")
   );
-  const [roomDetails, setRoomDetails] = useState({
-    roomID: '',
-    question: '',
-    ownerUserID: '',
-    numberOfVotesPerUser: 3,
-    endTime: '',
-  });
-
 
   //==================== NAVIGATE TO RESULTS IF TIME ENDS ==================//
   useEffect(() => {
@@ -60,7 +59,7 @@ const Room = () => {
       if (currentTime >= endTime) {
         // Time has ended, navigate to ResultPage
         clearInterval(intervalId);
-        navigate('/resultpage'); // Adjust the path accordingly
+        // navigate("/resultpage"); // Adjust the path accordingly
       }
     }, 1000);
 
@@ -89,9 +88,8 @@ const Room = () => {
   const sendUserConnectedBroadcast = () => {
     sendBroadcast(
       broadcastingEventTypes.USER_CONNECTED,
-      { userID, username, avatar: userDetails.profilePicture },
-      `${username} has ${userDetails.isAdmin ? 'created' : 'joined'} the room`,
-      userDetails.profilePicture // Include the avatar in the broadcast
+      { userID, username, profilePicture },
+      `${username} has ${userDetails.isAdmin ? "created" : "joined"} the room`
     );
   };
 
@@ -99,38 +97,34 @@ const Room = () => {
     if (userDetails.roomID !== localRoomID) {
       fetchRoomDetails();
       setLocalRoomID(userDetails.roomID);
-      sendUserConnectedBroadcast(); 
+      sendUserConnectedBroadcast();
     }
   }, [userDetails.roomID]); // Only re-run effect if userDetails.roomID
 
   const fetchRoomDetails = async () => {
     try {
       if (!userDetails.roomID) {
-        navigate('/');
-        alert('Room ID not found. Please try again.');
+        navigate("/");
+        alert("Room ID not found. Please try again.");
         return;
       }
       if (!userDetails.userID) {
-        navigate('/');
-        alert('User ID not found. Please try again.');
+        navigate("/");
+        alert("User ID not found. Please try again.");
         return;
       }
       const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
-      setRoomDetails({ ...roomDetails, numberOfVotesPerUser: 3 });
+      setRoomDetails({ ...roomDetails });
       voteManagement.setVotingOptions(roomDetails.voteOptions || []);
       setUsers(users);
       setPending(false);
     } catch (error) {
-      console.error('Failed to fetch room details:', error);
+      console.error("Failed to fetch room details:", error);
     }
   };
 
   const closeNewOptionModal = () => {
     setOpenNewOption(false);
-  };
-
-  const handleCancelSession = () => {
-    console.log('Session cancelled!');
   };
 
   const handleAddVote = async (optionID) => {
@@ -147,7 +141,8 @@ const Room = () => {
         `${username} voted for ${optionText}`
       );
     } catch (error) {
-      console.error('Error in voting:', error);
+      console.error("Error in voting:", error);
+      displayNotification(error, notificationColors.WARNING);
     }
   };
 
@@ -165,7 +160,8 @@ const Room = () => {
         `${username} unvoted for ${optionText}`
       );
     } catch (error) {
-      console.error('Error in removing vote:', error);
+      console.error("Error in removing vote:", error);
+      displayNotification(error, notificationColors.WARNING);
     }
   };
 
@@ -182,126 +178,89 @@ const Room = () => {
 
     setPending(false);
     addNewOption(newOptionText, newOptionID);
-    setNewOptionText('');
+    setNewOptionText("");
     setOpenNewOption(false);
 
     // BROADCAST THE NEW OPTION:
     const eventMessage = `${username} added a new option: ${newOptionText}`;
     sendBroadcast(
       broadcastingEventTypes.ADD_OPTION,
-      { 
-        optionText: newOptionText, 
-        optionID: newOptionID 
+      {
+        optionText: newOptionText,
+        optionID: newOptionID,
       },
       eventMessage
     );
   };
   // ====== END OF ADDING NEW OPTION ====== //
 
-  const handleAdminCancelledSession = () => {
-    setSessionCancelledByAdmin(true);
-
-    // Broadcast the event to notify other users
-    sendBroadcast(
-      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
-      { userID: userDetails.userID, username: userDetails.nickname },
-      `Admin has canceled the session`
-    );
-  };
-
-  const cancelSession = () => {
-    navigate("/");
-    setSessionCancelledByAdmin(true);
-  };
-
   return (
     <>
-
-      {sessionCancelledByAdmin && (
-        <div className="popup-container">
-          <div className="popup-content">
-            <Typography variant="h4" align="center">
-              Session has been ended by the admin.
-            </Typography>
-            <Button variant="contained" color="primary" onClick={cancelSession}>
-              OK
-            </Button>
-          </div>
-        </div>
-
-      )}
-      {!sessionCancelledByAdmin && (
-        <>
-          <Grid
-            className="container roomWrapper"
-            sx={{
-              marginLeft: hideDesktopDrawer ? '0px' : '240px',
+      <Grid
+        className="container roomWrapper"
+        sx={{
+          marginLeft: hideDesktopDrawer ? "0px" : "240px",
+        }}
+      >
+        <Box className="widthConstraint contentBox">
+          <RoomHeader
+            roomDetails={roomDetails}
+            users={users}
+            view={view}
+            setView={setView}
+            userDetails={userDetails}
+            hideDesktopDrawer={hideDesktopDrawer}
+            sendBroadcast={sendBroadcast}
+          />
+          <Box
+            style={{
+              flexGrow: 1,
+              overflowY: "scroll",
             }}
           >
-            <Box className="widthConstraint contentBox">
-              <RoomHeader
-                sessionCancelledByAdmin={sessionCancelledByAdmin}
-                roomDetails={roomDetails}
-                handleAdminCancelledSession={handleAdminCancelledSession}
-                users={users}
-                view={view}
-                setView={setView}
-                userDetails={userDetails}
-                sendBroadcast={sendBroadcast}
-                handleCancelSession={() => console.log('Session cancelled!')}
-                hideDesktopDrawer={hideDesktopDrawer}
+            {view === views.VOTING && (
+              <VotingOptionsList
+                votingOptions={voteManagement.votingOptions}
+                totalAvailableVotes={
+                  users.length * roomDetails.numberOfVotesPerUser
+                }
+                handleAddVote={handleAddVote}
+                handleRemoveVote={handleRemoveVote}
+                handleAddOption={() => setOpenNewOption(true)}
+                userID={userID}
               />
-              <Box
-                style={{
-                  flexGrow: 1,
-                  overflowY: 'scroll',
-                }}
-              >
-                {view === views.VOTING && (
-                  <VotingOptionsList
-                    votionOptions={voteManagement.votingOptions}
-                    totalAvailableVotes={
-                      users.length * roomDetails.numberOfVotesPerUser
-                    }
-                    handleAddVote={handleAddVote}
-                    handleRemoveVote={handleRemoveVote}
-                    handleAddOption={() => setOpenNewOption(true)}
-                  />
-                )}
-                {view === views.CHART && (
-                  <BubbleChart votionOptions={voteManagement.votingOptions}
-                  totalAvailableVotes={
-                    users.length * roomDetails.numberOfVotesPerUser
-                  }
-                  handleAddVote={handleAddVote}
-                  handleRemoveVote={handleRemoveVote}
-                  handleAddOption={() => setOpenNewOption(true)}
-                />
-                )}
-                {view === views.EVENT && (
-                  <EventLog logs={eventLog} userID={userID} />
-                )}
-                
-              </Box>
-              <Box className="footerBox">
-                <Typography variant="h6" fontStyle={'italic'}>
-                  You have{' '}
-                  {roomDetails.numberOfVotesPerUser -
-                    voteManagement.userVoteCount}
-                  /{roomDetails.numberOfVotesPerUser} votes left.
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => setOpenNewOption(true)}
-                >
-                  New Voting Option
-                </Button>
-              </Box>
-            </Box>
-          </Grid>
-        </>
-      )}
+            )}
+            {view === views.CHART && (
+              <BubbleChart
+                votingOptions={voteManagement.votingOptions}
+                totalAvailableVotes={
+                  users.length * roomDetails.numberOfVotesPerUser
+                }
+                handleAddVote={handleAddVote}
+                handleRemoveVote={handleRemoveVote}
+                handleAddOption={() => setOpenNewOption(true)}
+              />
+            )}
+            {view === views.EVENT && (
+              <EventLog logs={eventLog} userID={userID} />
+            )}
+          </Box>
+          <Box className="footerBox">
+            <Typography variant="h6" fontStyle={"italic"}>
+              You have{" "}
+              {roomDetails.numberOfVotesPerUser - voteManagement.userVoteCount}/
+              {roomDetails.numberOfVotesPerUser} votes left.
+            </Typography>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => setOpenNewOption(true)}
+            >
+              New Voting Option
+            </Button>
+          </Box>
+        </Box>
+      </Grid>
 
       <AddNewOptionModal
         open={openNewOption}
