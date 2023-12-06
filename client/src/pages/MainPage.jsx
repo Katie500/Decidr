@@ -58,18 +58,19 @@ const MainPage = () => {
   return (
     <>
 
-      <Grid className="container">
-        <Box>
-          <Typography
-            variant="h4"
-            className="title"
-            marginTop={2}
-            textAlign={'center'}
-          >
-            Decidr
-          </Typography>
+      <Grid className="container" >
+      
+        <Box display="flex" justifyContent="center" alignItems="center">
+        <img
+              src="/Decidr.gif" 
+              alt="Decidr GIF" 
+              style={{ width: '100%', maxWidth: '400px', display: 'block', marginLeft: '20%' }}
+              className='title'
+            />
+            
         </Box>
-        <Box className="contentBox widthConstraint">
+        <Box className="contentBox widthConstraint" paddingTop={"45%"}>
+        
           <Typography variant="h6">Enter code for an existing room:</Typography>
           <Box className="inputBox">
             <TextField

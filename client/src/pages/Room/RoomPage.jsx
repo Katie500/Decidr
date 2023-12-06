@@ -12,10 +12,13 @@ import VotingOptionsList from './VotingOptionsList';
 import RoomHeader from './RoomHeader';
 import useVoteManagement from '../../hooks/useVoteManagement';
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+import WarningPopup from '../../hooks/WarningPopup';
+import BubbleChart from './BubbleChart';
 
 const views = {
   VOTING: 'VOTING',
   EVENT: 'EVENT',
+  CHART: 'CHART',
 };
 
 const Room = () => {
@@ -26,6 +29,8 @@ const Room = () => {
   const [newOptionText, setNewOptionText] = useState('');
   const [eventLog, setEventLog] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
+  const [sessionCancelledByAdmin, setSessionCancelledByAdmin] = useState(false);
+  const [showWarningPopup, setShowWarningPopup] = useState(false);
 
   const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
@@ -79,7 +84,6 @@ const Room = () => {
   );
 
   const [localRoomID, setLocalRoomID] = useState(null);
-  const sessionCancelled = false;
 
   const sendUserConnectedBroadcast = () => {
     sendBroadcast(
@@ -192,16 +196,39 @@ const Room = () => {
   };
   // ====== END OF ADDING NEW OPTION ====== //
 
+  const handleAdminCancelledSession = () => {
+    setSessionCancelledByAdmin(true);
+
+    // Broadcast the event to notify other users
+    sendBroadcast(
+      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `Admin has canceled the session`
+    );
+  };
+
+  const cancelSession = () => {
+    navigate("/");
+    setSessionCancelledByAdmin(true);
+  };
+
   return (
     <>
 
-      {sessionCancelled && (
-        // We can fix closing a room(session) later
-        <Typography variant="h4" align="center">
-          Session has been cancelled.
-        </Typography>
+      {sessionCancelledByAdmin && (
+        <div className="popup-container">
+          <div className="popup-content">
+            <Typography variant="h4" align="center">
+              Session has been ended by the admin.
+            </Typography>
+            <Button variant="contained" color="primary" onClick={cancelSession}>
+              OK
+            </Button>
+          </div>
+        </div>
+
       )}
-      {!sessionCancelled && (
+      {!sessionCancelledByAdmin && (
         <>
           <Grid
             className="container roomWrapper"
@@ -211,12 +238,14 @@ const Room = () => {
           >
             <Box className="widthConstraint contentBox">
               <RoomHeader
-                sessionCancelled={sessionCancelled}
+                sessionCancelledByAdmin={sessionCancelledByAdmin}
                 roomDetails={roomDetails}
+                handleAdminCancelledSession={handleAdminCancelledSession}
                 users={users}
                 view={view}
                 setView={setView}
                 userDetails={userDetails}
+                sendBroadcast={sendBroadcast}
                 handleCancelSession={() => console.log('Session cancelled!')}
                 hideDesktopDrawer={hideDesktopDrawer}
               />
@@ -237,9 +266,20 @@ const Room = () => {
                     handleAddOption={() => setOpenNewOption(true)}
                   />
                 )}
+                {view === views.CHART && (
+                  <BubbleChart votionOptions={voteManagement.votingOptions}
+                  totalAvailableVotes={
+                    users.length * roomDetails.numberOfVotesPerUser
+                  }
+                  handleAddVote={handleAddVote}
+                  handleRemoveVote={handleRemoveVote}
+                  handleAddOption={() => setOpenNewOption(true)}
+                />
+                )}
                 {view === views.EVENT && (
                   <EventLog logs={eventLog} userID={userID} />
                 )}
+                
               </Box>
               <Box className="footerBox">
                 <Typography variant="h6" fontStyle={'italic'}>

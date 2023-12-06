@@ -2,6 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { UserContext } from '../contexts/UserContext';
 import { SocketContext } from '../contexts/SocketContext';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material';
+
 
 export const broadcastingEventTypes = {
   ADD_VOTE: 'ADD_VOTE',
@@ -9,6 +12,7 @@ export const broadcastingEventTypes = {
   ADD_OPTION: 'ADD_OPTION',
   USER_CONNECTED: 'USER_CONNECTED',
   USER_DISCONNECTED: 'USER_DISCONNECTED',
+  ADMIN_CANCELLED_SESSION: 'ADMIN_CANCELLED_SESSION'
 };
 
 const useBroadcast = (
@@ -23,6 +27,8 @@ const useBroadcast = (
   const userID = userDetails.userID;
 
   const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
+
+  const navigate = useNavigate();
 
   // ====== BROADCASTING EVENTS ====== //
   const sendBroadcast = async (eventType, eventData, eventMessage) => {
@@ -43,6 +49,12 @@ const useBroadcast = (
     // Update the event log with the new event
     setEventLog((prevLogs) => [...prevLogs, broadcastData]);
   };
+
+  const cancelSession = () => {
+    setShowWarningPopup(true);
+  }
+  const [showWarningPopup, setShowWarningPopup] = useState(false);
+
 
   // LISTEN FOR BROADCASTS
   useEffect(() => {
@@ -72,6 +84,20 @@ const useBroadcast = (
             ...prevStates,
             
           }));
+        }
+        if (eventType === broadcastingEventTypes.ADMIN_CANCELLED_SESSION) {
+          setShowWarningPopup(true);
+          <div className="popup-container">
+          <div className="popup-content">
+            <Typography variant="h4" align="center">
+              Session has been ended by the admin.
+            </Typography>
+            <Button variant="contained" color="primary" onClick={cancelSession}>
+              OK
+            </Button>
+          </div>
+        </div>
+          navigate("/");
         }
         setEventLog((list) => [...list, data]);
       } else {
