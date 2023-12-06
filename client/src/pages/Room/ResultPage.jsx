@@ -3,9 +3,12 @@ import {
   Box,
   Button,
   Grid,
-  IconButton,
   Typography,
   CircularProgress,
+  IconButton,
+  Info,
+  Card,
+  CardContent,
 } from '@mui/material';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +16,8 @@ import { UserContext } from '../../contexts/UserContext';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import { getRoomDetails } from '../../api/getRoomDetails';
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ResultPage = () => {
   const { userDetails } = useContext(UserContext);
@@ -51,32 +56,43 @@ const ResultPage = () => {
     navigate('/');
   };
 
+  // Filter options and take the top 3
+  const topThreeOptions = roomDetails
+    ? roomDetails.voteOptions
+      .slice()
+      .sort((a, b) => b.votes.length - a.votes.length)
+      .slice(0, 3)
+    : [];
+
+
   return (
     <>
-    <Box display="flex" justifyContent="center" alignItems="center" >
+      <Box display="flex" justifyContent="center" alignItems="center" >
         <img
-              src="/Decider-Logo-Only.jpg" 
-              alt="Decidr JPG" 
-              style={{ width: '100%', maxWidth: '250px', display: 'block', marginInlineStart: '35%' }}
-              className='title'
-            />
-            
-    </Box>
-    <Box paddingTop={"10%"}>
-      <Box className="topBarContainer">
-        <Box className="topBar widthConstraint">
-          <IconButton className="topBarIcon" onClick={handleBack}>
-            <ArrowBackOutlinedIcon />
-          </IconButton>
-          <Typography variant="h6"></Typography>
-        </Box>
+          src="/Decider-Logo-Only.jpg"
+          alt="Decidr JPG"
+          style={{ width: '100%', maxWidth: '250px', display: 'block', marginInlineStart: '35%' }}
+          className='title'
+        />
       </Box>
 
-      <Grid className="container">
-        <Box className="contentBox widthConstraint">
-          {loading && <LoadingBackdrop open={true} />}
-          {!loading && roomDetails && (
-            <Grid container spacing={2}>
+
+      <Box paddingTop={"10%"}>
+        <Box className="topBarContainer">
+          <Box className="topBar widthConstraint">
+            <IconButton className="topBarIcon" onClick={handleBack}>
+              <ArrowBackOutlinedIcon />
+            </IconButton>
+            <Typography variant="h6"></Typography>
+          </Box>
+        </Box>
+
+        <Grid className="container">
+          <Box className="contentBox widthConstraint">
+            {loading && <LoadingBackdrop open={true} />}
+            {!loading && roomDetails && (
+
+              // Display the question  
               <Grid item xs={12}>
                 {/* Adjusted marginTop value */}
                 <Typography
@@ -100,54 +116,65 @@ const ResultPage = () => {
                   Question: {roomDetails.question}
 
                 </Typography>
-              </Grid>
-              <Grid item xs={12}>
 
-                <Typography variant="h6" align="center" paddingBottom={"15px"}>
-                  <strong>Question:</strong> {roomDetails.question}
-                </Typography>
-                <Typography 
-                  variant="h6"
-                  fontsize = "1.1rem"
-                  paddingLeft={"10%"}
-                  >
-                  <strong>Results:</strong>
-                </Typography>
-                {roomDetails.voteOptions.map((option, index) => (
-                  <div key={option._id}>
-                    <Typography 
-                    variant="body1"
-                    paddingLeft={"15%"} 
-                    
-                    >
-                      <strong>{index + 1}: {option.optionText} </strong> 
-                    </Typography>
-                    <Typography 
-                    variant="body1"
-                    paddingLeft={"20%"}
-                    paddingTop={"5px"}
-                    paddingBottom={"5px"}
-                    >
-                        Votes: {option.votes.length}
-                    </Typography>
-                  </div>
-                ))}
-              </Grid>
+                <br></br>
+              
               <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={handleHomePage}
-                  fullWidth
-                >
-                  Back to home
-                </Button>
+                  
+                  <Typography variant="h6" fontSize="1.1rem" paddingLeft={"10%"}>
+                    <strong>Results:</strong>
+                  </Typography>
+
+                  {topThreeOptions.map((option, index) => (
+                    <div key={option._id}>
+                      <Typography variant="body1" style={{ paddingLeft: '5%' }}>
+                        <Card
+                          style={{
+                            borderRadius: '16px', // You can adjust the value for more or less rounding
+                            marginTop: '8px', // Adjust spacing between cards
+                          }}
+                        >
+                          <CardContent
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <div>
+                              <strong style={{ marginRight: '8px' }}>{index + 1}:</strong> {option.optionText}
+                            </div>
+                            <div>
+                              <strong>Votes:</strong> {option.votes.length}
+                              </div>
+                              <div>                              <IconButton>
+                                <FontAwesomeIcon icon={faInfoCircle} />
+                              </IconButton></div>
+
+                          </CardContent>
+                        </Card>
+                      </Typography>
+
+                    </div>
+                  ))}
+                </Grid>
+
+                <br/>
+                <Grid item xs={12}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleHomePage}
+                    fullWidth
+                  >
+                    Back to home
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
-          )}
-        </Box>
-      </Grid>
-    </Box>
+            )}
+          </Box>
+        </Grid>
+      </Box>
     </>
   );
 };

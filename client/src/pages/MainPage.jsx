@@ -11,17 +11,25 @@ const MainPage = () => {
   const [room, setRoom] = useState('');
   const [error, setError] = useState('');
   const { updateUserDetails } = useContext(UserContext);
+  const [musicPlayed, setMusicPlayed] = useState(false);
 
 
   const musicAudio = new Audio('/PeaceTheme.mp3');
-
+  function playMusicAudio(volume = 1) {
+    musicAudio.volume = volume;
+  
+    // Check if the music has been played in this session
+    const musicPlayedInSession = sessionStorage.getItem('musicPlayedInSession');
+    if (!musicPlayedInSession) {
+      musicAudio.loop = true;
+      musicAudio.play();
+      sessionStorage.setItem('musicPlayedInSession', 'true');
+    }
+  }
+  
 
   const navigate = useNavigate();
 
-  function playMusicAudio(volume = 0.25) {
-    musicAudio.volume = volume;
-    musicAudio.play();
-  }
 
   const handleVerify = async () => {
     setPending(true);
