@@ -45,6 +45,7 @@ const Timer = ({ endTime }) => {
 
 const RoomHeader = ({
   handleCancelSession,
+  handleAdminCancelledSession,
   users,
   roomDetails,
   userDetails,
@@ -62,6 +63,7 @@ const RoomHeader = ({
         open={drawerOpen}
         setDrawerOpen={setDrawerOpen}
         onCancelSession={handleCancelSession}
+        handleAdminCancelledSession={handleAdminCancelledSession}
         sendBroadcast={sendBroadcast}
         profileName={userDetails.nickname || 'ERROR IN ROOM HEADER'}
         users={users}

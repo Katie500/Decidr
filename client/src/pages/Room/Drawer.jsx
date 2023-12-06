@@ -23,6 +23,7 @@ export default function CustomDrawer({
   setDrawerOpen,
   drawerWidth,
   onCancelSession,
+  handleAdminCancelledSession,
   users,
   profileName,
   profileAvatar,
@@ -83,6 +84,16 @@ export default function CustomDrawer({
     });
 
     setWindowOpen(!isWindowOpen);
+  };
+
+  const handleCancelSession = () => {
+    // Trigger the pop-up window in RoomPage.jsx
+    sendBroadcast(
+      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} cancelled the session`
+    );
+    handleAdminCancelledSession();
   };
 
   const leaveRoom = () => {
@@ -191,7 +202,7 @@ export default function CustomDrawer({
         <List>
           <ListItem disablePadding>
             {adminID === userDetails.userID && (
-            <ListItemButton onClick={onCancelSession}>
+            <ListItemButton onClick={handleCancelSession}>
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
