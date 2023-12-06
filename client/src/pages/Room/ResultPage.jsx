@@ -6,7 +6,6 @@ import {
   Typography,
   CircularProgress,
   IconButton,
-  Info,
   Card,
   CardContent,
 } from '@mui/material';
@@ -16,8 +15,7 @@ import { UserContext } from '../../contexts/UserContext';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import { getRoomDetails } from '../../api/getRoomDetails';
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import InfoIcon from '@mui/icons-material/Info';
 
 const ResultPage = () => {
   const { userDetails } = useContext(UserContext);
@@ -147,8 +145,9 @@ const ResultPage = () => {
                             <div>
                               <strong>Votes:</strong> {option.votes.length}
                               </div>
-                              <div>                              <IconButton>
-                                <FontAwesomeIcon icon={faInfoCircle} />
+                              <div>
+                              <IconButton>
+                                <InfoIcon />
                               </IconButton></div>
 
                           </CardContent>
