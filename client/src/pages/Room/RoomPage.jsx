@@ -227,6 +227,7 @@ const Room = () => {
                 handleAddVote={handleAddVote}
                 handleRemoveVote={handleRemoveVote}
                 handleAddOption={() => setOpenNewOption(true)}
+                userID={userID}
               />
             )}
             {view === views.CHART && (
