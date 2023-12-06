@@ -62,23 +62,8 @@ const ResultPage = () => {
         .slice(0, 3)
     : [];
 
-  return (
-    <>
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <img
-          src="/Decider-Logo-Only.jpg"
-          alt="Decidr JPG"
-          style={{
-            width: "100%",
-            maxWidth: "250px",
-            display: "block",
-            marginInlineStart: "35%",
-          }}
-          className="title"
-        />
-      </Box>
-
-      <Box paddingTop={"10%"}>
+    return (
+      <>
         <Box className="topBarContainer">
           <Box className="topBar widthConstraint">
             <IconButton className="topBarIcon" onClick={handleBack}>
@@ -87,9 +72,26 @@ const ResultPage = () => {
             <Typography variant="h6"></Typography>
           </Box>
         </Box>
-
+  
         <Grid className="container">
           <Box className="contentBox widthConstraint">
+            <Box
+              style={{
+                width: "100%",
+                marginBottom: "1rem",
+                display: "flex",
+                justifyContent: "center", // Center horizontally
+                alignItems: "center", // Center vertically
+              }}
+            >
+              <img
+                src="/logoCropped.jpg"
+                alt="Decidr GIF"
+                style={{
+                  width: "50%",
+                }}
+              />
+            </Box>
             {loading && <LoadingBackdrop open={true} />}
             {!loading && roomDetails && (
               // Display the question
@@ -112,18 +114,14 @@ const ResultPage = () => {
                 >
                   Question: {roomDetails.question}
                 </Typography>
-
+  
                 <br></br>
-
+  
                 <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    fontSize="1.1rem"
-                    paddingLeft={"10%"}
-                  >
+                  <Typography variant="h6" fontSize="1.1rem" paddingLeft={"10%"}>
                     <strong>Results:</strong>
                   </Typography>
-
+  
                   {topThreeOptions.map((option, index) => (
                     <div key={option._id}>
                       <Typography variant="body1" style={{ paddingLeft: "5%" }}>
@@ -160,7 +158,7 @@ const ResultPage = () => {
                     </div>
                   ))}
                 </Grid>
-
+  
                 <br />
                 <Grid item xs={12}>
                   <Button
@@ -176,9 +174,8 @@ const ResultPage = () => {
             )}
           </Box>
         </Grid>
-      </Box>
-    </>
-  );
-};
+      </>
+    );
+  };
 
 export default ResultPage;
