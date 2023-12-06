@@ -119,9 +119,7 @@ const StartNewRoom = () => {
             {userDetails?.nickname}'s <br/> new room
             </Typography>
           </IconButton>
-          {/* <Typography variant="h6" >
-            {userDetails?.nickname}'s new room
-          </Typography> */}
+          
         </Box>
         
       </Box>
