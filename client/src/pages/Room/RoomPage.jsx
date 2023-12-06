@@ -30,8 +30,7 @@ const Room = () => {
   const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
   const username = userDetails.nickname;
-
-  const avatar = userDetails.profilePicture;
+  const profilePicture = userDetails.avatar;
   const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down('md')
@@ -85,9 +84,8 @@ const Room = () => {
   const sendUserConnectedBroadcast = () => {
     sendBroadcast(
       broadcastingEventTypes.USER_CONNECTED,
-      { userID, username, avatar: userDetails.profilePicture },
+      { userID, username, profilePicture },
       `${username} has ${userDetails.isAdmin ? 'created' : 'joined'} the room`,
-      userDetails.profilePicture // Include the avatar in the broadcast
     );
   };
 

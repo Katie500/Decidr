@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import Box from '@mui/material/Box';
+import {Button, Box} from '@mui/material';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
@@ -178,7 +178,13 @@ const changeProfilePicture = async () => {
                     console.log('Avatar set in Drawer Page:', selectedAvatar);
                   }}
                 />
-                <button onClick={changeProfilePicture}>Apply</button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => changeProfilePicture()}
+                >
+                  Apply
+                </Button>
               </Box>
             </Modal>
           </div>

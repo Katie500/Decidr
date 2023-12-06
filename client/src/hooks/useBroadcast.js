@@ -59,19 +59,18 @@ const useBroadcast = (
         }
         if (eventType === broadcastingEventTypes.USER_CONNECTED) {
           
-          const { userID, username, userProfilePicture } = eventData;
-          setUsers((prevUsers) => [...prevUsers, { userID, username }]);
+          const { userID, username, profilePicture } = eventData;
+          setUsers((prevUsers) => [...prevUsers, { userID, username, profilePicture }]);
           setAvatarStates((prevStates) => ({
             ...prevStates,
-            [userID]: userProfilePicture,
           }));
         }
         if (eventType === broadcastingEventTypes.ADD_OPTION) {
-          const { optionText, optionID, userProfilePicture } = eventData;
+          const { optionText, optionID } = eventData;
           addNewOption(optionText, optionID);
           setAvatarStates((prevStates) => ({
             ...prevStates,
-            [data.author]: userProfilePicture,
+            
           }));
         }
         setEventLog((list) => [...list, data]);
