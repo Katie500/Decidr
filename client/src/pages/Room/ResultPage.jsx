@@ -12,12 +12,15 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import { getRoomDetails } from '../../api/getRoomDetails';
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
 
 const ResultPage = () => {
   const { userDetails } = useContext(UserContext);
   const [roomDetails, setRoomDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const { sendBroadcast, subscribeToBroadcast } = useBroadcast();
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
@@ -75,25 +78,31 @@ const ResultPage = () => {
           {!loading && roomDetails && (
             <Grid container spacing={2}>
               <Grid item xs={12}>
+                {/* Adjusted marginTop value */}
                 <Typography
                   variant="h4"
                   textAlign="center"
+
                   fontStyle="bold"
                   marginTop={1.5}
-                  
                 >
                   Top Suggestions
                 </Typography>
+                {/* Adjusted marginTop value */}
                 <Typography
                   variant="h5"
                   textAlign="center"
                   fontStyle="italic"
+
                   marginTop={2.5}
                 >
-                  Room ID: {roomDetails.roomID}
+
+                  Question: {roomDetails.question}
+
                 </Typography>
               </Grid>
               <Grid item xs={12}>
+
                 <Typography variant="h6" align="center" paddingBottom={"15px"}>
                   <strong>Question:</strong> {roomDetails.question}
                 </Typography>
@@ -142,6 +151,5 @@ const ResultPage = () => {
     </>
   );
 };
-
 
 export default ResultPage;

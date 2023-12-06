@@ -123,4 +123,34 @@ router.delete('/users/:userID', (req, res) => {
 
 
 //==================== PUT ENDPOINTS =====================//
+
+// PUT Endpoint for updating user details
+router.put('/users/:userID', async (req, res) => {
+  const { userID } = req.params; // Extract user ID from the URL
+  const { profilePicture } = req.body;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userID);
+
+    if (!user) {
+      res.status(404).send({ message: 'User not found' });
+      return;
+    }
+
+    // Update the user's profile picture
+    user.profilePicture = profilePicture;
+    
+    // Save the updated user to the database
+    const updatedUser = await user.save();
+
+    res.status(200).send(updatedUser);
+  } catch (error) {
+    console.error('Error updating user profile picture:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+});
+
+
+
 module.exports = router;
