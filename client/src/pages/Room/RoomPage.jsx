@@ -1,19 +1,23 @@
-import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
-import LoadingBackdrop from '../../components/global/LoadingBackdrop';
-import { UserContext } from '../../contexts/UserContext';
-import AddNewOptionModal from './NewOptionModal';
-import './RoomPage.css';
-import { getRoomDetails } from '../../api/getRoomDetails';
-import { useNavigate } from 'react-router-dom';
-import EventLog from './EventLog';
-import { addNewOptionToDB } from '../../api/addNewOptionToDB';
-import VotingOptionsList from './VotingOptionsList';
-import RoomHeader from './RoomHeader';
-import useVoteManagement from '../../hooks/useVoteManagement';
-import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+import { Box, Button, Grid, Typography, useMediaQuery } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import LoadingBackdrop from "../../components/global/LoadingBackdrop";
+import { UserContext } from "../../contexts/UserContext";
+import AddNewOptionModal from "./NewOptionModal";
+import "./RoomPage.css";
+import { getRoomDetails } from "../../api/getRoomDetails";
+import { useNavigate } from "react-router-dom";
+import EventLog from "./EventLog";
+import { addNewOptionToDB } from "../../api/addNewOptionToDB";
+import VotingOptionsList from "./VotingOptionsList";
+import RoomHeader from "./RoomHeader";
+import useVoteManagement from "../../hooks/useVoteManagement";
+import useBroadcast, { broadcastingEventTypes } from "../../hooks/useBroadcast";
 import WarningPopup from '../../hooks/WarningPopup';
 import BubbleChart from './BubbleChart';
+import {
+  notificationColors,
+  useNotification,
+} from "../../contexts/NotificationContext";
 
 const views = {
   VOTING: 'VOTING',
@@ -26,9 +30,9 @@ const Room = () => {
   // const [votionOptions, setVotingOptions] = useState([]);
   const [users, setUsers] = useState([]); // users state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
-  const [newOptionText, setNewOptionText] = useState('');
+  const [newOptionText, setNewOptionText] = useState("");
   const [eventLog, setEventLog] = useState([]);
-  const { userDetails, updateUserDetails } = useContext(UserContext);
+  const { userDetails } = useContext(UserContext);
   const [sessionCancelledByAdmin, setSessionCancelledByAdmin] = useState(false);
   const [showWarningPopup, setShowWarningPopup] = useState(false);
 
@@ -38,15 +42,18 @@ const Room = () => {
   const profilePicture = userDetails.avatar;
   const navigate = useNavigate();
   const hideDesktopDrawer = useMediaQuery((theme) =>
-    theme.breakpoints.down('md')
+    theme.breakpoints.down("md")
   );
   const [roomDetails, setRoomDetails] = useState({
-    roomID: '',
-    question: '',
-    ownerUserID: '',
+    roomID: "",
+    question: "",
+    ownerUserID: "",
     numberOfVotesPerUser: 3,
-    endTime: '',
+    endTime: "",
   });
+
+
+  const { displayNotification } = useNotification();
 
 
   //==================== NAVIGATE TO RESULTS IF TIME ENDS ==================//
@@ -66,6 +73,7 @@ const Room = () => {
     // Clean up the interval on component unmount
     return () => clearInterval(intervalId);
   }, [roomDetails.endTime, navigate]);
+
 
   const voteManagement = useVoteManagement(roomDetails, setPending);
   // addNewOption needs to be declared here because it needs to be passed to useBroadcast
@@ -104,13 +112,13 @@ const Room = () => {
   const fetchRoomDetails = async () => {
     try {
       if (!userDetails.roomID) {
-        navigate('/');
-        alert('Room ID not found. Please try again.');
+        navigate("/");
+        alert("Room ID not found. Please try again.");
         return;
       }
       if (!userDetails.userID) {
-        navigate('/');
-        alert('User ID not found. Please try again.');
+        navigate("/");
+        alert("User ID not found. Please try again.");
         return;
       }
       const { roomDetails, users } = await getRoomDetails(userDetails.roomID);
@@ -119,7 +127,7 @@ const Room = () => {
       setUsers(users);
       setPending(false);
     } catch (error) {
-      console.error('Failed to fetch room details:', error);
+      console.error("Failed to fetch room details:", error);
     }
   };
 
@@ -145,7 +153,8 @@ const Room = () => {
         `${username} voted for ${optionText}`
       );
     } catch (error) {
-      console.error('Error in voting:', error);
+      console.error("Error in voting:", error);
+      displayNotification(error, notificationColors.WARNING);
     }
   };
 
@@ -163,7 +172,8 @@ const Room = () => {
         `${username} unvoted for ${optionText}`
       );
     } catch (error) {
-      console.error('Error in removing vote:', error);
+      console.error("Error in removing vote:", error);
+      displayNotification(error, notificationColors.WARNING);
     }
   };
 
@@ -180,7 +190,7 @@ const Room = () => {
 
     setPending(false);
     addNewOption(newOptionText, newOptionID);
-    setNewOptionText('');
+    setNewOptionText("");
     setOpenNewOption(false);
 
     // BROADCAST THE NEW OPTION:
@@ -233,7 +243,7 @@ const Room = () => {
           <Grid
             className="container roomWrapper"
             sx={{
-              marginLeft: hideDesktopDrawer ? '0px' : '240px',
+              marginLeft: hideDesktopDrawer ? "0px" : "240px",
             }}
           >
             <Box className="widthConstraint contentBox">
@@ -245,14 +255,13 @@ const Room = () => {
                 view={view}
                 setView={setView}
                 userDetails={userDetails}
-                sendBroadcast={sendBroadcast}
                 handleCancelSession={() => console.log('Session cancelled!')}
                 hideDesktopDrawer={hideDesktopDrawer}
               />
               <Box
                 style={{
                   flexGrow: 1,
-                  overflowY: 'scroll',
+                  overflowY: "scroll",
                 }}
               >
                 {view === views.VOTING && (
@@ -282,8 +291,8 @@ const Room = () => {
                 
               </Box>
               <Box className="footerBox">
-                <Typography variant="h6" fontStyle={'italic'}>
-                  You have{' '}
+                <Typography variant="h6" fontStyle={"italic"}>
+                  You have{" "}
                   {roomDetails.numberOfVotesPerUser -
                     voteManagement.userVoteCount}
                   /{roomDetails.numberOfVotesPerUser} votes left.

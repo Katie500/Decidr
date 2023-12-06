@@ -1,7 +1,7 @@
-import { useContext, useState } from 'react';
-import { addVoteToDb } from '../api/addVoteToDB';
-import { removeVoteFromDb } from '../api/removeVoteFromDB';
-import { UserContext } from '../contexts/UserContext';
+import { useContext, useState } from "react";
+import { addVoteToDb } from "../api/addVoteToDB";
+import { removeVoteFromDb } from "../api/removeVoteFromDB";
+import { UserContext } from "../contexts/UserContext";
 
 const useVoteManagement = (roomDetails, setPending) => {
   const [votingOptions, setVotingOptions] = useState([]);
@@ -12,7 +12,7 @@ const useVoteManagement = (roomDetails, setPending) => {
   const submitUserVote = (optionID) => {
     return new Promise((resolve, reject) => {
       if (userVoteCount >= roomDetails.numberOfVotesPerUser) {
-        reject('No more votes left');
+        reject("No more votes left");
         return;
       }
 
@@ -55,7 +55,7 @@ const useVoteManagement = (roomDetails, setPending) => {
           (option) => option._id === optionID && option.votes.includes(userID)
         )
       ) {
-        reject('Vote not found');
+        reject("All votes removed");
         return;
       }
 
