@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,12 +10,16 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import { IconButton, useMediaQuery } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SelectAvatarMenu from './SelectAvatarMenu';
 import { UserContext } from '../../contexts/UserContext';
+
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+
 import { useNavigate } from 'react-router-dom';
 
 export default function CustomDrawer({
@@ -22,13 +27,16 @@ export default function CustomDrawer({
   setDrawerOpen,
   drawerWidth,
   onCancelSession,
+  handleAdminCancelledSession,
   users,
   profileName,
   profileAvatar,
+  sendBroadcast,
   adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
   const navigate = useNavigate();
+
   useEffect(() => {
     // Update the drawer state based on screen size and passed `open` prop
     if (isMobile) {
@@ -38,9 +46,8 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
-  const backToHomepage = () => {
-    navigate('/');
-  };
+
+
   const toResultspage = () => {
     navigate('/resultpage');
   };
@@ -87,6 +94,34 @@ export default function CustomDrawer({
     });
 
     setWindowOpen(!isWindowOpen);
+  };
+
+  const handleCancelSession = () => {
+    // Trigger the pop-up window in RoomPage.jsx
+    sendBroadcast(
+      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} cancelled the session`
+    );
+    handleAdminCancelledSession();
+  };
+
+  const handleAddTime = () => {
+
+  }
+
+  const leaveRoom = () => {
+    onCancelSession();
+
+    // Broadcast that the user left the room
+    sendBroadcast(
+      broadcastingEventTypes.USER_DISCONNECTED,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} left the room`
+    );
+
+    // Optionally, close the drawer after leaving the room
+    setDrawerOpen(false);
   };
 
   return (
@@ -180,25 +215,61 @@ export default function CustomDrawer({
         <Divider />
         <List>
           <ListItem disablePadding>
+
+          {adminID !== userDetails.userID && (
+          <ListItemButton onClick={leaveRoom} component={Link} to="/">
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'red' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Leave the room'} />
+            </ListItemButton>
+          )}
+          </ListItem>
+          <List>
+            <ListItem disablePadding>
+
+              {adminID === userDetails.userID && (
+              <ListItemButton onClick={handleAddTime}>
+
+                <ListItemIcon>
+                <AddAlarmIcon sx={{ color: 'blue' }} />
+              </ListItemIcon>
+                <ListItemText primary={'Add Time'} />
+              </ListItemButton>
+            )}
+            </ListItem>
+          </List>
+          <Divider />
+          <ListItem disablePadding>
+            {adminID === userDetails.userID && (
+
             <ListItemButton onClick={toResultspage}>
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'orange' }} />
               </ListItemIcon>
               <ListItemText primary={'Finish Session'} />
             </ListItemButton>
+
+           )}
+
           </ListItem>
         </List>
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={backToHomepage}>
+
+            {adminID === userDetails.userID && (
+            <ListItemButton onClick={handleCancelSession}>
+
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
               <ListItemText primary={'Cancel Session'} />
             </ListItemButton>
+           )}
           </ListItem>
         </List>
+        
       </Drawer>
     </Box>
   );
