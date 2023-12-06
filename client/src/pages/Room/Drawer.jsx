@@ -1,26 +1,28 @@
-import React, { useContext, useEffect, useState } from 'react';
-import {Button, Box} from '@mui/material';
-import { Link } from 'react-router-dom';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import AddAlarmIcon from '@mui/icons-material/AddAlarm';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import { IconButton, useMediaQuery, Modal } from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import SelectAvatarMenu from './SelectAvatarMenu';
-import { UserContext } from '../../contexts/UserContext';
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Box } from "@mui/material";
+import { Link } from "react-router-dom";
+import Drawer from "@mui/material/Drawer";
+import CssBaseline from "@mui/material/CssBaseline";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import AddAlarmIcon from "@mui/icons-material/AddAlarm";
+import ListItemText from "@mui/material/ListItemText";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import { IconButton, useMediaQuery, Modal } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SelectAvatarMenu from "./SelectAvatarMenu";
+import { UserContext } from "../../contexts/UserContext";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
-import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+import { broadcastingEventTypes } from "../../hooks/useBroadcast";
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export default function CustomDrawer({
   open,
@@ -34,7 +36,7 @@ export default function CustomDrawer({
   sendBroadcast,
   adminID,
 }) {
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,15 +48,13 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
-
-
   const toResultspage = () => {
-    navigate('/resultpage');
+    navigate("/resultpage");
   };
   //==================== profile picture algorithm ================//
   //open picture window
   const [isWindowOpen, setWindowOpen] = useState(false);
-  const [profilePicture, setProfilePicture] = useState('');
+  const [profilePicture, setProfilePicture] = useState("");
   const [svgContent, setSvgContent] = useState(null);
   const [svgContent2, setSvgContent2] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -77,11 +77,11 @@ export default function CustomDrawer({
             const base64 = btoa(svgText);
             setSvgContent(base64);
           } else {
-            console.error('Failed to fetch SVG:', response.status);
+            console.error("Failed to fetch SVG:", response.status);
           }
         }
       } catch (error) {
-        console.error('Error fetching SVG:', error);
+        console.error("Error fetching SVG:", error);
       }
     };
 
@@ -93,62 +93,61 @@ export default function CustomDrawer({
       try {
         const promises = users?.map(async (user, index) => {
           if (user.profilePicture) {
-            console.log("IDs are" + user.profilePicture)
+            console.log("IDs are" + user.profilePicture);
             const response = await fetch(user.profilePicture);
             if (response.ok) {
               const svgText = await response.text();
               const base64 = btoa(svgText);
               return base64;
             } else {
-              console.error('Failed to fetch SVG:', response.status);
+              console.error("Failed to fetch SVG:", response.status);
               return null;
             }
           } else {
             return null;
           }
         });
-  
+
         const svgContents = await Promise.all(promises);
         setSvgContent2(svgContents);
       } catch (error) {
-        console.error('Error fetching SVG:', error);
+        console.error("Error fetching SVG:", error);
       }
     };
-  
+
     fetchSvgForUsers();
   }, [users]);
 
-
-const changeProfilePicture = async () => {
-  try {
-    // Make a request to your backend API to update the user's profile picture
-    const response = await fetch(`http://localhost:3001/users/${userDetails.userID}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        profilePicture: profilePicture,
-      }),
-    });
+  const changeProfilePicture = async () => {
+    try {
+      // Make a request to your backend API to update the user's profile picture
+      const response = await fetch(
+        `http://localhost:3001/users/${userDetails.userID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            profilePicture: profilePicture,
+          }),
+        }
+      );
 
       // Close the modal when the Apply button is clicked
       setModalOpen(false);
-    if (response.ok) {
-      // Update the user details in the context or state on success
-      updateUserDetails({
-        profilePicture: profilePicture,
-      });
-
-    } else {
-      console.error('Failed to update profile picture:', response.status);
+      if (response.ok) {
+        // Update the user details in the context or state on success
+        updateUserDetails({
+          profilePicture: profilePicture,
+        });
+      } else {
+        console.error("Failed to update profile picture:", response.status);
+      }
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
     }
-  } catch (error) {
-    console.error('Error updating profile picture:', error);
-  }
-};
-
-  
+  };
 
   // Default to an empty array if svgContent2 is null
   const svgContent2Array = svgContent2 || [];
@@ -162,10 +161,6 @@ const changeProfilePicture = async () => {
     );
     handleAdminCancelledSession();
   };
-
-  const handleAddTime = () => {
-
-  }
 
   const leaveRoom = () => {
     onCancelSession();
@@ -182,18 +177,18 @@ const changeProfilePicture = async () => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             width: drawerWidth,
-            boxSizing: 'border-box',
+            boxSizing: "border-box",
           },
         }}
-        variant={isMobile ? 'temporary' : 'permanent'}
+        variant={isMobile ? "temporary" : "permanent"}
         open={open}
         onClose={() => setDrawerOpen(false)}
         anchor="left"
@@ -201,12 +196,12 @@ const changeProfilePicture = async () => {
         <Toolbar>
           <div>
             <IconButton onClick={() => setModalOpen(true)}>
-              {profilePicture !== '' ? (
+              {profilePicture !== "" ? (
                 <img
                   src={`data:image/svg+xml;base64,${svgContent}`}
                   alt="Profile Picture"
-                  style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                  onError={(e) => console.error('Error loading image:', e)}
+                  style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+                  onError={(e) => console.error("Error loading image:", e)}
                 />
               ) : (
                 <AccountCircleIcon />
@@ -217,7 +212,7 @@ const changeProfilePicture = async () => {
                 <SelectAvatarMenu
                   onSelectAvatar={(selectedAvatar) => {
                     setProfilePicture(selectedAvatar);
-                    console.log('Avatar set in Drawer Page:', selectedAvatar);
+                    console.log("Avatar set in Drawer Page:", selectedAvatar);
                   }}
                 />
                 <Button
@@ -238,7 +233,7 @@ const changeProfilePicture = async () => {
         <List>
           <ListItem key={-1} disablePadding>
             <ListItemButton>
-              <ListItemText primary={'User List:'} />
+              <ListItemText primary={"User List:"} />
             </ListItemButton>
           </ListItem>
           {users?.map((user, index) => (
@@ -249,25 +244,31 @@ const changeProfilePicture = async () => {
                     <img
                       src={`data:image/svg+xml;base64,${svgContent}`}
                       alt="Profile Picture"
-                      style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                      onError={(e) => console.error('Error loading image:', e)}
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                      }}
+                      onError={(e) => console.error("Error loading image:", e)}
+                    />
+                  ) : svgContent2Array[index] ? (
+                    <img
+                      src={`data:image/svg+xml;base64,${svgContent2Array[index]}`}
+                      alt="Profile Picture"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                      }}
+                      onError={(e) => console.error("Error loading image:", e)}
                     />
                   ) : (
-                    svgContent2Array[index] ? (
-                      <img
-                        src={`data:image/svg+xml;base64,${svgContent2Array[index]}`}
-                        alt="Profile Picture"
-                        style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                        onError={(e) => console.error('Error loading image:', e)}
-                      />
-                    ) : (
-                      <AccountCircleIcon />
-                    )
+                    <AccountCircleIcon />
                   )}
                 </ListItemIcon>
                 <ListItemText
                   primary={`${user.username} ${
-                    user._id === adminID ? '(admin)' : ''
+                    user._id === adminID ? "(admin)" : ""
                   }`}
                 />
               </ListItemButton>
@@ -277,61 +278,40 @@ const changeProfilePicture = async () => {
         <Divider />
         <List>
           <ListItem disablePadding>
-
-          {adminID !== userDetails.userID && (
-          <ListItemButton onClick={leaveRoom} component={Link} to="/">
-              <ListItemIcon>
-                <InboxIcon sx={{ color: 'red' }} />
-              </ListItemIcon>
-              <ListItemText primary={'Leave the room'} />
-            </ListItemButton>
-          )}
-          </ListItem>
-          <List>
-            <ListItem disablePadding>
-
-              {adminID === userDetails.userID && (
-              <ListItemButton onClick={handleAddTime}>
-
+            {adminID !== userDetails.userID && (
+              <ListItemButton onClick={leaveRoom} component={Link} to="/">
                 <ListItemIcon>
-                <AddAlarmIcon sx={{ color: 'blue' }} />
-              </ListItemIcon>
-                <ListItemText primary={'Add Time'} />
+                  <InboxIcon sx={{ color: "red" }} />
+                </ListItemIcon>
+                <ListItemText primary={"Leave the room"} />
               </ListItemButton>
             )}
-            </ListItem>
-          </List>
-          <Divider />
+          </ListItem>
+
           <ListItem disablePadding>
             {adminID === userDetails.userID && (
-
-            <ListItemButton onClick={toResultspage}>
-              <ListItemIcon>
-                <InboxIcon sx={{ color: 'orange' }} />
-              </ListItemIcon>
-              <ListItemText primary={'Finish Session'} />
-            </ListItemButton>
-
-           )}
-
+              <ListItemButton onClick={toResultspage}>
+                <ListItemIcon>
+                  <CheckCircleIcon sx={{ color: "orange" }} />
+                </ListItemIcon>
+                <ListItemText primary={"Finish Session"} />
+              </ListItemButton>
+            )}
           </ListItem>
         </List>
         <Divider />
         <List>
           <ListItem disablePadding>
-
             {adminID === userDetails.userID && (
-            <ListItemButton onClick={handleCancelSession}>
-
-              <ListItemIcon>
-                <InboxIcon sx={{ color: 'red' }} />
-              </ListItemIcon>
-              <ListItemText primary={'Cancel Session'} />
-            </ListItemButton>
-           )}
+              <ListItemButton onClick={handleCancelSession}>
+                <ListItemIcon>
+                  <CancelIcon sx={{ color: "red" }} />
+                </ListItemIcon>
+                <ListItemText primary={"Cancel Session"} />
+              </ListItemButton>
+            )}
           </ListItem>
         </List>
-        
       </Drawer>
     </Box>
   );
