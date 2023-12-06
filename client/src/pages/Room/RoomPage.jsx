@@ -126,7 +126,7 @@ const Room = () => {
       );
     } catch (error) {
       console.error("Error in voting:", error);
-      displayNotification(error, notificationColors.ERROR);
+      displayNotification(error, notificationColors.WARNING);
     }
   };
 
@@ -145,6 +145,7 @@ const Room = () => {
       );
     } catch (error) {
       console.error("Error in removing vote:", error);
+      displayNotification(error, notificationColors.WARNING);
     }
   };
 

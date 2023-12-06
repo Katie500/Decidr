@@ -1,6 +1,6 @@
 // NotificationContext.js
 import React, { createContext, useContext, useState } from "react";
-import CustomSnackbar from "../pages/Room/CustomSnackbar";
+import CustomSnackbar from "../components/global/CustomSnackbar";
 
 export const notificationColors = {
   SUCCESS: "success",
