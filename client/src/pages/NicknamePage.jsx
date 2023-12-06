@@ -120,20 +120,7 @@ const NicknamePage = () => {
                 }}
               />
             </Box>
-            <Box
-              style={{
-                width: "100%",
-                marginBottom: "1rem",
-                marginTop: "1rem",
-                flexGrow: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden",
-                padding: "0.5rem",
-              }}
-            >
+            <Box className="flexGrowBox">
               <SelectAvatarMenu
                 onSelectAvatar={(selectedAvatar) => {
                   setAvatar(selectedAvatar);

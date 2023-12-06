@@ -10,21 +10,21 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
-import LoadingBackdrop from '../components/global/LoadingBackdrop';
-import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
-import './StartNewRoom.css';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../contexts/UserContext';
-import { SocketContext } from '../contexts/SocketContext';
-import { createRoom } from '../api/createRoom';
+} from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import LoadingBackdrop from "../components/global/LoadingBackdrop";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
+import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import "./StartNewRoom.css";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
+import { SocketContext } from "../contexts/SocketContext";
+import { createRoom } from "../api/createRoom";
 
 const StartNewRoom = () => {
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState('');
-  const [question, setQuestion] = useState('');
+  const [error, setError] = useState("");
+  const [question, setQuestion] = useState("");
   const [duration, setDuration] = useState(5);
   const [votes, setVotes] = useState(1);
   const [roomID, setroomID] = useState(Math.random().toString(36).substring(7)); // TODO: Generate room code
@@ -39,19 +39,19 @@ const StartNewRoom = () => {
   useEffect(() => {
     // if user details are not present, redirect to home page
     if (!userDetails?.userID && !userDetails?.nickname) {
-      navigate('/');
-      alert('User not found');
+      navigate("/");
+      alert("User not found");
     }
     // setSessionCode(generateSessionCode());
   }, []);
 
   const handleCreate = async () => {
     if (!question) {
-      setError('Please enter a question.');
+      setError("Please enter a question.");
       return;
     }
     setPending(true);
-    console.log('SOCKET: ', socket);
+    console.log("SOCKET: ", socket);
 
     const userID = await createRoom({
       roomID: roomID,
@@ -67,13 +67,13 @@ const StartNewRoom = () => {
       userID: userID,
     });
 
-    socket.emit('join_room', roomID);
+    socket.emit("join_room", roomID);
 
-    navigate('/room');
+    navigate("/room");
   };
 
   const handleBack = () => {
-    navigate('/nickname');
+    navigate("/nickname");
   };
 
   const handleDurationChange = (event) => {
@@ -94,116 +94,120 @@ const StartNewRoom = () => {
         }, 2000);
       })
       .catch((err) => {
-        console.error('Failed to copy: ', err);
+        console.error("Failed to copy: ", err);
       });
   };
 
   return (
     <>
-    <Box display="flex" justifyContent="center" alignItems="center" >
-        <img
-              src="/Decider-Logo-Only.jpg" 
-              alt="Decidr JPG" 
-              style={{ width: '100%', maxWidth: '250px', display: 'block', marginInlineStart: '35%' }}
-              className='title'
-            />
-            
-    </Box>
-    <Box paddingTop={"2%"}>
-      <Box margin={"5%"}>
-        <Box className="topBar widthConstraint">
-          <IconButton className="topBarIcon" onClick={handleBack}>
-            
-            <ArrowBackOutlinedIcon />
-            <Typography variant="body2" >
-            {userDetails?.nickname}'s <br/> new room
-            </Typography>
-          </IconButton>
-          
-        </Box>
-        
-      </Box>
-      
-      <Grid className="container">
-        <Box className="contentBox widthConstraint">
-          <Grid margin={1}>
-          
-            <Typography variant="h6">Your room code is:</Typography>
-            <Box className="room">
-              <Typography
-                variant="h4"
-                textAlign={'center'}
-                fontStyle={'italic'}
-                marginTop={1.5}
-                textTransform={'uppercase'}
-              >
-                {roomID}
+      <Box>
+        {/* <Box margin={"5%"}>
+          <Box className="topBar widthConstraint">
+            <IconButton className="topBarIcon" onClick={handleBack}>
+              <ArrowBackOutlinedIcon />
+              <Typography variant="body2">
+                {userDetails?.nickname}'s <br /> new room
               </Typography>
-              <Tooltip title={copySuccess ? 'Copied' : 'Click to copy'}>
-                <IconButton onClick={handleCopy}>
-                  <ContentCopyOutlinedIcon />
-                </IconButton>
-              </Tooltip>
+            </IconButton>
+          </Box>
+        </Box> */}
+
+        <Grid className="container alignInitial">
+          <Box className="contentBox widthConstraint">
+            <Box className="headerBox">
+              <IconButton className="menuIcon" onClick={handleBack}>
+                <ArrowBackOutlinedIcon />
+              </IconButton>
+              <Typography variant="h6">
+                {userDetails?.nickname}'s new room
+              </Typography>
             </Box>
-          </Grid>
-          <Grid margin={1}>
-            <Typography variant="h6">Enter your question:</Typography>
-            <TextField
-              fullWidth
-              label="Enter your Question "
-              variant="outlined"
-              value={question}
-              onChange={(e) => {
-                setQuestion(e.target.value);
-                setError('');
-              }}
-              error={error ? true : false}
-              helperText={error}
-            />
-          </Grid>
-          <Grid margin={1}>
-            <Typography variant="h6">Enter room duration:</Typography>
-            <FormControl fullWidth>
-              <InputLabel>Duration</InputLabel>
-              <Select
-                value={duration}
-                label="Duration"
-                onChange={handleDurationChange}
-              >
-                {[...Array(10).keys()].map((num) => (
-                  <MenuItem key={num} value={num + 1}>
-                    {num + 1} min
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid margin={1} marginBottom={2}>
-            <Typography variant="h6">Votes per person:</Typography>
-            <FormControl fullWidth>
-              <InputLabel>Votes</InputLabel>
-              <Select value={votes} label="Votes" onChange={handleVotesChange}>
-                {[...Array(5).keys()].map((num) => (
-                  <MenuItem key={num} value={num + 1}>
-                    {num + 1}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleCreate}
-            fullWidth
-            className="sessionButton"
-          >
-            Start Room
-          </Button>
-        </Box>
-      </Grid>
-      <LoadingBackdrop open={pending} />
-    </Box>
+            <Box className="flexGrowBox">
+              <Box width={"100%"}>
+                <Grid margin={1}>
+                  <Typography variant="h6">Your room code is:</Typography>
+                  <Box className="room">
+                    <Typography
+                      variant="h4"
+                      textAlign={"center"}
+                      fontStyle={"italic"}
+                      marginTop={1.5}
+                      textTransform={"uppercase"}
+                    >
+                      {roomID}
+                    </Typography>
+                    <Tooltip title={copySuccess ? "Copied" : "Click to copy"}>
+                      <IconButton onClick={handleCopy}>
+                        <ContentCopyOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Grid>
+                <Grid margin={1}>
+                  <Typography variant="h6">Enter your question:</Typography>
+                  <TextField
+                    fullWidth
+                    label="Enter your Question "
+                    variant="outlined"
+                    value={question}
+                    onChange={(e) => {
+                      setQuestion(e.target.value);
+                      setError("");
+                    }}
+                    error={error ? true : false}
+                    helperText={error}
+                  />
+                </Grid>
+                <Grid margin={1}>
+                  <Typography variant="h6">Enter room duration:</Typography>
+                  <FormControl fullWidth>
+                    <InputLabel>Duration</InputLabel>
+                    <Select
+                      value={duration}
+                      label="Duration"
+                      onChange={handleDurationChange}
+                    >
+                      {[...Array(10).keys()].map((num) => (
+                        <MenuItem key={num} value={num + 1}>
+                          {num + 1} min
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid margin={1} marginBottom={2}>
+                  <Typography variant="h6">Votes per person:</Typography>
+                  <FormControl fullWidth>
+                    <InputLabel>Votes</InputLabel>
+                    <Select
+                      value={votes}
+                      label="Votes"
+                      onChange={handleVotesChange}
+                    >
+                      {[...Array(5).keys()].map((num) => (
+                        <MenuItem key={num} value={num + 1}>
+                          {num + 1}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleCreate}
+                  fullWidth
+                  className="sessionButton"
+                >
+                  Start Room
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Grid>
+
+        <LoadingBackdrop open={pending} />
+      </Box>
     </>
   );
 };
