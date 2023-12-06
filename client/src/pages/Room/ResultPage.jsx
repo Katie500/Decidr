@@ -12,12 +12,15 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import LoadingBackdrop from '../../components/global/LoadingBackdrop';
 import { getRoomDetails } from '../../api/getRoomDetails';
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
 
 const ResultPage = () => {
   const { userDetails } = useContext(UserContext);
   const [roomDetails, setRoomDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const { sendBroadcast, subscribeToBroadcast } = useBroadcast();
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
@@ -65,37 +68,33 @@ const ResultPage = () => {
           {!loading && roomDetails && (
             <Grid container spacing={2}>
               <Grid item xs={12}>
+                {/* Adjusted marginTop value */}
                 <Typography
                   variant="h4"
                   textAlign="center"
                   fontStyle="italic"
-                  marginTop={1.5}
+                  marginTop={1}
                 >
                   Top Suggestions
                 </Typography>
+                {/* Adjusted marginTop value */}
                 <Typography
                   variant="h4"
                   textAlign="center"
                   fontStyle="italic"
-                  marginTop={1.5}
+                  marginTop={0.5}
                 >
-                  Room ID: {roomDetails.roomID}
+
+                  Question: {roomDetails.question}
+
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Question:</strong> {roomDetails.question}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Options:</strong>
-                </Typography>
+
                 {roomDetails.voteOptions.map((option, index) => (
                   <div key={option._id}>
                     <Typography variant="body1">
-                      <strong>Option {index + 1}:</strong> {option.optionText}
-                    </Typography>
-                    <Typography variant="body1">
-                      <strong>Votes:</strong> {option.votes.length}
+                      <strong>{option.optionText}:</strong> {option.votes.length} votes
                     </Typography>
                   </div>
                 ))}
@@ -117,6 +116,5 @@ const ResultPage = () => {
     </>
   );
 };
-
 
 export default ResultPage;

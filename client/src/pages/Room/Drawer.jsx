@@ -42,6 +42,7 @@ export default function CustomDrawer({
   const [isWindowOpen, setWindowOpen] = useState(false);
   const [avatar, setAvatar] = useState('');
   const [svgContent, setSvgContent] = useState(null);
+  const [svgContent2, setSvgContent2] = useState(null);
 
   const { userDetails, updateUserDetails } = useContext(UserContext);
   const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
@@ -72,6 +73,36 @@ export default function CustomDrawer({
 
     fetchSvg();
   }, [avatar]);
+
+  useEffect(() => {
+    const fetchSvgForUsers = async () => {
+      try {
+        const promises = users.map(async (user) => {
+          if (user.profilePicture) {
+            const response = await fetch(user.profilePicture);
+            if (response.ok) {
+              const svgText = await response.text();
+              const base64 = btoa(svgText);
+              return base64;
+            } else {
+              console.error('Failed to fetch SVG:', response.status);
+              return null;
+            }
+          } else {
+            return null;
+          }
+        });
+  
+        const svgContents = await Promise.all(promises);
+        setSvgContent2(svgContents);
+      } catch (error) {
+        console.error('Error fetching SVG:', error);
+      }
+    };
+  
+    fetchSvgForUsers();
+  }, [users]);
+  
 
   const changeProfilePicture = () => {
     console.log('avatar is:' + avatar);
@@ -135,40 +166,36 @@ export default function CustomDrawer({
             </ListItemButton>
           </ListItem>
           {users?.map((user, index) => (
-            <ListItem key={index} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {user._id === userDetails.userID && svgContent ? (
-                    <img
-                      src={`data:image/svg+xml;base64,${svgContent}`}
-                      alt="Profile Picture"
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                      }}
-                      onError={(e) => console.error('Error loading image:', e)}
-                    />
-                  ) : (
-                    <AccountCircleIcon />
-                  )}
-                </ListItemIcon>
+  <ListItem key={index} disablePadding>
+    <ListItemButton>
+      <ListItemIcon>
+        {user._id === userDetails.userID && svgContent ? (
+          // Display the avatar of the logged-in user
+          <img
+            src={`data:image/svg+xml;base64,${svgContent}`}
+            alt="Profile Picture"
+            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+            onError={(e) => console.error('Error loading image:', e)}
+          />
+        ) : (
+          // Display for other users
+          <img
+            src={`data:image/svg+xml;base64,${svgContent2[index]}`}
+            alt="Profile Picture"
+            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+            onError={(e) => console.error('Error loading image:' + svgContent2[index], e)}
+          />
+        )}
+      </ListItemIcon>
+      <ListItemText
+        primary={`${user.username} ${
+          user._id === adminID ? '(admin)' : ''
+        }`}
+      />
+    </ListItemButton>
+  </ListItem>
+))}
 
-                {/* avatarStates[user._id] ? (<img
-                      src={`data:image/svg+xml;base64,${avatarStates[user._id]}`}
-                      alt="Profile Picture"
-                      style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                      onError={(e) => console.error('Error loading image:', e)}
-                    />): <> </> 
-                )  */}
-                <ListItemText
-                  primary={`${user.username} ${
-                    user._id === adminID ? '(admin)' : ''
-                  }`}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
         </List>
         <Divider />
         <List>
