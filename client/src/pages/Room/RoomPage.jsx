@@ -13,10 +13,12 @@ import RoomHeader from './RoomHeader';
 import useVoteManagement from '../../hooks/useVoteManagement';
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
 import WarningPopup from '../../hooks/WarningPopup';
+import BubbleChart from './BubbleChart';
 
 const views = {
   VOTING: 'VOTING',
   EVENT: 'EVENT',
+  CHART: 'CHART',
 };
 
 const Room = () => {
@@ -266,9 +268,20 @@ const Room = () => {
                     handleAddOption={() => setOpenNewOption(true)}
                   />
                 )}
+                {view === views.CHART && (
+                  <BubbleChart votionOptions={voteManagement.votingOptions}
+                  totalAvailableVotes={
+                    users.length * roomDetails.numberOfVotesPerUser
+                  }
+                  handleAddVote={handleAddVote}
+                  handleRemoveVote={handleRemoveVote}
+                  handleAddOption={() => setOpenNewOption(true)}
+                />
+                )}
                 {view === views.EVENT && (
                   <EventLog logs={eventLog} userID={userID} />
                 )}
+                
               </Box>
               <Box className="footerBox">
                 <Typography variant="h6" fontStyle={'italic'}>
