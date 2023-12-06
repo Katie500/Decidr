@@ -5,12 +5,6 @@ Default branch is "Dev"
 
 2023/11/25
 
-**How to run**:
-
-Navigate to server folder and run 'npm start'
-
-Navigate to client folder and run 'npm start'
-
 **Group 19 Members**:
 
 - Luqman Bukhari (30105752)
@@ -22,3 +16,13 @@ Navigate to client folder and run 'npm start'
 - Katherine Knauss (30087243)
 
 - Arya Vivekanand Prabhu (30044884)
+
+**How to run**:
+
+Navigate to server folder and run 'npm start'
+
+Navigate to client folder and run 'npm start'
+
+**Back-end**:
+
+- The database is stored using mongoDB
