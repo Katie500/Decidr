@@ -20,19 +20,25 @@ const colorScale = (percent) => {
   return color;
 };
 
-function truncateText(text, width) {
+const truncateText = (text, width) => {
   const ellipsis = "...";
   const truncatedText =
     text.length > width
       ? text.slice(0, width - ellipsis.length) + ellipsis
       : text;
   return truncatedText;
-}
+};
+
+const getGrowthFactor = (length) => {
+  if (length === 5) return 3;
+  if (length === 4) return 5;
+  else return length;
+};
 
 const BubbleChart = ({ votionOptions, totalAvailableVotes }) => {
   const chartRef = useRef(null);
 
-  const growthFactor = 2;
+  const growthFactor = getGrowthFactor(votionOptions.length);
   const speed = 0.05;
   const center_x = 200;
   const center_y = 300;
@@ -93,6 +99,7 @@ const BubbleChart = ({ votionOptions, totalAvailableVotes }) => {
       .attr("dy", (d) => d.r / 8)
       .style("fill", "white")
       .style("font-size", "18px")
+      .style("text-shadow", "1px 1px 1px black")
       .text((d) => truncateText(d.name, d.r / 6));
 
     svg
@@ -104,6 +111,7 @@ const BubbleChart = ({ votionOptions, totalAvailableVotes }) => {
       .attr("dy", (d) => d.r / 8 + 18)
       .style("fill", "white")
       .style("font-size", "18px")
+      .style("text-shadow", "1px 1px 1px black")
       .style("width", (d) => d.r)
       .text((d) => d.numOfVotes);
 
