@@ -8,6 +8,7 @@ import './RoomPage.css';
 const views = {
   VOTING: 'VOTING',
   EVENT: 'EVENT',
+  CHART: 'CHART',
 };
 const drawerWidth = 240;
 
@@ -45,10 +46,12 @@ const Timer = ({ endTime }) => {
 
 const RoomHeader = ({
   handleCancelSession,
+  handleAdminCancelledSession,
   users,
   roomDetails,
   userDetails,
   view,
+  sendBroadcast,
   setView,
   hideDesktopDrawer,
 }) => {
@@ -61,6 +64,8 @@ const RoomHeader = ({
         open={drawerOpen}
         setDrawerOpen={setDrawerOpen}
         onCancelSession={handleCancelSession}
+        handleAdminCancelledSession={handleAdminCancelledSession}
+        sendBroadcast={sendBroadcast}
         profileName={userDetails.nickname || 'ERROR IN ROOM HEADER'}
         users={users}
         adminID={roomDetails.ownerUserID}
@@ -108,6 +113,15 @@ const RoomHeader = ({
           onClick={() => setView(views.VOTING)}
         >
           Voting
+        </Button>
+        <Button
+          variant={view === views.CHART ? 'contained' : 'outlined'}
+          size="small"
+          color="success"
+          fullWidth
+          onClick={() => setView(views.CHART)}
+        >
+          Chart
         </Button>
         <Button
           variant={view === views.EVENT ? 'contained' : 'outlined'}

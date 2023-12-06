@@ -1,24 +1,21 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import MainPage from './pages/MainPage';
-import { ThemeProvider, createTheme } from '@mui/material';
-import NicknamePage from './pages/NicknamePage';
-import '../src/styles/SharedStyles.css';
-import StartNewRoom from './pages/StartNewRoom';
-import { UserProvider } from './contexts/UserContext';
-import Bubbles from './components/Test/Bubbles';
-import Room from './pages/Room/RoomPage';
-import ResultPage from './pages/Room/ResultPage';
-
-
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import MainPage from "./pages/MainPage";
+import { ThemeProvider, createTheme } from "@mui/material";
+import NicknamePage from "./pages/NicknamePage";
+import "../src/styles/SharedStyles.css";
+import StartNewRoom from "./pages/StartNewRoom";
+import { UserProvider } from "./contexts/UserContext";
+import Bubbles from "./components/Test/Bubbles";
+import Room from "./pages/Room/RoomPage";
+import ResultPage from "./pages/Room/ResultPage";
 
 //Test Code
-import TestUser from './components/Test/apiTest';
-import TestRoom from './components/Test/apiTest2';
-import TestAvatar from './components/Test/AvatarPage';
-import TestPage1 from './components/Test/page1';
-import TestPage2 from './components/Test/page2';
-import { SocketProvider } from './contexts/SocketContext';
-
+import TestUser from "./components/Test/apiTest";
+import TestRoom from "./components/Test/apiTest2";
+import TestAvatar from "./components/Test/AvatarPage";
+import TestPage1 from "./components/Test/page1";
+import TestPage2 from "./components/Test/page2";
+import { SocketProvider } from "./contexts/SocketContext";
 
 function App() {
   const theme = createTheme({
@@ -28,7 +25,7 @@ function App() {
         styleOverrides: {
           root: {
             borderRadius: 50, // Sets the border radius to be fully rounded
-            textTransform: 'none', // Prevents text from being capitalized
+            textTransform: "none", // Prevents text from being capitalized
           },
         },
       },
@@ -37,7 +34,6 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-
       <SocketProvider>
         <UserProvider>
           <BrowserRouter>
@@ -53,13 +49,11 @@ function App() {
               <Route path="/testRoom" element={<TestRoom />} />
               <Route path="/testAvatar" element={<TestAvatar />} />
               <Route path="/testPage1" element={<TestPage1 />} />
-              <Route path="/testPage2" element={<TestPage2 />} />  
-              <Route path="/Bubbles" element={<Bubbles />} />
+              <Route path="/testPage2" element={<TestPage2 />} />
             </Routes>
           </BrowserRouter>
         </UserProvider>
       </SocketProvider>
-
     </ThemeProvider>
   );
 }
