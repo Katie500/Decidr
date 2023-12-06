@@ -5,16 +5,16 @@ import NicknamePage from "./pages/NicknamePage";
 import "../src/styles/SharedStyles.css";
 import StartNewRoom from "./pages/StartNewRoom";
 import { UserProvider } from "./contexts/UserContext";
-import Bubbles from "./components/Test/Bubbles";
 import Room from "./pages/Room/RoomPage";
-import ResultPage from "./pages/Room/ResultPage";
+import ResultPage from "./pages/ResultPage";
+import { SocketProvider } from "./contexts/SocketContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
+// TESTING:
 import TestUser from "./components/Test/apiTest";
 import TestRoom from "./components/Test/apiTest2";
 import TestAvatar from "./components/Test/AvatarPage";
 import TestPage1 from "./components/Test/page1";
 import TestPage2 from "./components/Test/page2";
-import { SocketProvider } from "./contexts/SocketContext";
-import { NotificationProvider } from "./contexts/NotificationContext";
 
 function App() {
   const theme = createTheme({
