@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,17 +17,24 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SelectAvatarMenu from './SelectAvatarMenu';
 import { UserContext } from '../../contexts/UserContext';
 
+import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+
+import { useNavigate } from 'react-router-dom';
+
 export default function CustomDrawer({
   open,
   setDrawerOpen,
   drawerWidth,
   onCancelSession,
+  handleAdminCancelledSession,
   users,
   profileName,
   profileAvatar,
+  sendBroadcast,
   adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Update the drawer state based on screen size and passed `open` prop
@@ -37,6 +45,14 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
+
+  const backToHomepage = () => {
+    navigate('/');
+  };
+
+  const toResultspage = () => {
+    navigate('/resultpage');
+  };
   //==================== profile picture algorithm ================//
   //open picture window
   const [isWindowOpen, setWindowOpen] = useState(false);
@@ -80,6 +96,30 @@ export default function CustomDrawer({
     });
 
     setWindowOpen(!isWindowOpen);
+  };
+
+  const handleCancelSession = () => {
+    // Trigger the pop-up window in RoomPage.jsx
+    sendBroadcast(
+      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} cancelled the session`
+    );
+    handleAdminCancelledSession();
+  };
+
+  const leaveRoom = () => {
+    onCancelSession();
+
+    // Broadcast that the user left the room
+    sendBroadcast(
+      broadcastingEventTypes.USER_DISCONNECTED,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `${userDetails.nickname} left the room`
+    );
+
+    // Optionally, close the drawer after leaving the room
+    setDrawerOpen(false);
   };
 
   return (
@@ -173,14 +213,47 @@ export default function CustomDrawer({
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={onCancelSession}>
+
+          {adminID !== userDetails.userID && (
+          <ListItemButton onClick={leaveRoom} component={Link} to="/">
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'red' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Leave the room'} />
+            </ListItemButton>
+          )}
+          </ListItem>
+        
+          <ListItem disablePadding>
+            {adminID === userDetails.userID && (
+
+            <ListItemButton onClick={toResultspage}>
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'orange' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Finish Session'} />
+            </ListItemButton>
+
+           )}
+
+          </ListItem>
+        </List>
+        <Divider />
+        <List>
+          <ListItem disablePadding>
+
+            {adminID === userDetails.userID && (
+            <ListItemButton onClick={handleCancelSession}>
+              
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
               <ListItemText primary={'Cancel Session'} />
             </ListItemButton>
+           )}
           </ListItem>
         </List>
+        
       </Drawer>
     </Box>
   );

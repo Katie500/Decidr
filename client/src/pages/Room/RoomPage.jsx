@@ -12,7 +12,7 @@ import VotingOptionsList from './VotingOptionsList';
 import RoomHeader from './RoomHeader';
 import useVoteManagement from '../../hooks/useVoteManagement';
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
-import BubbleChart from './BubbleChart';
+import WarningPopup from '../../hooks/WarningPopup';
 
 const views = {
   VOTING: 'VOTING',
@@ -28,6 +28,8 @@ const Room = () => {
   const [newOptionText, setNewOptionText] = useState('');
   const [eventLog, setEventLog] = useState([]);
   const { userDetails, updateUserDetails } = useContext(UserContext);
+  const [sessionCancelledByAdmin, setSessionCancelledByAdmin] = useState(false);
+  const [showWarningPopup, setShowWarningPopup] = useState(false);
 
   const [view, setView] = useState(views.VOTING); // View state
   const userID = userDetails.userID;
@@ -46,6 +48,25 @@ const Room = () => {
     endTime: '',
   });
 
+
+  //==================== NAVIGATE TO RESULTS IF TIME ENDS ==================//
+  useEffect(() => {
+    // Check if the time has ended
+    const intervalId = setInterval(() => {
+      const currentTime = new Date();
+      const endTime = new Date(roomDetails.endTime);
+
+      if (currentTime >= endTime) {
+        // Time has ended, navigate to ResultPage
+        clearInterval(intervalId);
+        navigate('/resultpage'); // Adjust the path accordingly
+      }
+    }, 1000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [roomDetails.endTime, navigate]);
+
   const voteManagement = useVoteManagement(roomDetails, setPending);
   // addNewOption needs to be declared here because it needs to be passed to useBroadcast
   const addNewOption = (optionText, newOptionID) => {
@@ -63,7 +84,6 @@ const Room = () => {
   );
 
   const [localRoomID, setLocalRoomID] = useState(null);
-  const sessionCancelled = false;
 
   const sendUserConnectedBroadcast = () => {
     sendBroadcast(
@@ -177,16 +197,39 @@ const Room = () => {
   };
   // ====== END OF ADDING NEW OPTION ====== //
 
+  const handleAdminCancelledSession = () => {
+    setSessionCancelledByAdmin(true);
+
+    // Broadcast the event to notify other users
+    sendBroadcast(
+      broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
+      { userID: userDetails.userID, username: userDetails.nickname },
+      `Admin has canceled the session`
+    );
+  };
+
+  const cancelSession = () => {
+    navigate("/");
+    setSessionCancelledByAdmin(true);
+  };
+
   return (
     <>
 
-      {sessionCancelled && (
-        // We can fix closing a room(session) later
-        <Typography variant="h4" align="center">
-          Session has been cancelled.
-        </Typography>
+      {sessionCancelledByAdmin && (
+        <div className="popup-container">
+          <div className="popup-content">
+            <Typography variant="h4" align="center">
+              Session has been ended by the admin.
+            </Typography>
+            <Button variant="contained" color="primary" onClick={cancelSession}>
+              OK
+            </Button>
+          </div>
+        </div>
+
       )}
-      {!sessionCancelled && (
+      {!sessionCancelledByAdmin && (
         <>
           <Grid
             className="container roomWrapper"
@@ -196,12 +239,14 @@ const Room = () => {
           >
             <Box className="widthConstraint contentBox">
               <RoomHeader
-                sessionCancelled={sessionCancelled}
+                sessionCancelledByAdmin={sessionCancelledByAdmin}
                 roomDetails={roomDetails}
+                handleAdminCancelledSession={handleAdminCancelledSession}
                 users={users}
                 view={view}
                 setView={setView}
                 userDetails={userDetails}
+                sendBroadcast={sendBroadcast}
                 handleCancelSession={() => console.log('Session cancelled!')}
                 hideDesktopDrawer={hideDesktopDrawer}
               />

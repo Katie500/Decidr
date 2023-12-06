@@ -100,19 +100,34 @@ const StartNewRoom = () => {
 
   return (
     <>
-      <Box className="topBarContainer">
+    <Box display="flex" justifyContent="center" alignItems="center" >
+        <img
+              src="/Decider-Logo-Only.jpg" 
+              alt="Decidr JPG" 
+              style={{ width: '100%', maxWidth: '250px', display: 'block', marginInlineStart: '35%' }}
+              className='title'
+            />
+            
+    </Box>
+    <Box paddingTop={"2%"}>
+      <Box margin={"5%"}>
         <Box className="topBar widthConstraint">
           <IconButton className="topBarIcon" onClick={handleBack}>
+            
             <ArrowBackOutlinedIcon />
+            <Typography variant="body2" >
+            {userDetails?.nickname}'s <br/> new room
+            </Typography>
           </IconButton>
-          <Typography variant="h6">
-            {userDetails?.nickname}'s new room
-          </Typography>
+          
         </Box>
+        
       </Box>
+      
       <Grid className="container">
         <Box className="contentBox widthConstraint">
           <Grid margin={1}>
+          
             <Typography variant="h6">Your room code is:</Typography>
             <Box className="room">
               <Typography
@@ -188,6 +203,7 @@ const StartNewRoom = () => {
         </Box>
       </Grid>
       <LoadingBackdrop open={pending} />
+    </Box>
     </>
   );
 };

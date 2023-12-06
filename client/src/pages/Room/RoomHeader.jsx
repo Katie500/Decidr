@@ -46,10 +46,12 @@ const Timer = ({ endTime }) => {
 
 const RoomHeader = ({
   handleCancelSession,
+  handleAdminCancelledSession,
   users,
   roomDetails,
   userDetails,
   view,
+  sendBroadcast,
   setView,
   hideDesktopDrawer,
 }) => {
@@ -62,6 +64,8 @@ const RoomHeader = ({
         open={drawerOpen}
         setDrawerOpen={setDrawerOpen}
         onCancelSession={handleCancelSession}
+        handleAdminCancelledSession={handleAdminCancelledSession}
+        sendBroadcast={sendBroadcast}
         profileName={userDetails.nickname || 'ERROR IN ROOM HEADER'}
         users={users}
         adminID={roomDetails.ownerUserID}
@@ -88,17 +92,17 @@ const RoomHeader = ({
       <Typography
         variant="h5"
         fontStyle={'italic'}
-        width={'100%'}
         textAlign={'center'}
+        paddingTop={'0.5rem'}
       >
         {roomDetails.question}
       </Typography>
       <Box
         style={{
-          width: '100%',
           display: 'flex',
-          margin: '0.5rem',
+          padding: '1rem',
           gap: '0.5rem',
+          justifyContent: 'center',
         }}
       >
         <Button

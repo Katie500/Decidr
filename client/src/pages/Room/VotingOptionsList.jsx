@@ -18,7 +18,7 @@ const VotingOptionCard = ({
         display: 'flex',
         gap: '1rem',
         alignItems: 'center',
-        margin: '1rem',
+        margin: '0.5rem',
       }}
     >
       <Typography

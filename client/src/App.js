@@ -5,11 +5,16 @@ import NicknamePage from "./pages/NicknamePage";
 import "../src/styles/SharedStyles.css";
 import StartNewRoom from "./pages/StartNewRoom";
 import { UserProvider } from "./contexts/UserContext";
+import Bubbles from "./components/Test/Bubbles";
 import Room from "./pages/Room/RoomPage";
+import ResultPage from "./pages/Room/ResultPage";
+
+//Test Code
 import TestUser from "./components/Test/apiTest";
 import TestRoom from "./components/Test/apiTest2";
 import TestAvatar from "./components/Test/AvatarPage";
 import TestPage1 from "./components/Test/page1";
+import TestPage2 from "./components/Test/page2";
 import { SocketProvider } from "./contexts/SocketContext";
 
 function App() {
@@ -37,9 +42,14 @@ function App() {
               <Route path="/nickname" element={<NicknamePage />} />
               <Route path="/startnewroom" element={<StartNewRoom />} />
               <Route path="/room" element={<Room />} />
+              <Route path="/resultpage" element={<ResultPage />} />
+
+              {/* Testing code */}
               <Route path="/testUser" element={<TestUser />} />
               <Route path="/testRoom" element={<TestRoom />} />
               <Route path="/testAvatar" element={<TestAvatar />} />
+              <Route path="/testPage1" element={<TestPage1 />} />
+              <Route path="/testPage2" element={<TestPage2 />} />
             </Routes>
           </BrowserRouter>
         </UserProvider>
