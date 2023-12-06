@@ -83,13 +83,25 @@ const NicknamePage = () => {
           roomID: userDetails.roomID,
         });
         console.log("userID", userID);
-        updateUserDetails({
-          nickname: name,
-          profilePicture: avatar,
-          userID: userID,
-        });
-        socket.emit("join_room", userDetails.roomID);
-        navigate("/room");
+        if (userID) {
+          updateUserDetails({
+            nickname: name,
+            profilePicture: avatar,
+            userID: userID,
+          });
+          socket.emit("join_room", userDetails.roomID);
+          navigate("/room");
+        } else {
+          console.error("userID not found in NicknamePage");
+          navigate("/");
+          alert("Something went wrong. Please try again.");
+          updateUserDetails({
+            nickname: "",
+            profilePicture: "",
+            userID: "",
+          });
+          return;
+        }
       } else {
         console.error("SOCKET NOT FOUND in NicknamePage");
         return;
