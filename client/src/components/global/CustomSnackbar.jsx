@@ -26,7 +26,11 @@ export default function CustomSnackbar({ message, color }) {
       autoHideDuration={2000}
       onClose={handleClose}
     >
-      <Button variant="contained" color={color || "primary"}>
+      <Button
+        variant="contained"
+        color={color || "primary"}
+        sx={{ maxWidth: "300px" }}
+      >
         {message}
       </Button>
     </Snackbar>
