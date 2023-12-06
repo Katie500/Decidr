@@ -6,9 +6,9 @@ import dayjs from "dayjs";
 import "./RoomPage.css";
 
 const views = {
-  VOTING: 'VOTING',
-  EVENT: 'EVENT',
-  CHART: 'CHART',
+  VOTING: "VOTING",
+  EVENT: "EVENT",
+  CHART: "CHART",
 };
 export const drawerWidth = 240;
 
@@ -45,8 +45,6 @@ const Timer = ({ endTime }) => {
 };
 
 const RoomHeader = ({
-  handleCancelSession,
-  handleAdminCancelledSession,
   users,
   roomDetails,
   userDetails,
@@ -63,10 +61,8 @@ const RoomHeader = ({
         drawerWidth={drawerWidth}
         open={drawerOpen}
         setDrawerOpen={setDrawerOpen}
-        onCancelSession={handleCancelSession}
-        handleAdminCancelledSession={handleAdminCancelledSession}
         sendBroadcast={sendBroadcast}
-        profileName={userDetails.nickname || 'ERROR IN ROOM HEADER'}
+        profileName={userDetails.nickname || "ERROR IN ROOM HEADER"}
         users={users}
         adminID={roomDetails.ownerUserID}
       />
@@ -115,7 +111,7 @@ const RoomHeader = ({
           Voting
         </Button>
         <Button
-          variant={view === views.CHART ? 'contained' : 'outlined'}
+          variant={view === views.CHART ? "contained" : "outlined"}
           size="small"
           color="success"
           fullWidth
@@ -124,7 +120,7 @@ const RoomHeader = ({
           Chart
         </Button>
         <Button
-          variant={view === views.EVENT ? 'contained' : 'outlined'}
+          variant={view === views.EVENT ? "contained" : "outlined"}
           size="small"
           color="success"
           fullWidth

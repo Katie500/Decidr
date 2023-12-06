@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Box } from "@mui/material";
-import { Link } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
@@ -10,16 +9,13 @@ import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import AddAlarmIcon from "@mui/icons-material/AddAlarm";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import { IconButton, useMediaQuery, Modal } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SelectAvatarMenu from "./SelectAvatarMenu";
 import { UserContext } from "../../contexts/UserContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-
 import { broadcastingEventTypes } from "../../hooks/useBroadcast";
 
 import { useNavigate } from "react-router-dom";
@@ -28,11 +24,8 @@ export default function CustomDrawer({
   open,
   setDrawerOpen,
   drawerWidth,
-  onCancelSession,
-  handleAdminCancelledSession,
   users,
   profileName,
-  profileAvatar,
   sendBroadcast,
   adminID,
 }) {
@@ -52,14 +45,11 @@ export default function CustomDrawer({
     navigate("/resultpage");
   };
   //==================== profile picture algorithm ================//
-  //open picture window
-  const [isWindowOpen, setWindowOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState("");
   const [svgContent, setSvgContent] = useState(null);
   const [svgContent2, setSvgContent2] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const { userDetails, updateUserDetails } = useContext(UserContext);
-  const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
 
   useEffect(() => {
     if (userDetails?.profilePicture) {
@@ -157,23 +147,9 @@ export default function CustomDrawer({
     sendBroadcast(
       broadcastingEventTypes.ADMIN_CANCELLED_SESSION,
       { userID: userDetails.userID, username: userDetails.nickname },
-      `${userDetails.nickname} cancelled the session`
+      `${userDetails.nickname}(admin) cancelled the session`
     );
-    handleAdminCancelledSession();
-  };
-
-  const leaveRoom = () => {
-    onCancelSession();
-
-    // Broadcast that the user left the room
-    sendBroadcast(
-      broadcastingEventTypes.USER_DISCONNECTED,
-      { userID: userDetails.userID, username: userDetails.nickname },
-      `${userDetails.nickname} left the room`
-    );
-
-    // Optionally, close the drawer after leaving the room
-    setDrawerOpen(false);
+    navigate("/");
   };
 
   return (
@@ -276,42 +252,31 @@ export default function CustomDrawer({
           ))}
         </List>
         <Divider />
-        <List>
-          <ListItem disablePadding>
-            {adminID !== userDetails.userID && (
-              <ListItemButton onClick={leaveRoom} component={Link} to="/">
-                <ListItemIcon>
-                  <InboxIcon sx={{ color: "red" }} />
-                </ListItemIcon>
-                <ListItemText primary={"Leave the room"} />
-              </ListItemButton>
-            )}
-          </ListItem>
-
-          <ListItem disablePadding>
-            {adminID === userDetails.userID && (
-              <ListItemButton onClick={toResultspage}>
-                <ListItemIcon>
-                  <CheckCircleIcon sx={{ color: "orange" }} />
-                </ListItemIcon>
-                <ListItemText primary={"Finish Session"} />
-              </ListItemButton>
-            )}
-          </ListItem>
-        </List>
-        <Divider />
-        <List>
-          <ListItem disablePadding>
-            {adminID === userDetails.userID && (
-              <ListItemButton onClick={handleCancelSession}>
-                <ListItemIcon>
-                  <CancelIcon sx={{ color: "red" }} />
-                </ListItemIcon>
-                <ListItemText primary={"Cancel Session"} />
-              </ListItemButton>
-            )}
-          </ListItem>
-        </List>
+        {adminID === userDetails.userID && (
+          <>
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton onClick={toResultspage}>
+                  <ListItemIcon>
+                    <CheckCircleIcon sx={{ color: "orange" }} />
+                  </ListItemIcon>
+                  <ListItemText primary={"Finish Session Now"} />
+                </ListItemButton>
+              </ListItem>
+            </List>
+            <Divider />
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton onClick={handleCancelSession}>
+                  <ListItemIcon>
+                    <CancelIcon sx={{ color: "red" }} />
+                  </ListItemIcon>
+                  <ListItemText primary={"Cancel Session"} />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </>
+        )}
       </Drawer>
     </Box>
   );

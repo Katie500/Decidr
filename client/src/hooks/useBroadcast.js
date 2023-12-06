@@ -7,7 +7,6 @@ import {
   useNotification,
 } from "../contexts/NotificationContext";
 import { useNavigate } from "react-router-dom";
-import { Button, Typography } from "@mui/material";
 
 export const broadcastingEventTypes = {
   ADD_VOTE: "ADD_VOTE",
@@ -54,11 +53,6 @@ const useBroadcast = (
     setEventLog((prevLogs) => [...prevLogs, broadcastData]);
   };
 
-  const cancelSession = () => {
-    setShowWarningPopup(true);
-  };
-  const [showWarningPopup, setShowWarningPopup] = useState(false);
-
   // LISTEN FOR BROADCASTS
   useEffect(() => {
     const messageHandler = (data) => {
@@ -94,22 +88,8 @@ const useBroadcast = (
           displayNotification(eventMessage, notificationColors.PRIMARY);
         }
         if (eventType === broadcastingEventTypes.ADMIN_CANCELLED_SESSION) {
-          setShowWarningPopup(true);
-          <div className="popup-container">
-            <div className="popup-content">
-              <Typography variant="h4" align="center">
-                Session has been ended by the admin.
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={cancelSession}
-              >
-                OK
-              </Button>
-            </div>
-          </div>;
           navigate("/");
+          displayNotification(eventMessage, notificationColors.ERROR);
         }
         setEventLog((list) => [...list, data]);
       } else {
