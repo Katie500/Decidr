@@ -113,7 +113,7 @@ const StartNewRoom = () => {
               </Typography>
             </Box>
             <Box className="flexGrowBox">
-              <Box width={"100%"}>
+              <Box width={"100%"} height={"100%"}>
                 <Grid margin={1}>
                   <Typography variant="h6">Your room code is:</Typography>
                   <Box className="room">

@@ -79,34 +79,25 @@ const useVoteManagement = (roomDetails, setPending) => {
   };
 
   const removeVoteFromState = (userID, optionID) => {
-    // Find the option with the given optionID
-    const option = votingOptions.find((option) => option._id === optionID);
-
-    // Check if userID exists in the votes array of the found option
-    if (option && option.votes.includes(userID)) {
-      setVotingOptions((prevOptions) =>
-        prevOptions.map((option) => {
-          if (option._id === optionID) {
-            // Find the index of the first occurrence of the user's vote
-            const indexToRemove = option.votes.indexOf(userID);
-            if (indexToRemove !== -1) {
-              // Create a new array excluding the first occurrence of the user's vote
-              return {
-                ...option,
-                votes: [
-                  ...option.votes.slice(0, indexToRemove),
-                  ...option.votes.slice(indexToRemove + 1),
-                ],
-              };
-            }
+    setVotingOptions((prevOptions) =>
+      prevOptions.map((option) => {
+        if (option._id === optionID) {
+          // Find the index of the first occurrence of the user's vote
+          const indexToRemove = option.votes.indexOf(userID);
+          if (indexToRemove !== -1) {
+            // Create a new array excluding the first occurrence of the user's vote
+            return {
+              ...option,
+              votes: [
+                ...option.votes.slice(0, indexToRemove),
+                ...option.votes.slice(indexToRemove + 1),
+              ],
+            };
           }
-          return option;
-        })
-      );
-      return true; // Vote found and attempt to remove is made
-    } else {
-      return false; // Vote not found, no state update
-    }
+        }
+        return option;
+      })
+    );
   };
 
   // ====== END OF REMOVING VOTES ====== //
