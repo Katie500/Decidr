@@ -26,21 +26,12 @@ const views = {
 
 const Room = () => {
   const [pending, setPending] = useState(true);
-  // const [votionOptions, setVotingOptions] = useState([]);
   const [users, setUsers] = useState([]); // users state
   const [openNewOption, setOpenNewOption] = useState(false); // Modal state
   const [newOptionText, setNewOptionText] = useState("");
   const [eventLog, setEventLog] = useState([]);
   const { userDetails } = useContext(UserContext);
-
   const [view, setView] = useState(views.VOTING); // View state
-  const userID = userDetails.userID;
-  const username = userDetails.nickname;
-  const profilePicture = userDetails.avatar;
-  const navigate = useNavigate();
-  const hideDesktopDrawer = useMediaQuery((theme) =>
-    theme.breakpoints.down("md")
-  );
   const [roomDetails, setRoomDetails] = useState({
     roomID: "",
     question: "",
@@ -48,8 +39,15 @@ const Room = () => {
     numberOfVotesPerUser: 1,
     endTime: "",
   });
-
+  const navigate = useNavigate();
   const { displayNotification } = useNotification();
+
+  const userID = userDetails.userID;
+  const username = userDetails.nickname;
+  const profilePicture = userDetails.avatar;
+  const hideDesktopDrawer = useMediaQuery((theme) =>
+    theme.breakpoints.down("md")
+  );
 
   //==================== NAVIGATE TO RESULTS IF TIME ENDS ==================//
   useEffect(() => {
@@ -61,7 +59,7 @@ const Room = () => {
       if (currentTime >= endTime) {
         // Time has ended, navigate to ResultPage
         clearInterval(intervalId);
-        navigate("/resultpage"); // Adjust the path accordingly
+        // navigate("/resultpage"); // Adjust the path accordingly
       }
     }, 1000);
 
@@ -222,7 +220,7 @@ const Room = () => {
           >
             {view === views.VOTING && (
               <VotingOptionsList
-                votionOptions={voteManagement.votingOptions}
+                votingOptions={voteManagement.votingOptions}
                 totalAvailableVotes={
                   users.length * roomDetails.numberOfVotesPerUser
                 }
@@ -233,7 +231,7 @@ const Room = () => {
             )}
             {view === views.CHART && (
               <BubbleChart
-                votionOptions={voteManagement.votingOptions}
+                votingOptions={voteManagement.votingOptions}
                 totalAvailableVotes={
                   users.length * roomDetails.numberOfVotesPerUser
                 }

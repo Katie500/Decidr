@@ -21,10 +21,10 @@ const colorScale = (percent) => {
   return color;
 };
 
-const getNumOfVoters = (votionOptions) => {
+const getNumOfVoters = (votingOptions) => {
   let count = 0;
-  for (let i = 0; i < votionOptions.length; i++) {
-    if (votionOptions[i].votes.length > 0) count += 1;
+  for (let i = 0; i < votingOptions.length; i++) {
+    if (votingOptions[i].votes.length > 0) count += 1;
   }
   return count;
 };
@@ -44,41 +44,41 @@ const getGrowthFactor = (numOfVoters) => {
   else return 2.5;
 };
 
-const getCurrentNumOfVotes = (votionOptions) => {
+const getCurrentNumOfVotes = (votingOptions) => {
   let count = 0;
-  for (let i = 0; i < votionOptions.length; i++) {
-    count = count + votionOptions[i].votes.length;
+  for (let i = 0; i < votingOptions.length; i++) {
+    count = count + votingOptions[i].votes.length;
   }
   return count;
 };
 
-const Bubble = ({ votionOptions, totalAvailableVotes }) => {
+const Bubble = ({ votingOptions, totalAvailableVotes }) => {
   const chartRef = useRef(null);
 
-  const growthFactor = getGrowthFactor(getNumOfVoters(votionOptions));
+  const growthFactor = getGrowthFactor(getNumOfVoters(votingOptions));
   const speed = 0.05;
   const center_x = 200;
   const center_y = 300;
 
-  // console.log("votionOptions",votionOptions);
-  // console.log("Number of votes",votionOptions[0].votes.length);
+  // console.log("votingOptions",votingOptions);
+  // console.log("Number of votes",votingOptions[0].votes.length);
   // console.log("userID",userID);
   // console.log("totalAvailableVotes",totalAvailableVotes);
 
-  // console.log(getPercentage(totalAvailableVotes, votionOptions[0].votes.length));
+  // console.log(getPercentage(totalAvailableVotes, votingOptions[0].votes.length));
 
   useEffect(() => {
     const svg = d3.select(chartRef.current);
 
-    const totalCurrentVotes = getCurrentNumOfVotes(votionOptions);
+    const totalCurrentVotes = getCurrentNumOfVotes(votingOptions);
 
     //arranging data into a format that we can use with d3
     let data = [];
-    for (let i = 0; i < votionOptions.length; i++) {
-      const numOfVotes = votionOptions[i].votes.length;
+    for (let i = 0; i < votingOptions.length; i++) {
+      const numOfVotes = votingOptions[i].votes.length;
       const item = {
         r: getPercentage(totalAvailableVotes, numOfVotes) * growthFactor,
-        name: votionOptions[i].optionText,
+        name: votingOptions[i].optionText,
         numOfVotes: numOfVotes,
       };
       numOfVotes > 0 ? data.push(item) : data.push();
@@ -157,15 +157,15 @@ const Bubble = ({ votionOptions, totalAvailableVotes }) => {
 };
 
 const BubbleChart = ({
-  votionOptions,
+  votingOptions,
   totalAvailableVotes,
   handleAddOption,
 }) => {
-  if (votionOptions.length > 0) {
-    if (getCurrentNumOfVotes(votionOptions) > 0)
+  if (votingOptions.length > 0) {
+    if (getCurrentNumOfVotes(votingOptions) > 0)
       return (
         <Bubble
-          votionOptions={votionOptions}
+          votingOptions={votingOptions}
           totalAvailableVotes={totalAvailableVotes}
         />
       );
