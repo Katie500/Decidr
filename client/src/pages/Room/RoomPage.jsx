@@ -13,6 +13,7 @@ import RoomHeader from './RoomHeader';
 import useVoteManagement from '../../hooks/useVoteManagement';
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
 import WarningPopup from '../../hooks/WarningPopup';
+import BubbleChart from './BubbleChart';
 
 const views = {
   VOTING: 'VOTING',
