@@ -244,9 +244,7 @@ export default function CustomDrawer({
 
             {adminID === userDetails.userID && (
             <ListItemButton onClick={handleCancelSession}>
-
-            <ListItemButton onClick={backToHomepage}>
-
+              
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
