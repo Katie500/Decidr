@@ -1,5 +1,5 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import LoadingBackdrop from "../components/global/LoadingBackdrop";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
@@ -11,6 +11,16 @@ const MainPage = () => {
   const [error, setError] = useState("");
   const { updateUserDetails } = useContext(UserContext);
   const [musicPlayed, setMusicPlayed] = useState(false);
+
+  useEffect(() => {
+    updateUserDetails({
+      userID: "",
+      nickname: "",
+      roomID: "",
+      profilePicture: "",
+      isAdmin: false,
+    });
+  }, []);
 
   const musicAudio = new Audio("/PeaceTheme.mp3");
   function playMusicAudio(volume = 1) {
