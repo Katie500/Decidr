@@ -16,7 +16,9 @@ import { IconButton, useMediaQuery } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SelectAvatarMenu from './SelectAvatarMenu';
 import { UserContext } from '../../contexts/UserContext';
+
 import useBroadcast, { broadcastingEventTypes } from '../../hooks/useBroadcast';
+
 import { useNavigate } from 'react-router-dom';
 
 export default function CustomDrawer({
@@ -42,6 +44,11 @@ export default function CustomDrawer({
       setDrawerOpen(true);
     }
   }, [isMobile, open]);
+
+
+  const backToHomepage = () => {
+    navigate('/');
+  };
 
   const toResultspage = () => {
     navigate('/resultpage');
@@ -206,6 +213,7 @@ export default function CustomDrawer({
         <Divider />
         <List>
           <ListItem disablePadding>
+
           {adminID !== userDetails.userID && (
           <ListItemButton onClick={leaveRoom} component={Link} to="/">
               <ListItemIcon>
@@ -218,20 +226,27 @@ export default function CustomDrawer({
         
           <ListItem disablePadding>
             {adminID === userDetails.userID && (
+
             <ListItemButton onClick={toResultspage}>
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'orange' }} />
               </ListItemIcon>
               <ListItemText primary={'Finish Session'} />
             </ListItemButton>
+
            )}
+
           </ListItem>
         </List>
         <Divider />
         <List>
           <ListItem disablePadding>
+
             {adminID === userDetails.userID && (
             <ListItemButton onClick={handleCancelSession}>
+
+            <ListItemButton onClick={backToHomepage}>
+
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
