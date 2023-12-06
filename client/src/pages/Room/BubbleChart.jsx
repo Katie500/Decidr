@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { Typography } from "@mui/material";
 
 const getRandomColor = () => {
   const red = Math.floor(Math.random() * 256);
@@ -20,6 +21,14 @@ const colorScale = (percent) => {
   return color;
 };
 
+const getNumOfVoters = (votionOptions) => {
+  let count = 0;
+  for (let i = 0; i < votionOptions.length; i++) {
+    if (votionOptions[i].votes.length > 0) count += 1;
+  }
+  return count;
+};
+
 const truncateText = (text, width) => {
   const ellipsis = "...";
   const truncatedText =
@@ -29,16 +38,24 @@ const truncateText = (text, width) => {
   return truncatedText;
 };
 
-const getGrowthFactor = (length) => {
-  if (length === 5) return 3;
-  if (length === 4) return 5;
-  else return length;
+const getGrowthFactor = (numOfVoters) => {
+  if (numOfVoters === 5) return 3;
+  if (numOfVoters === 4) return 5;
+  else return 2.5;
 };
 
-const BubbleChart = ({ votionOptions, totalAvailableVotes }) => {
+const getCurrentNumOfVotes = (votionOptions) => {
+  let count = 0;
+  for (let i = 0; i < votionOptions.length; i++) {
+    count = count + votionOptions[i].votes.length;
+  }
+  return count;
+};
+
+const Bubble = ({ votionOptions, totalAvailableVotes }) => {
   const chartRef = useRef(null);
 
-  const growthFactor = getGrowthFactor(votionOptions.length);
+  const growthFactor = getGrowthFactor(getNumOfVoters(votionOptions));
   const speed = 0.05;
   const center_x = 200;
   const center_y = 300;
@@ -52,6 +69,8 @@ const BubbleChart = ({ votionOptions, totalAvailableVotes }) => {
 
   useEffect(() => {
     const svg = d3.select(chartRef.current);
+
+    const totalCurrentVotes = getCurrentNumOfVotes(votionOptions);
 
     //arranging data into a format that we can use with d3
     let data = [];
@@ -135,6 +154,46 @@ const BubbleChart = ({ votionOptions, totalAvailableVotes }) => {
   }, []);
 
   return <svg ref={chartRef} width="100%" height="100%" />;
+};
+
+const BubbleChart = ({
+  votionOptions,
+  totalAvailableVotes,
+  handleAddOption,
+}) => {
+  if (votionOptions.length > 0) {
+    if (getCurrentNumOfVotes(votionOptions) > 0)
+      return (
+        <Bubble
+          votionOptions={votionOptions}
+          totalAvailableVotes={totalAvailableVotes}
+        />
+      );
+    else
+      return (
+        <Typography variant="h6" textAlign={"center"} marginTop={"1rem"}>
+          Waiting for you to vote! <br />
+        </Typography>
+      );
+  } else
+    return (
+      <Typography variant="h6" textAlign={"center"} marginTop={"1rem"}>
+        No voting options added yet. <br />
+        Click{" "}
+        <span
+          style={{
+            cursor: "pointer",
+            color: "#007bff",
+            textDecoration: "underline",
+            textStyle: "italic",
+          }}
+          onClick={handleAddOption}
+        >
+          here
+        </span>{" "}
+        to add one.
+      </Typography>
+    );
 };
 
 export default BubbleChart;
