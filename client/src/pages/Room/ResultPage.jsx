@@ -50,6 +50,16 @@ const ResultPage = () => {
 
   return (
     <>
+    <Box display="flex" justifyContent="center" alignItems="center" >
+        <img
+              src="/Decider-Logo-Only.jpg" 
+              alt="Decidr JPG" 
+              style={{ width: '100%', maxWidth: '250px', display: 'block', marginInlineStart: '35%' }}
+              className='title'
+            />
+            
+    </Box>
+    <Box paddingTop={"10%"}>
       <Box className="topBarContainer">
         <Box className="topBar widthConstraint">
           <IconButton className="topBarIcon" onClick={handleBack}>
@@ -128,6 +138,7 @@ const ResultPage = () => {
           )}
         </Box>
       </Grid>
+    </Box>
     </>
   );
 };

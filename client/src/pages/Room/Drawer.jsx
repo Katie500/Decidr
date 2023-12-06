@@ -15,6 +15,7 @@ import { IconButton, useMediaQuery } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SelectAvatarMenu from './SelectAvatarMenu';
 import { UserContext } from '../../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function CustomDrawer({
   open,
@@ -27,7 +28,7 @@ export default function CustomDrawer({
   adminID,
 }) {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('md'));
-
+  const navigate = useNavigate();
   useEffect(() => {
     // Update the drawer state based on screen size and passed `open` prop
     if (isMobile) {
@@ -37,6 +38,12 @@ export default function CustomDrawer({
     }
   }, [isMobile, open]);
 
+  const backToHomepage = () => {
+    navigate('/');
+  };
+  const toResultspage = () => {
+    navigate('/resultpage');
+  };
   //==================== profile picture algorithm ================//
   //open picture window
   const [isWindowOpen, setWindowOpen] = useState(false);
@@ -173,7 +180,18 @@ export default function CustomDrawer({
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={onCancelSession}>
+            <ListItemButton onClick={toResultspage}>
+              <ListItemIcon>
+                <InboxIcon sx={{ color: 'orange' }} />
+              </ListItemIcon>
+              <ListItemText primary={'Finish Session'} />
+            </ListItemButton>
+          </ListItem>
+        </List>
+        <Divider />
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton onClick={backToHomepage}>
               <ListItemIcon>
                 <InboxIcon sx={{ color: 'red' }} />
               </ListItemIcon>
