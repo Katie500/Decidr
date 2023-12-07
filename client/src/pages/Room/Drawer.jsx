@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,7 +12,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { IconButton, useMediaQuery, Modal } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import SelectAvatarMenu from "./SelectAvatarMenu";
 import { UserContext } from "../../contexts/UserContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -29,6 +28,8 @@ export default function CustomDrawer({
   sendBroadcast,
   adminID,
 }) {
+  const [profilePictures, setProfilePictures] = useState({});
+  const { userDetails } = useContext(UserContext);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
@@ -40,104 +41,6 @@ export default function CustomDrawer({
       setDrawerOpen(true);
     }
   }, [isMobile, open]);
-
-  //==================== profile picture algorithm ================//
-  const [profilePicture, setProfilePicture] = useState("");
-  const [svgContent, setSvgContent] = useState(null);
-  const [svgContent2, setSvgContent2] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const { userDetails, updateUserDetails } = useContext(UserContext);
-
-  useEffect(() => {
-    if (userDetails?.profilePicture) {
-      setProfilePicture(userDetails.profilePicture);
-    }
-  }, [userDetails]);
-
-  useEffect(() => {
-    const fetchSvg = async () => {
-      try {
-        if (profilePicture) {
-          const response = await fetch(profilePicture);
-          if (response.ok) {
-            const svgText = await response.text();
-            const base64 = btoa(svgText);
-            setSvgContent(base64);
-          } else {
-            console.error("Failed to fetch SVG:", response.status);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching SVG:", error);
-      }
-    };
-
-    fetchSvg();
-  }, [profilePicture]);
-
-  useEffect(() => {
-    const fetchSvgForUsers = async () => {
-      try {
-        const promises = users?.map(async (user, index) => {
-          if (user.profilePicture) {
-            console.log("IDs are" + user.profilePicture);
-            const response = await fetch(user.profilePicture);
-            if (response.ok) {
-              const svgText = await response.text();
-              const base64 = btoa(svgText);
-              return base64;
-            } else {
-              console.error("Failed to fetch SVG:", response.status);
-              return null;
-            }
-          } else {
-            return null;
-          }
-        });
-
-        const svgContents = await Promise.all(promises);
-        setSvgContent2(svgContents);
-      } catch (error) {
-        console.error("Error fetching SVG:", error);
-      }
-    };
-
-    fetchSvgForUsers();
-  }, [users]);
-
-  const changeProfilePicture = async () => {
-    try {
-      // Make a request to your backend API to update the user's profile picture
-      const response = await fetch(
-        `http://localhost:3001/users/${userDetails.userID}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            profilePicture: profilePicture,
-          }),
-        }
-      );
-
-      // Close the modal when the Apply button is clicked
-      setModalOpen(false);
-      if (response.ok) {
-        // Update the user details in the context or state on success
-        updateUserDetails({
-          profilePicture: profilePicture,
-        });
-      } else {
-        console.error("Failed to update profile picture:", response.status);
-      }
-    } catch (error) {
-      console.error("Error updating profile picture:", error);
-    }
-  };
-
-  // Default to an empty array if svgContent2 is null
-  const svgContent2Array = svgContent2 || [];
 
   const handleCancelSession = () => {
     sendBroadcast(
@@ -155,6 +58,44 @@ export default function CustomDrawer({
     );
     navigate("/resultPage");
   };
+
+  const fetchProfilePicture = async (url, userID) => {
+    // Check if image is cached
+    const cachedImage = localStorage.getItem(`profilePicture-${userID}`);
+    if (cachedImage) {
+      return cachedImage; // Return cached image if available
+    }
+
+    // Fetch image if not cached
+    const response = await fetch(url);
+    if (response.ok) {
+      const svgText = await response.text();
+      const base64 = btoa(svgText);
+      localStorage.setItem(`profilePicture-${userID}`, base64); // Cache the image
+      return base64;
+    } else {
+      console.error("Failed to fetch SVG:", response.status);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchAllProfilePictures = async () => {
+      const pictures = {};
+      for (const user of users) {
+        if (user.profilePicture) {
+          const base64Image = await fetchProfilePicture(
+            user.profilePicture,
+            user._id
+          );
+          pictures[user._id] = base64Image;
+        }
+      }
+      setProfilePictures(pictures);
+    };
+
+    fetchAllProfilePictures();
+  }, [users]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -174,37 +115,20 @@ export default function CustomDrawer({
         anchor="left"
       >
         <Toolbar>
-          <div>
-            <IconButton onClick={() => setModalOpen(true)}>
-              {profilePicture !== "" ? (
-                <img
-                  src={`data:image/svg+xml;base64,${svgContent}`}
-                  alt="Profile Picture"
-                  style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-                  onError={(e) => console.error("Error loading image:", e)}
-                />
-              ) : (
-                <AccountCircleIcon />
-              )}
-            </IconButton>
-            <Modal open={isModalOpen} onClose={() => setModalOpen(false)}>
-              <Box>
-                <SelectAvatarMenu
-                  onSelectAvatar={(selectedAvatar) => {
-                    setProfilePicture(selectedAvatar);
-                    console.log("Avatar set in Drawer Page:", selectedAvatar);
-                  }}
-                />
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => changeProfilePicture()}
-                >
-                  Apply
-                </Button>
-              </Box>
-            </Modal>
-          </div>
+          <IconButton>
+            {profilePictures[userDetails.userID] ? (
+              <img
+                src={`data:image/svg+xml;base64,${
+                  profilePictures[userDetails.userID]
+                }`}
+                alt="Profile Picture"
+                style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+                onError={(e) => console.error("Error loading image:", e)}
+              />
+            ) : (
+              <AccountCircleIcon />
+            )}
+          </IconButton>
           <Typography noWrap component="div">
             {profileName}
           </Typography>
@@ -220,20 +144,11 @@ export default function CustomDrawer({
             <ListItem key={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  {user._id === userDetails.userID && svgContent ? (
+                  {profilePictures[userDetails.userID] ? (
                     <img
-                      src={`data:image/svg+xml;base64,${svgContent}`}
-                      alt="Profile Picture"
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "50%",
-                      }}
-                      onError={(e) => console.error("Error loading image:", e)}
-                    />
-                  ) : svgContent2Array[index] ? (
-                    <img
-                      src={`data:image/svg+xml;base64,${svgContent2Array[index]}`}
+                      src={`data:image/svg+xml;base64,${
+                        profilePictures[user._id]
+                      }`}
                       alt="Profile Picture"
                       style={{
                         width: "40px",

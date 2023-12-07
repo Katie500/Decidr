@@ -74,19 +74,13 @@ const useBroadcast = (
           const { userID, username, profilePicture } = eventData;
           setUsers((prevUsers) => [
             ...prevUsers,
-            { userID, username, profilePicture },
+            { _id: userID, username, profilePicture },
           ]);
-          setAvatarStates((prevStates) => ({
-            ...prevStates,
-          }));
           displayNotification(eventMessage, notificationColors.INFO);
         }
         if (eventType === broadcastingEventTypes.ADD_OPTION) {
           const { optionText, optionID } = eventData;
           addNewOption(optionText, optionID);
-          setAvatarStates((prevStates) => ({
-            ...prevStates,
-          }));
           displayNotification(eventMessage, notificationColors.PRIMARY);
         }
         if (eventType === broadcastingEventTypes.SESSION_CANCELLED) {

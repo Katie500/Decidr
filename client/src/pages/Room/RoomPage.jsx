@@ -70,7 +70,7 @@ const Room = () => {
   const sendUserConnectedBroadcast = () => {
     sendBroadcast(
       broadcastingEventTypes.USER_CONNECTED,
-      { userID, username, profilePicture },
+      { userID, username, profilePicture: userDetails.profilePicture },
       `${username} has ${userDetails.isAdmin ? "created" : "joined"} the room`
     );
   };
