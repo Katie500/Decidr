@@ -4,7 +4,6 @@ import {
   Button,
   Grid,
   Typography,
-  CircularProgress,
   IconButton,
   Card,
   CardContent,
@@ -26,13 +25,16 @@ const ResultPage = () => {
     const fetchRoomDetails = async () => {
       try {
         if (!userDetails.roomID) {
-          // Handle case where room ID is not available
+          navigate("/");
+          alert("Room ID not found. Please try again.");
           return;
         }
-
-        const { roomDetails, voteOptions } = await getRoomDetails(
-          userDetails.roomID
-        );
+        if (!userDetails.userID) {
+          navigate("/");
+          alert("User ID not found. Please try again.");
+          return;
+        }
+        const { roomDetails } = await getRoomDetails(userDetails.roomID);
         setRoomDetails(roomDetails);
         setLoading(false);
       } catch (error) {
