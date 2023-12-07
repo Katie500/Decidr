@@ -49,24 +49,6 @@ const Room = () => {
     theme.breakpoints.down("md")
   );
 
-  //==================== NAVIGATE TO RESULTS IF TIME ENDS ==================//
-  useEffect(() => {
-    // Check if the time has ended
-    const intervalId = setInterval(() => {
-      const currentTime = new Date();
-      const endTime = new Date(roomDetails.endTime);
-
-      if (currentTime >= endTime) {
-        // Time has ended, navigate to ResultPage
-        clearInterval(intervalId);
-        // navigate("/resultpage"); // Adjust the path accordingly
-      }
-    }, 1000);
-
-    // Clean up the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, [roomDetails.endTime, navigate]);
-
   const voteManagement = useVoteManagement(roomDetails, setPending);
   // addNewOption needs to be declared here because it needs to be passed to useBroadcast
   const addNewOption = (optionText, newOptionID) => {

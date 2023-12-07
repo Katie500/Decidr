@@ -3,7 +3,12 @@ import React, { useEffect, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CustomDrawer from "./Drawer";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 import "./RoomPage.css";
+import {
+  notificationColors,
+  useNotification,
+} from "../../contexts/NotificationContext";
 
 const views = {
   VOTING: "VOTING",
@@ -12,15 +17,20 @@ const views = {
 };
 export const drawerWidth = 240;
 
-const Timer = ({ endTime }) => {
+const Timer = ({ endTime, onTimeEnd }) => {
   const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(0);
 
   useEffect(() => {
     setRemainingTimeInSeconds(calculateRemainingTimeInSeconds(endTime));
     const interval = setInterval(() => {
-      setRemainingTimeInSeconds((prevTime) =>
-        prevTime > 0 ? prevTime - 1 : 0
-      );
+      setRemainingTimeInSeconds((prevTime) => {
+        const updatedTime = prevTime > 0 ? prevTime - 1 : 0;
+
+        if (updatedTime === 0 && onTimeEnd) {
+          onTimeEnd();
+        }
+        return updatedTime;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
@@ -55,6 +65,14 @@ const RoomHeader = ({
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
 
+  const navigate = useNavigate();
+  const { displayNotification } = useNotification();
+
+  const onTimeEnd = () => {
+    navigate("/resultpage");
+    displayNotification("Voting has ended!", notificationColors.INFO);
+  };
+
   return (
     <>
       <CustomDrawer
@@ -82,7 +100,7 @@ const RoomHeader = ({
           </span>
         </Typography>
         <Typography className="timeText">
-          <Timer endTime={roomDetails.endTime} />
+          <Timer endTime={roomDetails.endTime} onTimeEnd={onTimeEnd} />
         </Typography>
       </Box>
       <Typography
