@@ -48,6 +48,7 @@ export default function CustomDrawer({
   const [isModalOpen, setModalOpen] = useState(false);
   const { userDetails, updateUserDetails } = useContext(UserContext);
 
+
   useEffect(() => {
     if (userDetails?.profilePicture) {
       setProfilePicture(userDetails.profilePicture);
@@ -96,6 +97,7 @@ export default function CustomDrawer({
         });
 
         const svgContents = await Promise.all(promises);
+        console.log(svgContents);
         setSvgContent2(svgContents);
       } catch (error) {
         console.error("Error fetching SVG:", error);
