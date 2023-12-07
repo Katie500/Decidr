@@ -122,15 +122,9 @@ const NicknamePage = () => {
               <IconButton className="menuIcon" onClick={handleBack}>
                 <ArrowBackOutlinedIcon />
               </IconButton>
-              <img
-                src="/logoCropped.jpg"
-                alt="Decidr GIF"
-                style={{
-                  width: "100%",
-                  maxWidth: "150px",
-                  maxHeight: "150px",
-                }}
-              />
+              <Typography variant="h6" textAlign={"center"}>
+                Profile
+              </Typography>
             </Box>
             <Box className="flexGrowBox">
               <SelectAvatarMenu
