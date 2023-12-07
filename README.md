@@ -1,12 +1,12 @@
 # Decidr Application
 
-![Decidr Logo GIF](./client/public/Decidr.gif) 
+![Decidr Logo GIF](./client/public/Decidr.gif)
 
 Default branch is "Dev"
 
 **SENG 513 Final Project**
 
-*2023/11/25*
+_2023/11/25_
 
 ## Group 19 Members:
 
@@ -18,8 +18,8 @@ Default branch is "Dev"
 
 ## How to run:
 
-1. Navigate to the `server` folder and run `npm start`.
-2. Navigate to the `client` folder and run `npm start`.
+1. Navigate to the `server` folder, run `npm i` and then `npm start`.
+2. Navigate to the `client` folder, run `npm i` and then `npm start`.
 
 ## Back-end:
 
@@ -28,6 +28,7 @@ Default branch is "Dev"
 ## Technologies Used:
 
 - **Front-end:**
+
   - React.js
   - Material-UI (MUI) library for graphics
 
@@ -46,18 +47,23 @@ Decidr is an innovative web-based application designed to streamline group decis
 ## Features:
 
 - **Collaborative Decision-Making:**
+
   - Users can contribute suggestions and view others' ideas in real-time.
 
 - **Real-Time Interaction:**
+
   - Operates in real-time, enabling dynamic changes during the decision-making process.
 
 - **Anonymous Voting and Results:**
+
   - Tallies votes anonymously and presents top options at the end of a preset time limit.
 
 - **Admin Control:**
+
   - Admins initiate decision-making sessions, set parameters, and guide the process.
 
 - **Responsive UI with React:**
+
   - Built with React to provide an interactive and user-friendly interface.
 
 - **MongoDB Data Storage:**
@@ -66,6 +72,7 @@ Decidr is an innovative web-based application designed to streamline group decis
 ## Usage of External APIs:
 
 - **Multiavatar API:**
+
   - Utilized for open-source avatar generation, enhancing user profiles.
 
 - **Freesound API:**
@@ -76,4 +83,3 @@ Decidr is an innovative web-based application designed to streamline group decis
 1. [Freesound](https://freesound.org/): Open-source sound database.
 
 ---
-
