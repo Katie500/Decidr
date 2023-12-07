@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
@@ -16,6 +16,7 @@ import { UserContext } from "../../contexts/UserContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { broadcastingEventTypes } from "../../hooks/useBroadcast";
+import SelectAvatarMenu from "./SelectAvatarMenu";
 
 import { useNavigate } from "react-router-dom";
 
@@ -29,7 +30,7 @@ export default function CustomDrawer({
   adminID,
 }) {
   const [profilePictures, setProfilePictures] = useState({});
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, updateUserDetails } = useContext(UserContext);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
@@ -41,6 +42,50 @@ export default function CustomDrawer({
       setDrawerOpen(true);
     }
   }, [isMobile, open]);
+
+//------------------------ changing picture content ------------------//
+
+//==================== profile picture algorithm ================//
+const [profilePicture, setProfilePicture] = useState("");
+const [isModalOpen, setModalOpen] = useState(false);
+
+useEffect(() => {
+  if (userDetails?.profilePicture) {
+    setProfilePicture(userDetails.profilePicture);
+  }
+}, [userDetails]);
+
+const changeProfilePicture = async () => {
+  try {
+    // Make a request to your backend API to update the user's profile picture
+    const response = await fetch(
+      `http://localhost:3001/users/${userDetails.userID}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          profilePicture: profilePicture,
+        }),
+      }
+    );
+
+    // Close the modal when the Apply button is clicked
+    setModalOpen(false);
+    if (response.ok) {
+      // Update the user details in the context or state on success
+      updateUserDetails({
+        profilePicture: profilePicture,
+      });
+    } else {
+      console.error("Failed to update profile picture:", response.status);
+    }
+  } catch (error) {
+    console.error("Error updating profile picture:", error);
+  }
+};
+
 
   const handleCancelSession = () => {
     sendBroadcast(
@@ -115,7 +160,9 @@ export default function CustomDrawer({
         anchor="left"
       >
         <Toolbar>
-          <IconButton>
+
+
+          <IconButton onClick={() => setModalOpen(true)}>
             {profilePictures[userDetails.userID] ? (
               <img
                 src={`data:image/svg+xml;base64,${
@@ -129,6 +176,26 @@ export default function CustomDrawer({
               <AccountCircleIcon />
             )}
           </IconButton>
+          <Modal open={isModalOpen} onClose={() => setModalOpen(false)}>
+              <Box>
+                <SelectAvatarMenu
+                  onSelectAvatar={(selectedAvatar) => {
+                    setProfilePicture(selectedAvatar);
+                    console.log("Avatar set in Drawer Page:", selectedAvatar);
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => changeProfilePicture()}
+                >
+                  Apply
+                </Button>
+              </Box>
+            </Modal>
+
+
+
           <Typography noWrap component="div">
             {profileName}
           </Typography>
