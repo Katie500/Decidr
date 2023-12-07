@@ -31,8 +31,6 @@ const useBroadcast = (
 
   const userID = userDetails.userID;
 
-  const [avatarStates, setAvatarStates] = useState({}); // State to store avatar for each user
-
   const navigate = useNavigate();
 
   // ====== BROADCASTING EVENTS ====== //

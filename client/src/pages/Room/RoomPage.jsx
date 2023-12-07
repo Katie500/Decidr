@@ -44,7 +44,6 @@ const Room = () => {
 
   const userID = userDetails.userID;
   const username = userDetails.nickname;
-  const profilePicture = userDetails.avatar;
   const hideDesktopDrawer = useMediaQuery((theme) =>
     theme.breakpoints.down("md")
   );
