@@ -1,0 +1,180 @@
+:root {
+  --android-body-large-font-family: "Roboto-Regular", Helvetica;
+  --android-body-large-font-size: 16px;
+  --android-body-large-font-style: normal;
+  --android-body-large-font-weight: 400;
+  --android-body-large-letter-spacing: 0.5px;
+  --android-body-large-line-height: 24px;
+  --android-body-small-font-family: "Roboto-Regular", Helvetica;
+  --android-body-small-font-size: 12px;
+  --android-body-small-font-style: normal;
+  --android-body-small-font-weight: 400;
+  --android-body-small-letter-spacing: 0px;
+  --android-body-small-line-height: 16px;
+  --android-display-medium-font-family: "Roboto-Regular", Helvetica;
+  --android-display-medium-font-size: 45px;
+  --android-display-medium-font-style: normal;
+  --android-display-medium-font-weight: 400;
+  --android-display-medium-letter-spacing: 0px;
+  --android-display-medium-line-height: 52px;
+  --android-title-large-font-family: "Roboto-Regular", Helvetica;
+  --android-title-large-font-size: 22px;
+  --android-title-large-font-style: normal;
+  --android-title-large-font-weight: 400;
+  --android-title-large-letter-spacing: 0px;
+  --android-title-large-line-height: 28px;
+  --body-font-family: "WorkSans-Regular", Helvetica;
+  --body-font-size: 13px;
+  --body-font-style: normal;
+  --body-font-weight: 400;
+  --body-letter-spacing: -0.26px;
+  --body-line-height: normal;
+  --custom-body-1-font-family: "Inter-Regular", Helvetica;
+  --custom-body-1-font-size: 16px;
+  --custom-body-1-font-style: normal;
+  --custom-body-1-font-weight: 400;
+  --custom-body-1-letter-spacing: 0px;
+  --custom-body-1-line-height: 24px;
+  --custom-button-1-font-family: "Inter-Bold", Helvetica;
+  --custom-button-1-font-size: 16px;
+  --custom-button-1-font-style: normal;
+  --custom-button-1-font-weight: 700;
+  --custom-button-1-letter-spacing: 0px;
+  --custom-button-1-line-height: 24px;
+  --custom-caption-font-family: "Inter-Regular", Helvetica;
+  --custom-caption-font-size: 12px;
+  --custom-caption-font-style: normal;
+  --custom-caption-font-weight: 400;
+  --custom-caption-letter-spacing: 0px;
+  --custom-caption-line-height: 16px;
+  --fuschia-100: rgba(239, 93, 168, 1);
+  --fuschia-60: rgba(252, 221, 236, 1);
+  --fuschia-80: rgba(241, 120, 182, 1);
+  --header-1-font-family: "WorkSans-Bold", Helvetica;
+  --header-1-font-size: 34px;
+  --header-1-font-style: normal;
+  --header-1-font-weight: 700;
+  --header-1-letter-spacing: -0.68px;
+  --header-1-line-height: normal;
+  --header-2-font-family: "WorkSans-Bold", Helvetica;
+  --header-2-font-size: 20px;
+  --header-2-font-style: normal;
+  --header-2-font-weight: 700;
+  --header-2-letter-spacing: -0.4px;
+  --header-2-line-height: normal;
+  --ios-body-font-family: "SFPro-Regular", Helvetica;
+  --ios-body-font-size: 17px;
+  --ios-body-font-style: normal;
+  --ios-body-font-weight: 400;
+  --ios-body-letter-spacing: 0px;
+  --ios-body-line-height: 24px;
+  --ios-caption-1-font-family: "SFPro-Regular", Helvetica;
+  --ios-caption-1-font-size: 12px;
+  --ios-caption-1-font-style: normal;
+  --ios-caption-1-font-weight: 400;
+  --ios-caption-1-letter-spacing: 0px;
+  --ios-caption-1-line-height: 16px;
+  --iris-100: rgba(93, 95, 239, 1);
+  --iris-60: rgba(165, 166, 246, 1);
+  --iris-80: rgba(120, 121, 241, 1);
+  --primitives-color-grey-black: rgba(0, 0, 0, 1);
+  --primitives-color-grey-grey-200: rgba(226, 226, 226, 1);
+  --primitives-color-grey-grey-600: rgba(84, 84, 84, 1);
+  --primitives-color-grey-white: rgba(255, 255, 255, 1);
+  --primitives-grey-black: rgba(0, 0, 0, 1);
+  --primitives-grey-grey-100: rgba(238, 238, 238, 1);
+  --primitives-grey-grey-200: rgba(226, 226, 226, 1);
+  --primitives-grey-grey-300: rgba(203, 203, 203, 1);
+  --primitives-grey-grey-400: rgba(175, 175, 175, 1);
+  --primitives-grey-grey-50: rgba(246, 246, 246, 1);
+  --primitives-grey-grey-500: rgba(117, 117, 117, 1);
+  --primitives-grey-grey-600: rgba(84, 84, 84, 1);
+  --primitives-grey-grey-700: rgba(51, 51, 51, 1);
+  --primitives-grey-white: rgba(255, 255, 255, 1);
+  --primitives-red-red-500: rgba(255, 44, 32, 1);
+  --tokens-background-surface-primary: var(--primitives-color-grey-white);
+  --tokens-button-secondary-button-secondary-text-color: var(--primitives-grey-white);
+  --tokens-ios-home-indicator-background-color: rgba(255, 255, 255, 1);
+  --tokens-ios-home-indicator-indicator-color: rgba(0, 0, 0, 1);
+  --tokens-ios-status-bar-status-bar-background-color: rgba(255, 255, 255, 1);
+  --tokens-ios-status-bar-status-bar-text-color: rgba(0, 0, 0, 1);
+  --tokens-text-field-disabled-field-text-color: var(--primitives-grey-grey-300);
+  --tokens-text-field-error-field-input-color: var(--primitives-grey-black);
+  --tokens-text-field-error-field-text-color: var(--primitives-red-red-500);
+  --tokens-text-field-search-field-background-color: var(--primitives-grey-grey-50);
+  --tokens-text-field-search-field-background-hover-color: var(--primitives-grey-grey-100);
+  --tokens-text-field-search-field-background-pressed-color: var(--primitives-grey-grey-200);
+  --tokens-text-field-search-field-text-color: var(--primitives-grey-grey-500);
+  --tokens-text-field-success-field-input-color: var(--primitives-grey-black);
+  --tokens-text-field-text-field-background-color: var(--primitives-color-grey-white);
+  --tokens-text-field-text-field-background-color-duplicate: var(--primitives-grey-white);
+  --tokens-text-field-text-field-border-hover-color: var(--primitives-grey-grey-400);
+  --tokens-text-field-text-field-border-pressed-color: var(--primitives-grey-black);
+  --tokens-text-field-text-field-border-standard-color: var(--primitives-color-grey-grey-200);
+  --tokens-text-field-text-field-border-standard-color-duplicate: var(--primitives-grey-grey-200);
+  --tokens-text-field-text-field-text-color: var(--primitives-grey-grey-500);
+  --tokens-text-field-text-field-text-input-color: var(--primitives-grey-black);
+  --tokens-top-navigation-navigation-background-color: var(--primitives-color-grey-white);
+  --variable-collection-1e19e9: rgba(93, 95, 239, 1);
+  --variable-collection-blue-colour: rgba(30, 25, 233, 1);
+  --variable-collection-green-colour: rgba(45, 222, 30, 1);
+  --variable-collection-red-colour: rgba(229, 23, 23, 1);
+}
+
+/*
+
+To enable a theme in your HTML, simply add one of the following data attributes to an HTML element, like so:
+
+<body data-tokens-mode="dark">
+    <!-- the rest of your content -->
+</body>
+
+You can apply the theme on any DOM node, not just the `body`
+
+*/
+
+[data-tokens-mode="dark"] {
+  --tokens-background-surface-primary: var(--primitives-color-grey-black);
+  --tokens-button-secondary-button-secondary-text-color: var(--primitives-grey-grey-500);
+  --tokens-ios-home-indicator-background-color: rgba(0, 0, 0, 1);
+  --tokens-ios-home-indicator-indicator-color: rgba(255, 255, 255, 1);
+  --tokens-ios-status-bar-status-bar-background-color: rgba(0, 0, 0, 1);
+  --tokens-ios-status-bar-status-bar-text-color: rgba(255, 255, 255, 1);
+  --tokens-text-field-disabled-field-text-color: var(--primitives-grey-grey-600);
+  --tokens-text-field-error-field-input-color: var(--primitives-grey-white);
+  --tokens-text-field-search-field-background-color: var(--primitives-grey-grey-700);
+  --tokens-text-field-search-field-background-hover-color: var(--primitives-grey-grey-600);
+  --tokens-text-field-search-field-background-pressed-color: var(--primitives-grey-grey-500);
+  --tokens-text-field-search-field-text-color: var(--primitives-grey-grey-400);
+  --tokens-text-field-success-field-input-color: var(--primitives-grey-white);
+  --tokens-text-field-text-field-background-color: var(--primitives-color-grey-black);
+  --tokens-text-field-text-field-background-color-duplicate: var(--primitives-grey-black);
+  --tokens-text-field-text-field-border-pressed-color: var(--primitives-grey-white);
+  --tokens-text-field-text-field-border-standard-color: var(--primitives-color-grey-grey-600);
+  --tokens-text-field-text-field-border-standard-color-duplicate: var(--primitives-grey-grey-600);
+  --tokens-text-field-text-field-text-input-color: var(--primitives-grey-white);
+  --tokens-top-navigation-navigation-background-color: var(--primitives-color-grey-black);
+}
+
+[data-tokens-mode="light"] {
+  --tokens-background-surface-primary: var(--primitives-color-grey-white);
+  --tokens-button-secondary-button-secondary-text-color: var(--primitives-grey-white);
+  --tokens-ios-home-indicator-background-color: rgba(255, 255, 255, 1);
+  --tokens-ios-home-indicator-indicator-color: rgba(0, 0, 0, 1);
+  --tokens-ios-status-bar-status-bar-background-color: rgba(255, 255, 255, 1);
+  --tokens-ios-status-bar-status-bar-text-color: rgba(0, 0, 0, 1);
+  --tokens-text-field-disabled-field-text-color: var(--primitives-grey-grey-300);
+  --tokens-text-field-error-field-input-color: var(--primitives-grey-black);
+  --tokens-text-field-search-field-background-color: var(--primitives-grey-grey-50);
+  --tokens-text-field-search-field-background-hover-color: var(--primitives-grey-grey-100);
+  --tokens-text-field-search-field-background-pressed-color: var(--primitives-grey-grey-200);
+  --tokens-text-field-search-field-text-color: var(--primitives-grey-grey-500);
+  --tokens-text-field-success-field-input-color: var(--primitives-grey-black);
+  --tokens-text-field-text-field-background-color: var(--primitives-color-grey-white);
+  --tokens-text-field-text-field-background-color-duplicate: var(--primitives-grey-white);
+  --tokens-text-field-text-field-border-pressed-color: var(--primitives-grey-black);
+  --tokens-text-field-text-field-border-standard-color: var(--primitives-color-grey-grey-200);
+  --tokens-text-field-text-field-border-standard-color-duplicate: var(--primitives-grey-grey-200);
+  --tokens-text-field-text-field-text-input-color: var(--primitives-grey-black);
+  --tokens-top-navigation-navigation-background-color: var(--primitives-color-grey-white);
+}

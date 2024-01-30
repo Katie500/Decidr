@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Decidr/static/css/main.9d08f4e8.css",
+    "main.js": "/Decidr/static/js/main.0fac84c7.js",
+    "index.html": "/Decidr/index.html",
+    "main.9d08f4e8.css.map": "/Decidr/static/css/main.9d08f4e8.css.map",
+    "main.0fac84c7.js.map": "/Decidr/static/js/main.0fac84c7.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9d08f4e8.css",
+    "static/js/main.0fac84c7.js"
+  ]
+}
